@@ -1,0 +1,8 @@
+[
+  {"service": "gateway", "spans": 3400000, "attr_bytes": 610000000},
+  {"service": "checkout", "spans": 2100000, "attr_bytes": 1900000000},
+  {"service": "catalog", "spans": 1850000, "attr_bytes": 8400000000},
+  {"service": "loadbalancer", "spans": 900000, "attr_bytes": 120000000},
+  {"service": "payments", "spans": 640000, "attr_bytes": 520000000},
+  {"service": "", "spans": 120000, "attr_bytes": 40000000}
+]

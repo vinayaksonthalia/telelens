@@ -1,0 +1,9 @@
+[
+  {"metric_name": "http_server_duration", "series": 210000, "samples": 92000000, "last_seen_unix": -60},
+  {"metric_name": "request_count", "series": 800, "samples": 9000000, "last_seen_unix": -60},
+  {"metric_name": "cpu_usage", "series": 640, "samples": 12000000, "last_seen_unix": -60},
+  {"metric_name": "memory_usage", "series": 640, "samples": 12000000, "last_seen_unix": -60},
+  {"metric_name": "temp_debug_counter", "series": 12, "samples": 3400000, "last_seen_unix": -120},
+  {"metric_name": "legacy_queue_depth", "series": 4, "samples": 1800000, "last_seen_unix": -60},
+  {"metric_name": "shipping.Legacy Sync Timer", "series": 6, "samples": 900000, "last_seen_unix": -400000}
+]

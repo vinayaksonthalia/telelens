@@ -1,0 +1,8 @@
+[
+  {"metric_name": "http_server_duration", "label": "user_id", "cardinality": 208000},
+  {"metric_name": "http_server_duration", "label": "http.route", "cardinality": 42},
+  {"metric_name": "http_server_duration", "label": "status_code", "cardinality": 6},
+  {"metric_name": "request_count", "label": "endpoint", "cardinality": 120},
+  {"metric_name": "cpu_usage", "label": "host", "cardinality": 32},
+  {"metric_name": "memory_usage", "label": "host", "cardinality": 32}
+]

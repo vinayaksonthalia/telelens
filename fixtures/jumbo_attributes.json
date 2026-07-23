@@ -1,0 +1,5 @@
+[
+  {"service": "catalog", "key": "db.statement", "avg_bytes": 4200, "max_bytes": 68000, "occurrences": 1700000},
+  {"service": "checkout", "key": "http.request.body", "avg_bytes": 9800, "max_bytes": 210000, "occurrences": 380000},
+  {"service": "payments", "key": "payment.provider.response", "avg_bytes": 480, "max_bytes": 2100, "occurrences": 610000}
+]

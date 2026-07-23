@@ -1,0 +1,6 @@
+[
+  {"label": "service.name", "metric_name": "http_server_duration", "series": 12},
+  {"label": "user_id", "metric_name": "http_server_duration", "series": 210000},
+  {"label": "session.id", "metric_name": "browser.sessions.count", "series": 37},
+  {"label": "page.route", "metric_name": "browser.web_vitals.lcp", "series": 24}
+]

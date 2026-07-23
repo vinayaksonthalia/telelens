@@ -1,0 +1,59 @@
+[
+  {
+    "title": "Service Health",
+    "widgets": [
+      {
+        "title": "Request latency p99",
+        "panelTypes": "graph",
+        "query": {
+          "queryType": "builder",
+          "builder": {
+            "queryData": [
+              {
+                "dataSource": "metrics",
+                "aggregateOperator": "p99",
+                "aggregateAttribute": {"key": "http_server_duration"},
+                "groupBy": [{"key": "http.route"}],
+                "having": [],
+                "orderBy": [{"columnName": "#SIGNOZ_VALUE", "order": "desc"}],
+                "limit": 20
+              }
+            ]
+          }
+        }
+      },
+      {
+        "title": "Requests per endpoint",
+        "panelTypes": "graph",
+        "query": {
+          "queryType": "builder",
+          "builder": {
+            "queryData": [
+              {
+                "dataSource": "metrics",
+                "aggregateOperator": "rate",
+                "aggregateAttribute": {"key": "request_count"},
+                "groupBy": [{"key": "endpoint"}]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "title": "Infrastructure",
+    "widgets": [
+      {
+        "title": "Host resources",
+        "panelTypes": "graph",
+        "query": {
+          "queryType": "clickhouse_sql",
+          "chQueries": {
+            "A": {"query": "SELECT toStartOfInterval(toDateTime(unix_milli/1000), INTERVAL 1 MINUTE) AS ts, avg(value) FROM signoz_metrics.distributed_samples_v4 WHERE metric_name IN ('cpu_usage','memory_usage') AND unix_milli >= {{.start_timestamp_ms}} GROUP BY ts ORDER BY ts"}
+          }
+        }
+      }
+    ]
+  }
+]

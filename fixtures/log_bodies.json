@@ -1,0 +1,23 @@
+[
+  {"service": "catalog", "severity_text": "DEBUG", "body": "cache miss for product id=48123 refreshing entry from origin", "weight": 1400000},
+  {"service": "catalog", "severity_text": "DEBUG", "body": "cache miss for product id=99021 refreshing entry from origin", "weight": 1350000},
+  {"service": "catalog", "severity_text": "DEBUG", "body": "cache miss for product id=10457 refreshing entry from origin", "weight": 1300000},
+  {"service": "catalog", "severity_text": "DEBUG", "body": "cache miss for product id=77310 refreshing entry from origin", "weight": 1250000},
+  {"service": "catalog", "severity_text": "DEBUG", "body": "cache miss for product id=31980 refreshing entry from origin", "weight": 300000},
+  {"service": "catalog", "severity_text": "DEBUG", "body": "connection pool stats: active=10 idle=5 waiting=0", "weight": 900000},
+  {"service": "catalog", "severity_text": "DEBUG", "body": "connection pool stats: active=10 idle=5 waiting=0", "weight": 880000},
+  {"service": "catalog", "severity_text": "DEBUG", "body": "connection pool stats: active=10 idle=5 waiting=0", "weight": 820000},
+  {"service": "catalog", "severity_text": "INFO", "body": "catalog service started listening on :8081", "weight": 12},
+  {"service": "checkout", "severity_text": "INFO", "body": "order 58201 processed in 45 ms", "weight": 700000},
+  {"service": "checkout", "severity_text": "INFO", "body": "order 58202 processed in 61 ms", "weight": 700000},
+  {"service": "checkout", "severity_text": "INFO", "body": "order 58203 processed in 38 ms", "weight": 700000},
+  {"service": "checkout", "severity_text": "ERROR", "body": "payment declined for order 58204 code=card_expired", "weight": 15000},
+  {"service": "checkout", "severity_text": "ERROR", "body": "payment declined for order 58211 code=insufficient_funds", "weight": 15000},
+  {"service": "payments", "severity_text": "INFO", "body": "payment authorized for order 58201 amount 12.34 USD", "weight": 650000},
+  {"service": "payments", "severity_text": "INFO", "body": "payment authorized for order 58202 amount 99.10 USD", "weight": 650000},
+  {"service": "payments", "severity_text": "warn", "body": "retrying provider call attempt 2 of 3", "weight": 90000},
+  {"service": "gateway", "severity_text": "INFO", "body": "request completed method=GET path=/healthz status=200 duration=1ms", "weight": 1500000},
+  {"service": "gateway", "severity_text": "INFO", "body": "request completed method=GET path=/api/products status=200 duration=42ms", "weight": 800000},
+  {"service": "gateway", "severity_text": "INFO", "body": "request completed method=POST path=/api/orders status=201 duration=88ms", "weight": 700000},
+  {"service": "loadbalancer", "severity_text": "NOTICE", "body": "upstream pool rebalanced members=4", "weight": 50000}
+]

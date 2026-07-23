@@ -1,0 +1,11 @@
+[
+  {"service": "catalog", "severity_text": "DEBUG", "count": 8200000, "bytes": 7400000000},
+  {"service": "gateway", "severity_text": "INFO", "count": 3000000, "bytes": 4300000000},
+  {"service": "checkout", "severity_text": "INFO", "count": 2100000, "bytes": 1900000000},
+  {"service": "payments", "severity_text": "INFO", "count": 1300000, "bytes": 1200000000},
+  {"service": "catalog", "severity_text": "INFO", "count": 400000, "bytes": 60000000},
+  {"service": "payments", "severity_text": "warn", "count": 90000, "bytes": 80000000},
+  {"service": "checkout", "severity_text": "ERROR", "count": 30000, "bytes": 45000000},
+  {"service": "gateway", "severity_text": "", "count": 210000, "bytes": 30000000},
+  {"service": "loadbalancer", "severity_text": "NOTICE", "count": 50000, "bytes": 6000000}
+]

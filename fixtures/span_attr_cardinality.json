@@ -1,0 +1,8 @@
+[
+  {"key": "user.id", "cardinality": 890000, "occurrences": 4100000, "avg_value_bytes": 12},
+  {"key": "session.id", "cardinality": 450000, "occurrences": 3800000, "avg_value_bytes": 36},
+  {"key": "http.url", "cardinality": 78000, "occurrences": 5200000, "avg_value_bytes": 64},
+  {"key": "http.route", "cardinality": 240, "occurrences": 5200000, "avg_value_bytes": 22},
+  {"key": "http.status_code", "cardinality": 12, "occurrences": 5200000, "avg_value_bytes": 3},
+  {"key": "http.method", "cardinality": 7, "occurrences": 5200000, "avg_value_bytes": 4}
+]

@@ -1,0 +1,6 @@
+.env
+out/
+out-live/
+out-live-refix/
+/telelens
+/dist/

@@ -1,0 +1,40 @@
+[
+  {
+    "alert": "High p99 latency",
+    "ruleType": "threshold_rule",
+    "condition": {
+      "compositeQuery": {
+        "queryType": "builder",
+        "builderQueries": {
+          "A": {
+            "dataSource": "metrics",
+            "aggregateOperator": "p99",
+            "aggregateAttribute": {"key": "http_server_duration"},
+            "groupBy": [{"key": "service.name"}]
+          }
+        }
+      },
+      "target": 750,
+      "matchType": "1"
+    }
+  },
+  {
+    "alert": "Error-rate spike",
+    "ruleType": "threshold_rule",
+    "condition": {
+      "compositeQuery": {
+        "queryType": "builder",
+        "builderQueries": {
+          "A": {
+            "dataSource": "metrics",
+            "aggregateOperator": "rate",
+            "aggregateAttribute": {"key": "request_count"},
+            "filters": {"items": [{"key": {"key": "status_code"}, "op": "=", "value": "500"}]}
+          }
+        }
+      },
+      "target": 5,
+      "matchType": "1"
+    }
+  }
+]
