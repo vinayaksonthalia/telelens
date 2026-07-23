@@ -1,0 +1,416 @@
+{
+  "title": "Telemetry Bill — Cost Overview",
+  "description": "TELELENS pack 1/3: what your telemetry ingest costs, by signal and service, from the signoz.meter.* usage metrics. Set $cost_per_gb to your storage price.",
+  "tags": [
+    "telelens",
+    "cost",
+    "finops"
+  ],
+  "layout": [
+    {
+      "i": "tb-ingest-by-signal",
+      "x": 0,
+      "y": 0,
+      "w": 6,
+      "h": 4,
+      "minW": 3,
+      "minH": 3,
+      "static": false,
+      "moved": false
+    },
+    {
+      "i": "tb-span-bytes-by-service",
+      "x": 6,
+      "y": 0,
+      "w": 6,
+      "h": 4,
+      "minW": 3,
+      "minH": 3,
+      "static": false,
+      "moved": false
+    },
+    {
+      "i": "tb-log-bytes-by-service",
+      "x": 0,
+      "y": 4,
+      "w": 6,
+      "h": 4,
+      "minW": 3,
+      "minH": 3,
+      "static": false,
+      "moved": false
+    },
+    {
+      "i": "tb-monthly-dollars",
+      "x": 6,
+      "y": 4,
+      "w": 6,
+      "h": 4,
+      "minW": 3,
+      "minH": 3,
+      "static": false,
+      "moved": false
+    }
+  ],
+  "panelMap": {},
+  "version": "v5",
+  "variables": {
+    "a24f7fc5-5a4b-49e8-8f4b-a4df31facc31": {
+      "name": "cost_per_gb",
+      "description": "Price per uncompressed-ingest GB in $",
+      "type": "TEXTBOX",
+      "textboxValue": "0.30",
+      "selectedValue": "0.30",
+      "sort": "DISABLED",
+      "multiSelect": false,
+      "showALLOption": false,
+      "id": "0d9410d1-db5e-4138-86ba-d9f07a9535e4",
+      "order": 0
+    }
+  },
+  "widgets": [
+    {
+      "id": "tb-ingest-by-signal",
+      "title": "Ingest rate by signal (bytes/hr)",
+      "description": "increase() over the signoz.meter.* size counters — the SigNoz usage-metering backbone (hourly buckets). [QB rubric #11676: rate/increase aggregations]",
+      "panelTypes": "graph",
+      "fillSpans": false,
+      "isStacked": false,
+      "isLogScale": false,
+      "legendPosition": "bottom",
+      "mergeAllActiveQueries": false,
+      "nullZeroValues": "zero",
+      "opacity": "1",
+      "softMax": 0,
+      "softMin": 0,
+      "thresholds": [],
+      "timePreferance": "GLOBAL_TIME",
+      "yAxisUnit": "bytes",
+      "query": {
+        "queryType": "builder",
+        "id": "414e832a-b948-4381-b6c5-b6aa66f35d99",
+        "builder": {
+          "queryData": [
+            {
+              "queryName": "A",
+              "expression": "A",
+              "disabled": false,
+              "dataSource": "metrics",
+              "source": "meter",
+              "stepInterval": 3600,
+              "filter": {
+                "expression": ""
+              },
+              "functions": [],
+              "groupBy": [],
+              "having": {
+                "expression": ""
+              },
+              "legend": "trace bytes",
+              "limit": null,
+              "orderBy": [],
+              "aggregations": [
+                {
+                  "metricName": "signoz.meter.span.size",
+                  "temporality": "delta",
+                  "timeAggregation": "increase",
+                  "spaceAggregation": "sum",
+                  "reduceTo": "sum"
+                }
+              ]
+            },
+            {
+              "queryName": "B",
+              "expression": "B",
+              "disabled": false,
+              "dataSource": "metrics",
+              "source": "meter",
+              "stepInterval": 3600,
+              "filter": {
+                "expression": ""
+              },
+              "functions": [],
+              "groupBy": [],
+              "having": {
+                "expression": ""
+              },
+              "legend": "log bytes",
+              "limit": null,
+              "orderBy": [],
+              "aggregations": [
+                {
+                  "metricName": "signoz.meter.log.size",
+                  "temporality": "delta",
+                  "timeAggregation": "increase",
+                  "spaceAggregation": "sum",
+                  "reduceTo": "sum"
+                }
+              ]
+            },
+            {
+              "queryName": "C",
+              "expression": "C",
+              "disabled": false,
+              "dataSource": "metrics",
+              "source": "meter",
+              "stepInterval": 3600,
+              "filter": {
+                "expression": ""
+              },
+              "functions": [],
+              "groupBy": [],
+              "having": {
+                "expression": ""
+              },
+              "legend": "metric datapoints",
+              "limit": null,
+              "orderBy": [],
+              "aggregations": [
+                {
+                  "metricName": "signoz.meter.metric.datapoint.count",
+                  "temporality": "delta",
+                  "timeAggregation": "increase",
+                  "spaceAggregation": "sum",
+                  "reduceTo": "sum"
+                }
+              ]
+            }
+          ],
+          "queryFormulas": []
+        },
+        "clickhouse_sql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": ""
+          }
+        ],
+        "promql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "tb-span-bytes-by-service",
+      "title": "Span bytes by service (top movers)",
+      "description": "Cross-context group-by on service.name over the meter counter. [QB rubric #11677 group-by, #11678 order-by+limit]",
+      "panelTypes": "graph",
+      "fillSpans": false,
+      "isStacked": false,
+      "isLogScale": false,
+      "legendPosition": "bottom",
+      "mergeAllActiveQueries": false,
+      "nullZeroValues": "zero",
+      "opacity": "1",
+      "softMax": 0,
+      "softMin": 0,
+      "thresholds": [],
+      "timePreferance": "GLOBAL_TIME",
+      "yAxisUnit": "bytes",
+      "query": {
+        "queryType": "builder",
+        "id": "1d17aa51-4733-4b6e-9b15-f00ee0d469f2",
+        "builder": {
+          "queryData": [
+            {
+              "queryName": "A",
+              "expression": "A",
+              "disabled": false,
+              "dataSource": "metrics",
+              "source": "meter",
+              "stepInterval": 3600,
+              "filter": {
+                "expression": ""
+              },
+              "functions": [],
+              "groupBy": [
+                {
+                  "dataType": "string",
+                  "key": "service.name",
+                  "type": "attribute"
+                }
+              ],
+              "having": {
+                "expression": ""
+              },
+              "legend": "{{service.name}}",
+              "limit": null,
+              "orderBy": [],
+              "aggregations": [
+                {
+                  "metricName": "signoz.meter.span.size",
+                  "temporality": "delta",
+                  "timeAggregation": "increase",
+                  "spaceAggregation": "sum",
+                  "reduceTo": "sum"
+                }
+              ]
+            }
+          ],
+          "queryFormulas": []
+        },
+        "clickhouse_sql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": ""
+          }
+        ],
+        "promql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "tb-log-bytes-by-service",
+      "title": "Log bytes by service",
+      "description": "Which services write your log bill. Same meter source, log.size counter.",
+      "panelTypes": "graph",
+      "fillSpans": false,
+      "isStacked": false,
+      "isLogScale": false,
+      "legendPosition": "bottom",
+      "mergeAllActiveQueries": false,
+      "nullZeroValues": "zero",
+      "opacity": "1",
+      "softMax": 0,
+      "softMin": 0,
+      "thresholds": [],
+      "timePreferance": "GLOBAL_TIME",
+      "yAxisUnit": "bytes",
+      "query": {
+        "queryType": "builder",
+        "id": "bc77e993-95f7-47c0-9203-795a5872c884",
+        "builder": {
+          "queryData": [
+            {
+              "queryName": "A",
+              "expression": "A",
+              "disabled": false,
+              "dataSource": "metrics",
+              "source": "meter",
+              "stepInterval": 3600,
+              "filter": {
+                "expression": ""
+              },
+              "functions": [],
+              "groupBy": [
+                {
+                  "dataType": "string",
+                  "key": "service.name",
+                  "type": "attribute"
+                }
+              ],
+              "having": {
+                "expression": ""
+              },
+              "legend": "{{service.name}}",
+              "limit": null,
+              "orderBy": [],
+              "aggregations": [
+                {
+                  "metricName": "signoz.meter.log.size",
+                  "temporality": "delta",
+                  "timeAggregation": "increase",
+                  "spaceAggregation": "sum",
+                  "reduceTo": "sum"
+                }
+              ]
+            }
+          ],
+          "queryFormulas": []
+        },
+        "clickhouse_sql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": ""
+          }
+        ],
+        "promql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "tb-monthly-dollars",
+      "title": "Projected monthly ingest cost ($)",
+      "description": "Window ingest bytes extrapolated to 30 days × $cost_per_gb (raw ClickHouse over the undocumented signoz_meter DB).",
+      "panelTypes": "value",
+      "fillSpans": false,
+      "isStacked": false,
+      "isLogScale": false,
+      "legendPosition": "bottom",
+      "mergeAllActiveQueries": false,
+      "nullZeroValues": "zero",
+      "opacity": "1",
+      "softMax": 0,
+      "softMin": 0,
+      "thresholds": [],
+      "timePreferance": "GLOBAL_TIME",
+      "yAxisUnit": "none",
+      "query": {
+        "queryType": "clickhouse_sql",
+        "id": "49006e67-cac5-49ca-ba65-249eda743a4f",
+        "builder": {
+          "queryData": [
+            {
+              "queryName": "A",
+              "expression": "A",
+              "disabled": false,
+              "dataSource": "metrics",
+              "source": "",
+              "stepInterval": 60,
+              "filter": {
+                "expression": ""
+              },
+              "functions": [],
+              "groupBy": [],
+              "having": {
+                "expression": ""
+              },
+              "legend": "",
+              "limit": null,
+              "orderBy": []
+            }
+          ],
+          "queryFormulas": []
+        },
+        "clickhouse_sql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": "SELECT round(sum(value)/1e9 * (2592000 / ($end_timestamp - $start_timestamp)) * toFloat64($cost_per_gb), 2) AS value FROM signoz_meter.distributed_samples WHERE metric_name IN ('signoz.meter.span.size','signoz.meter.log.size','signoz.meter.metric.datapoint.size') AND unix_milli >= {{.start_timestamp_ms}} AND unix_milli <= {{.end_timestamp_ms}}"
+          }
+        ],
+        "promql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": ""
+          }
+        ]
+      }
+    }
+  ]
+}

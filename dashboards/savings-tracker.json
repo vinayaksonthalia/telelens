@@ -1,0 +1,283 @@
+{
+  "title": "Telemetry Bill — Savings Tracker",
+  "description": "TELELENS pack 3/3: the before/after proof. Watch the ingest line fall off a cliff when the generated collector config is applied — while the error-span panel stays intact.",
+  "tags": [
+    "telelens",
+    "savings",
+    "finops"
+  ],
+  "layout": [
+    {
+      "i": "tb-cliff",
+      "x": 0,
+      "y": 0,
+      "w": 8,
+      "h": 5,
+      "minW": 3,
+      "minH": 3,
+      "static": false,
+      "moved": false
+    },
+    {
+      "i": "tb-window-gb",
+      "x": 8,
+      "y": 0,
+      "w": 4,
+      "h": 5,
+      "minW": 3,
+      "minH": 3,
+      "static": false,
+      "moved": false
+    },
+    {
+      "i": "tb-error-safety",
+      "x": 0,
+      "y": 5,
+      "w": 12,
+      "h": 5,
+      "minW": 3,
+      "minH": 3,
+      "static": false,
+      "moved": false
+    }
+  ],
+  "panelMap": {},
+  "version": "v5",
+  "variables": {},
+  "widgets": [
+    {
+      "id": "tb-cliff",
+      "title": "Total ingest rate (the cliff chart)",
+      "description": "Meter counters for spans + logs. The apply moment shows as a cliff in trace bytes while log bytes (unsampled) hold steady.",
+      "panelTypes": "graph",
+      "fillSpans": false,
+      "isStacked": false,
+      "isLogScale": false,
+      "legendPosition": "bottom",
+      "mergeAllActiveQueries": false,
+      "nullZeroValues": "zero",
+      "opacity": "1",
+      "softMax": 0,
+      "softMin": 0,
+      "thresholds": [],
+      "timePreferance": "GLOBAL_TIME",
+      "yAxisUnit": "bytes",
+      "query": {
+        "queryType": "builder",
+        "id": "18bb5186-41de-471e-bc51-6258569380e1",
+        "builder": {
+          "queryData": [
+            {
+              "queryName": "A",
+              "expression": "A",
+              "disabled": false,
+              "dataSource": "metrics",
+              "source": "meter",
+              "stepInterval": 3600,
+              "filter": {
+                "expression": ""
+              },
+              "functions": [],
+              "groupBy": [],
+              "having": {
+                "expression": ""
+              },
+              "legend": "trace bytes",
+              "limit": null,
+              "orderBy": [],
+              "aggregations": [
+                {
+                  "metricName": "signoz.meter.span.size",
+                  "temporality": "delta",
+                  "timeAggregation": "increase",
+                  "spaceAggregation": "sum",
+                  "reduceTo": "sum"
+                }
+              ]
+            },
+            {
+              "queryName": "B",
+              "expression": "B",
+              "disabled": false,
+              "dataSource": "metrics",
+              "source": "meter",
+              "stepInterval": 3600,
+              "filter": {
+                "expression": ""
+              },
+              "functions": [],
+              "groupBy": [],
+              "having": {
+                "expression": ""
+              },
+              "legend": "log bytes",
+              "limit": null,
+              "orderBy": [],
+              "aggregations": [
+                {
+                  "metricName": "signoz.meter.log.size",
+                  "temporality": "delta",
+                  "timeAggregation": "increase",
+                  "spaceAggregation": "sum",
+                  "reduceTo": "sum"
+                }
+              ]
+            }
+          ],
+          "queryFormulas": []
+        },
+        "clickhouse_sql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": ""
+          }
+        ],
+        "promql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "tb-error-safety",
+      "title": "Error spans per service (the safety check)",
+      "description": "Tail sampling must keep 100% of errors: this panel must NOT dip when sampling is applied. has_error=true, grouped by service.",
+      "panelTypes": "graph",
+      "fillSpans": false,
+      "isStacked": false,
+      "isLogScale": false,
+      "legendPosition": "bottom",
+      "mergeAllActiveQueries": false,
+      "nullZeroValues": "zero",
+      "opacity": "1",
+      "softMax": 0,
+      "softMin": 0,
+      "thresholds": [],
+      "timePreferance": "GLOBAL_TIME",
+      "yAxisUnit": "none",
+      "query": {
+        "queryType": "builder",
+        "id": "70301925-62db-451c-bf59-11954199fa07",
+        "builder": {
+          "queryData": [
+            {
+              "queryName": "A",
+              "expression": "A",
+              "disabled": false,
+              "dataSource": "traces",
+              "source": "",
+              "stepInterval": 60,
+              "filter": {
+                "expression": "has_error = true"
+              },
+              "functions": [],
+              "groupBy": [
+                {
+                  "dataType": "string",
+                  "key": "service.name",
+                  "type": "resource"
+                }
+              ],
+              "having": {
+                "expression": ""
+              },
+              "legend": "{{service.name}}",
+              "limit": null,
+              "orderBy": [],
+              "aggregations": [
+                {
+                  "expression": "count()"
+                }
+              ]
+            }
+          ],
+          "queryFormulas": []
+        },
+        "clickhouse_sql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": ""
+          }
+        ],
+        "promql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "tb-window-gb",
+      "title": "Trace ingest in window (GB)",
+      "description": "Raw meter DB: span bytes in the selected window. Compare a pre-apply window to a post-apply window for the measured savings number.",
+      "panelTypes": "value",
+      "fillSpans": false,
+      "isStacked": false,
+      "isLogScale": false,
+      "legendPosition": "bottom",
+      "mergeAllActiveQueries": false,
+      "nullZeroValues": "zero",
+      "opacity": "1",
+      "softMax": 0,
+      "softMin": 0,
+      "thresholds": [],
+      "timePreferance": "GLOBAL_TIME",
+      "yAxisUnit": "decgbytes",
+      "query": {
+        "queryType": "clickhouse_sql",
+        "id": "800666ac-28aa-4449-8b5e-f4b10968e43d",
+        "builder": {
+          "queryData": [
+            {
+              "queryName": "A",
+              "expression": "A",
+              "disabled": false,
+              "dataSource": "metrics",
+              "source": "",
+              "stepInterval": 60,
+              "filter": {
+                "expression": ""
+              },
+              "functions": [],
+              "groupBy": [],
+              "having": {
+                "expression": ""
+              },
+              "legend": "",
+              "limit": null,
+              "orderBy": []
+            }
+          ],
+          "queryFormulas": []
+        },
+        "clickhouse_sql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": "SELECT round(sum(value)/1e9, 4) AS value FROM signoz_meter.distributed_samples WHERE metric_name = 'signoz.meter.span.size' AND unix_milli >= {{.start_timestamp_ms}} AND unix_milli <= {{.end_timestamp_ms}}"
+          }
+        ],
+        "promql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": ""
+          }
+        ]
+      }
+    }
+  ]
+}

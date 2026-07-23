@@ -1,0 +1,319 @@
+{
+  "title": "Telemetry Bill — Cardinality Explorer",
+  "description": "TELELENS pack 2/3: where series counts and attribute cardinality come from. Mixes v5 builder panels with raw-ClickHouse panels — the 'builder vs SQL' theme.",
+  "tags": [
+    "telelens",
+    "cardinality",
+    "finops"
+  ],
+  "layout": [
+    {
+      "i": "tb-series-per-metric",
+      "x": 0,
+      "y": 0,
+      "w": 6,
+      "h": 5,
+      "minW": 3,
+      "minH": 3,
+      "static": false,
+      "moved": false
+    },
+    {
+      "i": "tb-label-bombs",
+      "x": 6,
+      "y": 0,
+      "w": 6,
+      "h": 5,
+      "minW": 3,
+      "minH": 3,
+      "static": false,
+      "moved": false
+    },
+    {
+      "i": "tb-span-attr-cardinality",
+      "x": 0,
+      "y": 5,
+      "w": 6,
+      "h": 5,
+      "minW": 3,
+      "minH": 3,
+      "static": false,
+      "moved": false
+    },
+    {
+      "i": "tb-rum-spans",
+      "x": 6,
+      "y": 5,
+      "w": 6,
+      "h": 5,
+      "minW": 3,
+      "minH": 3,
+      "static": false,
+      "moved": false
+    }
+  ],
+  "panelMap": {},
+  "version": "v5",
+  "variables": {},
+  "widgets": [
+    {
+      "id": "tb-series-per-metric",
+      "title": "Active time series per metric (top 20)",
+      "description": "uniqCombined(fingerprint) over time_series_v4 — the metric-cardinality ground truth.",
+      "panelTypes": "table",
+      "fillSpans": false,
+      "isStacked": false,
+      "isLogScale": false,
+      "legendPosition": "bottom",
+      "mergeAllActiveQueries": false,
+      "nullZeroValues": "zero",
+      "opacity": "1",
+      "softMax": 0,
+      "softMin": 0,
+      "thresholds": [],
+      "timePreferance": "GLOBAL_TIME",
+      "yAxisUnit": "none",
+      "query": {
+        "queryType": "clickhouse_sql",
+        "id": "be4f15ac-725c-4f86-8b47-188aa79b08ca",
+        "builder": {
+          "queryData": [
+            {
+              "queryName": "A",
+              "expression": "A",
+              "disabled": false,
+              "dataSource": "metrics",
+              "source": "",
+              "stepInterval": 60,
+              "filter": {
+                "expression": ""
+              },
+              "functions": [],
+              "groupBy": [],
+              "having": {
+                "expression": ""
+              },
+              "legend": "",
+              "limit": null,
+              "orderBy": []
+            }
+          ],
+          "queryFormulas": []
+        },
+        "clickhouse_sql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": "SELECT metric_name, uniqCombined(fingerprint) AS series FROM signoz_metrics.distributed_time_series_v4 WHERE unix_milli >= {{.start_timestamp_ms}} AND unix_milli <= {{.end_timestamp_ms}} GROUP BY metric_name ORDER BY series DESC LIMIT 20"
+          }
+        ],
+        "promql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "tb-label-bombs",
+      "title": "Label bombs: per-label distinct values (top 20)",
+      "description": "Which LABEL is exploding a metric: arrayJoin over the labels JSON. An unbounded ID here is a structural time bomb.",
+      "panelTypes": "table",
+      "fillSpans": false,
+      "isStacked": false,
+      "isLogScale": false,
+      "legendPosition": "bottom",
+      "mergeAllActiveQueries": false,
+      "nullZeroValues": "zero",
+      "opacity": "1",
+      "softMax": 0,
+      "softMin": 0,
+      "thresholds": [],
+      "timePreferance": "GLOBAL_TIME",
+      "yAxisUnit": "none",
+      "query": {
+        "queryType": "clickhouse_sql",
+        "id": "83034063-0bf6-4a47-9842-f175bbb0c16b",
+        "builder": {
+          "queryData": [
+            {
+              "queryName": "A",
+              "expression": "A",
+              "disabled": false,
+              "dataSource": "metrics",
+              "source": "",
+              "stepInterval": 60,
+              "filter": {
+                "expression": ""
+              },
+              "functions": [],
+              "groupBy": [],
+              "having": {
+                "expression": ""
+              },
+              "legend": "",
+              "limit": null,
+              "orderBy": []
+            }
+          ],
+          "queryFormulas": []
+        },
+        "clickhouse_sql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": "SELECT metric_name, kv.1 AS label, uniqCombined(kv.2) AS distinct_values FROM signoz_metrics.distributed_time_series_v4 ARRAY JOIN JSONExtractKeysAndValues(labels, 'String') AS kv WHERE unix_milli >= {{.start_timestamp_ms}} AND unix_milli <= {{.end_timestamp_ms}} AND kv.1 NOT LIKE '\\_\\_%' AND kv.1 != 'le' GROUP BY metric_name, label ORDER BY distinct_values DESC LIMIT 20"
+          }
+        ],
+        "promql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "tb-span-attr-cardinality",
+      "title": "Span attribute cardinality (top 25)",
+      "description": "Distinct values per span attribute key from the attribute catalog. High cardinality on SPANS is cheap — the danger is any of these keys becoming a metric label.",
+      "panelTypes": "table",
+      "fillSpans": false,
+      "isStacked": false,
+      "isLogScale": false,
+      "legendPosition": "bottom",
+      "mergeAllActiveQueries": false,
+      "nullZeroValues": "zero",
+      "opacity": "1",
+      "softMax": 0,
+      "softMin": 0,
+      "thresholds": [],
+      "timePreferance": "GLOBAL_TIME",
+      "yAxisUnit": "none",
+      "query": {
+        "queryType": "clickhouse_sql",
+        "id": "49e94add-88de-48a1-a9c1-5400c6356769",
+        "builder": {
+          "queryData": [
+            {
+              "queryName": "A",
+              "expression": "A",
+              "disabled": false,
+              "dataSource": "metrics",
+              "source": "",
+              "stepInterval": 60,
+              "filter": {
+                "expression": ""
+              },
+              "functions": [],
+              "groupBy": [],
+              "having": {
+                "expression": ""
+              },
+              "legend": "",
+              "limit": null,
+              "orderBy": []
+            }
+          ],
+          "queryFormulas": []
+        },
+        "clickhouse_sql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": "SELECT tag_key AS attribute, uniqCombined(string_value) AS distinct_values, count() AS occurrences FROM signoz_traces.distributed_tag_attributes_v2 WHERE tag_data_type = 'string' GROUP BY tag_key ORDER BY distinct_values DESC LIMIT 25"
+          }
+        ],
+        "promql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": ""
+          }
+        ]
+      }
+    },
+    {
+      "id": "tb-rum-spans",
+      "title": "Spans carrying session.id (RUM traffic), by service",
+      "description": "EXISTS filter isolates browser-RUM spans. [QB rubric #11673: EXISTS / boolean search]",
+      "panelTypes": "graph",
+      "fillSpans": false,
+      "isStacked": false,
+      "isLogScale": false,
+      "legendPosition": "bottom",
+      "mergeAllActiveQueries": false,
+      "nullZeroValues": "zero",
+      "opacity": "1",
+      "softMax": 0,
+      "softMin": 0,
+      "thresholds": [],
+      "timePreferance": "GLOBAL_TIME",
+      "yAxisUnit": "none",
+      "query": {
+        "queryType": "builder",
+        "id": "e38b357b-8a68-4537-ba56-470cf56618c5",
+        "builder": {
+          "queryData": [
+            {
+              "queryName": "A",
+              "expression": "A",
+              "disabled": false,
+              "dataSource": "traces",
+              "source": "",
+              "stepInterval": 60,
+              "filter": {
+                "expression": "session.id EXISTS"
+              },
+              "functions": [],
+              "groupBy": [
+                {
+                  "dataType": "string",
+                  "key": "service.name",
+                  "type": "resource"
+                }
+              ],
+              "having": {
+                "expression": ""
+              },
+              "legend": "{{service.name}}",
+              "limit": null,
+              "orderBy": [],
+              "aggregations": [
+                {
+                  "expression": "count()"
+                }
+              ]
+            }
+          ],
+          "queryFormulas": []
+        },
+        "clickhouse_sql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": ""
+          }
+        ],
+        "promql": [
+          {
+            "disabled": false,
+            "legend": "",
+            "name": "A",
+            "query": ""
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,157 @@
+[
+  {
+    "alert": "TELELENS guardrail: span-ingest spike per service",
+    "alertType": "METRIC_BASED_ALERT",
+    "ruleType": "threshold_rule",
+    "version": "v5",
+    "schemaVersion": "v2alpha1",
+    "condition": {
+      "compositeQuery": {
+        "queryType": "builder",
+        "panelType": "graph",
+        "unit": "bytes",
+        "queries": [
+          {
+            "type": "builder_query",
+            "spec": {
+              "name": "A",
+              "signal": "metrics",
+              "source": "meter",
+              "stepInterval": 3600,
+              "aggregations": [
+                {
+                  "metricName": "signoz.meter.span.size",
+                  "temporality": "delta",
+                  "timeAggregation": "increase",
+                  "spaceAggregation": "sum"
+                }
+              ],
+              "groupBy": [
+                { "name": "service.name", "fieldContext": "attribute", "fieldDataType": "string", "signal": "metrics" }
+              ],
+              "legend": "{{service.name}}"
+            }
+          }
+        ]
+      },
+      "selectedQueryName": "A",
+      "thresholds": {
+        "kind": "basic",
+        "spec": [
+          {
+            "name": "warning",
+            "op": "above",
+            "matchType": "at_least_once",
+            "target": 500000000,
+            "channels": ["TELELENS_ALERT_CHANNEL"]
+          }
+        ]
+      }
+    },
+    "evaluation": { "kind": "rolling", "spec": { "evalWindow": "1h", "frequency": "15m" } },
+    "notificationSettings": {
+      "groupBy": ["service.name"],
+      "renotify": { "enabled": true, "interval": "4h", "alertStates": ["firing"] }
+    },
+    "labels": { "severity": "warning", "source": "telelens" },
+    "annotations": {
+      "summary": "Span ingest for {{$labels.service_name}} spiked above the guardrail",
+      "description": "TELELENS seeded this after a cost cleanup so waste cannot silently return: a service is suddenly shipping >500 MB of spans per hour. Run `telelens scan` to see what changed."
+    }
+  },
+  {
+    "alert": "TELELENS guardrail: metric cardinality explosion",
+    "alertType": "METRIC_BASED_ALERT",
+    "ruleType": "threshold_rule",
+    "version": "v5",
+    "schemaVersion": "v2alpha1",
+    "condition": {
+      "compositeQuery": {
+        "queryType": "clickhouse_sql",
+        "panelType": "graph",
+        "queries": [
+          {
+            "type": "clickhouse_sql",
+            "spec": {
+              "name": "A",
+              "query": "SELECT toStartOfInterval(fromUnixTimestamp64Milli(unix_milli), INTERVAL 30 MINUTE) AS ts, metric_name, toFloat64(uniqCombined(fingerprint)) AS value FROM signoz_metrics.distributed_time_series_v4 WHERE unix_milli >= {{.start_timestamp_ms}} AND unix_milli <= {{.end_timestamp_ms}} GROUP BY ts, metric_name ORDER BY ts"
+            }
+          }
+        ]
+      },
+      "selectedQueryName": "A",
+      "thresholds": {
+        "kind": "basic",
+        "spec": [
+          {
+            "name": "critical",
+            "op": "above",
+            "matchType": "at_least_once",
+            "target": 50000,
+            "channels": ["TELELENS_ALERT_CHANNEL"]
+          }
+        ]
+      }
+    },
+    "evaluation": { "kind": "rolling", "spec": { "evalWindow": "30m", "frequency": "5m" } },
+    "notificationSettings": {
+      "groupBy": ["metric_name"],
+      "renotify": { "enabled": true, "interval": "1h", "alertStates": ["firing"] }
+    },
+    "labels": { "severity": "critical", "source": "telelens" },
+    "annotations": {
+      "summary": "A metric crossed 50k active series",
+      "description": "A label bomb is being armed (an unbounded ID used as a metric label). Run `telelens scan` — the ecosystem profiler names the label and generates the transform that defuses it."
+    }
+  },
+  {
+    "alert": "TELELENS guardrail: log volume anomaly",
+    "alertType": "METRIC_BASED_ALERT",
+    "ruleType": "anomaly_rule",
+    "version": "v5",
+    "evalWindow": "24h",
+    "frequency": "1h",
+    "condition": {
+      "compositeQuery": {
+        "queryType": "builder",
+        "panelType": "graph",
+        "queries": [
+          {
+            "type": "builder_query",
+            "spec": {
+              "name": "A",
+              "signal": "metrics",
+              "source": "meter",
+              "stepInterval": 3600,
+              "aggregations": [
+                {
+                  "metricName": "signoz.meter.log.count",
+                  "temporality": "delta",
+                  "timeAggregation": "increase",
+                  "spaceAggregation": "sum"
+                }
+              ],
+              "functions": [
+                { "name": "anomaly", "args": [ { "name": "z_score_threshold", "value": 3 } ] }
+              ]
+            }
+          }
+        ]
+      },
+      "op": "above",
+      "matchType": "all_the_times",
+      "target": 3,
+      "algorithm": "standard",
+      "seasonality": "daily",
+      "selectedQueryName": "A",
+      "requireMinPoints": true,
+      "requiredNumPoints": 3
+    },
+    "labels": { "severity": "warning", "source": "telelens" },
+    "annotations": {
+      "summary": "Log ingest volume is anomalous vs the daily pattern",
+      "description": "Log record volume deviates >3 sigma from its daily seasonality — a debug firehose may have been re-enabled. Run `telelens scan` to identify the source."
+    },
+    "preferredChannels": ["TELELENS_ALERT_CHANNEL"]
+  }
+]
