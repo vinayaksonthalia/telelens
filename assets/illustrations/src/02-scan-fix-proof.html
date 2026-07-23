@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="sketch.css">
+</head>
+<body>
+  <div class="title" style="left:60px; top:44px;">scan <span style="font-size:40px;">&rarr;</span> fix <span style="font-size:40px;">&rarr;</span> proof</div>
+  <div class="subtitle" style="left:64px; top:150px;">from "why is the bill huge" to a measured cut, without TELELENS writing a thing</div>
+
+  <div class="box" id="b1" style="left:70px; top:310px; width:290px; height:190px;">
+    <div class="label">scan</div>
+    <div class="sub">read-only, by design:<br>ClickHouse SELECTs +<br>SigNoz GETs. nothing else.</div>
+  </div>
+
+  <div class="box" id="b2" style="left:460px; top:310px; width:300px; height:190px;">
+    <div class="label">priced waste report</div>
+    <div class="sub">20 ranked findings<br>130 GB/mo &asymp; $39,<br>each with evidence</div>
+  </div>
+
+  <div class="box" id="b3" style="left:860px; top:310px; width:300px; height:190px;">
+    <div class="label">collector config</div>
+    <div class="sub">generated YAML fix &mdash;<br>a human reviews it,<br>a human applies it</div>
+  </div>
+
+  <div class="box thick" id="b4" style="left:1270px; top:290px; width:270px; height:230px;">
+    <div class="label" style="font-size:56px;">&minus;95%<span class="red-ink">*</span></div>
+    <div class="sub">span storage,<br>on the live ingester</div>
+  </div>
+
+  <div class="note" id="note" style="left:490px; top:650px; width:820px;">
+    *measured, not projected &mdash; and errors always kept
+  </div>
+
+  <div class="caption" style="bottom:44px;">applied live, measured, then reverted &mdash; and the revert verified too</div>
+
+<script src="sketch.js"></script>
+<script>
+window.addEventListener("load", () => {
+  Sketch.init();
+  Sketch.underline(".title");
+  Sketch.connect("#b1", "#b2", { seed: 17 });
+  Sketch.connect("#b2", "#b3", { seed: 28 });
+  Sketch.connect("#b3", "#b4", { seed: 39 });
+  // red dotted callback from the footnote up to the bottom edge of the -95% box
+  Sketch.arrow(1330, 660, 1450, 535, { color: "var(--red)", dotted: true, curve: -40, seed: 93, width: 2.8 });
+  window.__sketchDone = true;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+^D]11;?\[6n[1;38;5;37mtelelens scan[0m [2m· source: clickhouse (http://localhost:8123, window=7d)[0m
+[2m  traces     13 findings[0m
+[2m  logs       1 findings[0m
+[2m  metrics    0 findings[0m
+[2m  usage-xref 6 findings[0m
+[2m  ecosystem  5 findings[0m
+[2m  quality    1 findings[0m
+
+[1;38;5;145mID     SEV      CATEGORY  FINDING                                                       GB/MO     $/MO[0m
+[38;5;59m──────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+F-001  [38;5;214mhigh[0m     traces    7801417 near-identical success spans are prime tail-sampl…      9.7     2.90
+F-002  [38;5;178mmedium[0m   logs      INFO firehose: checkout is 35% of your log volume               1.9     0.58
+F-003  [38;5;214mhigh[0m     metrics   86 more metrics are written but read by no dashboard or a…      0.3     0.08
+F-004  [38;5;214mhigh[0m     metrics   Metric "signoz_latency.bucket" is written but read by no …      0.3     0.08
+F-005  [38;5;145mlow[0m      traces    Browser RUM telemetry bill: "browser-frontend" ships 1203…      0.2     0.05
+F-006  [38;5;214mhigh[0m     metrics   Metric "http.server.duration.bucket" is written but read …      0.0     0.01
+F-007  [38;5;214mhigh[0m     metrics   Metric "http.server.response.size.bucket" is written but …      0.0     0.01
+F-008  [38;5;214mhigh[0m     metrics   Metric "checkout.cart.value.bucket" is written but read b…      0.0     0.01
+F-009  [38;5;214mhigh[0m     metrics   Metric "otel.sdk.metric_reader.collection.duration.bucket…      0.0     0.01
+F-010  [38;5;178mmedium[0m   traces    Span attribute "url.full" has 57315 distinct values             0.0     0.01
+F-011  [38;5;178mmedium[0m   traces    Span attribute "db.statement" has 54630 distinct values         0.0     0.00
+F-012  [38;5;178mmedium[0m   traces    Span attribute "shipping.tracking.id" has 53051 distinct …      0.0     0.00
+F-013  [38;5;178mmedium[0m   traces    Span attribute "payment.transaction.id" has 53243 distinc…      0.0     0.00
+F-014  [38;5;178mmedium[0m   traces    Span attribute "app.shipping.tracking.id" has 53045 disti…      0.0     0.00
+F-015  [38;5;178mmedium[0m   traces    Span attribute "app.payment.transaction.id" has 53062 dis…      0.0     0.00
+F-016  [38;5;178mmedium[0m   traces    Span attribute "app.order.id" has 65591 distinct values         0.0     0.00
+F-017  [38;5;178mmedium[0m   traces    Span attribute "http.url" has 10068 distinct values             0.0     0.00
+F-018  [38;5;178mmedium[0m   traces    Span attribute "order.id" has 68176 distinct values             0.0     0.00
+F-019  [38;5;178mmedium[0m   traces    Span attribute "app.email.message_id" has 54780 distinct …      0.0     0.00
+F-020  [38;5;178mmedium[0m   traces    Span attribute "app.email.recipient" has 10011 distinct v…      0.0     0.00
+F-021  [38;5;178mmedium[0m   traces    Span attribute "app.user.id" has 43377 distinct values          0.0     0.00
+F-022  [38;5;145mlow[0m      traces    Browser RUM telemetry bill: "meridian-web" ships 223 sess…      0.0     0.00
+F-023  [38;5;145mlow[0m      traces    AI-agent telemetry bill: "argus" ships 35 gen_ai spans (2…      0.0     0.00
+F-024  [38;5;214mhigh[0m     metrics   Unbounded ID "session.id" is a metric label on browser.se…        —        —
+F-025  [38;5;145mlow[0m      quality   Cardinality discipline held: 2 unbounded ID attribute(s) …        —        —
+F-026  [38;5;145mlow[0m      quality   demo-app mixes severity casing ("Info")                           —        —
+
+[1mTotal identified savings: 12.5 GB/month ≈ $3.75/month[0m
+
+Sampling simulator replay (168711 traces, 8953804 spans)
+  policy: keep errors + keep >= 750 ms + sample 5.0% of the rest
+  error traces:  110430 / 110430 kept
+  slow traces:   145 / 145 kept
+  boring traces: 2947 / 58136 kept (94.9% dropped)
+  span volume dropped: 6.9%
+[1;38;5;41m  verdict: SAFE — policy retains 100% of error traces and 100% of slow traces[0m
+
+[2mscan completed in 8.701s · outputs in out-live/[0m

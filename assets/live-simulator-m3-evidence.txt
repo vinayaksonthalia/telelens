@@ -1,0 +1,34 @@
+$ telelens simulate --sample-pct 5 --latency-ms 750   # live, last 24h
+Sampling simulator replay (162760 traces, 8900958 spans)
+  policy: keep errors + keep >= 750 ms + sample 5.0% of the rest
+  error traces:  110597 / 110597 kept
+  slow traces:   142 / 142 kept
+  boring traces: 2633 / 52021 kept (94.9% dropped)
+  span volume dropped: 6.3%
+  verdict: SAFE — policy retains 100% of error traces and 100% of slow traces
+
+$ telelens simulate --sample-pct 1 --latency-ms 500   # more aggressive policy
+Sampling simulator replay (162760 traces, 8900958 spans)
+  policy: keep errors + keep >= 500 ms + sample 1.0% of the rest
+  error traces:  110597 / 110597 kept
+  slow traces:   143 / 143 kept
+  boring traces: 508 / 52020 kept (99.0% dropped)
+  span volume dropped: 6.5%
+  verdict: SAFE — policy retains 100% of error traces and 100% of slow traces
+exit=0
+
+--- Notes (honest read of the numbers) ---
+Replay input: ALL 162,760 traces (8,900,958 spans) from the live instance's
+last 24 hours, reduced to per-trace summaries by time-sliced GROUP BY trace_id
+(exact, not sampled). Deterministic FNV-hash sampling -> reproducible verdicts.
+
+Why "span volume dropped" is only ~6%: 68% of this day's traces carry an error
+(110,597/162,760) - the historical demo-lite `cart` error storm dominates the
+window, and the policy REFUSES to drop error traces (that is the invariant).
+Tail sampling cannot save money on a system that is mostly failing; the Waste
+Report says exactly that (see the ERROR-storm/log findings: fix the bug, then
+sample). On the live Faultline traffic (error rate <1%) the same policy drops
+~95% of boring traces - measured in the M4 before/after apply.
+
+The verdict is binary and enforced: a policy that would drop ONE error or slow
+trace exits non-zero (NFR-4), backed by TestSimulateSafetyInvariant.

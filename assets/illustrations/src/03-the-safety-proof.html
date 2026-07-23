@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="sketch.css">
+</head>
+<body>
+  <div class="title" style="left:60px; top:44px;">the safety proof</div>
+  <div class="subtitle" style="left:64px; top:118px;">sampling that must prove &mdash; on your data &mdash; it loses nothing that matters</div>
+
+  <div class="small-ink" style="left:75px; top:330px; width:270px; font-size:24px;">all traces from<br>your real last 24h</div>
+  <div class="small-gray" style="left:75px; top:400px; width:270px;">1195 traces &middot; 3976 spans<br>replayed through the policy</div>
+
+  <div class="box thick" id="valve" style="left:520px; top:290px; width:330px; height:200px;">
+    <div class="label">the sampling valve</div>
+    <div class="sub">tail-based: assess the whole<br>trace, then decide</div>
+  </div>
+
+  <div class="box" id="kept" style="left:1120px; top:230px; width:400px; height:190px;">
+    <div class="label">KEPT &mdash; always</div>
+    <div class="sub">100% of error traces (40/40)<br>100% of slow traces (55/55)</div>
+  </div>
+
+  <div class="box" id="dropped" style="left:1120px; top:625px; width:400px; height:160px;">
+    <div class="label" style="color:var(--gray);">dropped</div>
+    <div class="sub">boring, near-identical successes<br>&mdash; 95% of them, nothing else</div>
+  </div>
+
+  <div class="box" id="stamp" style="left:590px; top:610px; width:230px; height:120px; transform:rotate(-6deg);">
+    <div class="label stamp" style="font-size:44px;">SAFE</div>
+    <div class="sub">simulator verdict</div>
+  </div>
+
+  <div class="note" id="note" style="left:1130px; top:462px; width:400px;">
+    errors are never sampled away. ever.
+  </div>
+
+  <div class="caption" style="bottom:40px;">simulated on your real last 24h before you apply anything</div>
+
+<script src="sketch.js"></script>
+<script>
+window.addEventListener("load", () => {
+  Sketch.init();
+  Sketch.underline(".title");
+  // in-flow
+  Sketch.arrow(340, 385, 512, 390, { seed: 18, width: 3 });
+  // valve -> kept (thick, the headline)
+  Sketch.connect("#valve", "#kept", { from: "right", to: "left", fromOffset: -30, curve: -24, seed: 29, width: 3.2 });
+  // valve -> dropped (thin, downward)
+  Sketch.connect("#valve", "#dropped", { from: "bottomright", to: "left", curve: 42, seed: 40, width: 2 });
+  // red dotted callback up to the KEPT box bottom edge. Routed entirely up the
+  // clear LEFT column (x 1055->1145), left of the note text (which starts ~x1135):
+  // the descending dotted trail stays left of every letter and the arrowhead lands
+  // on the empty box bottom edge, ~37px clear of the nearest note text.
+  Sketch.arrow(1055, 500, 1145, 426, { color: "var(--red)", dotted: true, curve: -16, seed: 94, width: 2.8, head: 14 });
+  window.__sketchDone = true;
+});
+</script>
+</body>
+</html>

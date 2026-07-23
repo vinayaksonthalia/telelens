@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="sketch.css">
+</head>
+<body>
+  <div class="title" style="left:60px; top:40px;">how TELELENS hangs together</div>
+  <div class="subtitle" style="left:64px; top:110px;">reads your telemetry bill, never touches the switchboard</div>
+
+  <div class="box" id="ch" style="left:60px; top:220px; width:280px; height:120px;">
+    <div class="label" style="font-size:22px;">ClickHouse</div>
+    <div class="sub">SELECT only</div>
+  </div>
+  <div class="box" id="api" style="left:60px; top:370px; width:280px; height:120px;">
+    <div class="label" style="font-size:22px;">SigNoz API</div>
+    <div class="sub">GET only</div>
+  </div>
+
+  <div class="box thick" id="profilers" style="left:440px; top:250px; width:300px; height:230px;">
+    <div class="label" style="font-size:22px;">profilers</div>
+    <div class="sub">traces &middot; logs &middot;<br>metrics &middot; ecosystem</div>
+  </div>
+
+  <div class="box" id="analyzers" style="left:850px; top:250px; width:300px; height:230px;">
+    <div class="label" style="font-size:21px;">analyzers</div>
+    <div class="sub">cardinality &middot; log<br>templates (Drain) &middot;<br>tail-sampling simulator</div>
+  </div>
+
+  <div class="box" id="out1" style="left:1250px; top:120px; width:290px; height:120px;">
+    <div class="label" style="font-size:19px;">priced waste report</div>
+    <div class="sub">GB/mo &amp; $ per finding</div>
+  </div>
+  <div class="box" id="out2" style="left:1250px; top:255px; width:290px; height:130px;">
+    <div class="label" style="font-size:18px;">collector fragment +<br>casting patch</div>
+    <div class="sub">human applies it</div>
+  </div>
+  <div class="box" id="out3" style="left:1250px; top:400px; width:290px; height:110px;">
+    <div class="label" style="font-size:19px;">Telemetry Bill dashboards</div>
+  </div>
+  <div class="box" id="out4" style="left:1250px; top:525px; width:290px; height:110px;">
+    <div class="label" style="font-size:19px;">guardrail rules &amp;<br>scan --json</div>
+    <div class="sub">for agents</div>
+  </div>
+
+  <div class="note" id="note" style="left:60px; top:520px; width:280px;">
+    read-only by design &mdash;<br>the client refuses<br>anything but SELECT/GET
+  </div>
+
+  <div class="caption" style="bottom:36px;">telemetry in, priced findings out, humans still hold the switch</div>
+
+<script src="sketch.js"></script>
+<script>
+window.addEventListener("load", () => {
+  Sketch.init();
+  Sketch.underline(".title");
+  Sketch.connect("#ch", "#profilers", { from: "right", to: "left", toOffset: -50, seed: 11 });
+  Sketch.connect("#api", "#profilers", { from: "right", to: "left", toOffset: 50, curve: -14, seed: 12 });
+  Sketch.connect("#profilers", "#analyzers", { from: "right", to: "left", seed: 22 });
+  Sketch.connect("#analyzers", "#out1", { from: "right", to: "left", toOffset: -10, curve: -14, seed: 31 });
+  Sketch.connect("#analyzers", "#out2", { from: "right", to: "left", seed: 32 });
+  Sketch.connect("#analyzers", "#out3", { from: "right", to: "left", curve: 10, seed: 33 });
+  Sketch.connect("#analyzers", "#out4", { from: "right", to: "left", curve: 20, seed: 34 });
+  // coral read-only annotation loop from the note up to ClickHouse/API
+  const n = document.getElementById("note").getBoundingClientRect();
+  const ch = document.getElementById("ch").getBoundingClientRect();
+  Sketch.arrow(n.left + 60, n.top - 6, ch.left + 40, ch.bottom + 4,
+    { color: "var(--red)", dotted: true, curve: -60, seed: 55, width: 2.8, head: 16 });
+  window.__sketchDone = true;
+});
+</script>
+</body>
+</html>

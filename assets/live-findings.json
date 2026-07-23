@@ -1,0 +1,584 @@
+{
+  "generated_at": "2026-07-18T06:08:02.230961Z",
+  "source": "clickhouse (http://localhost:8123, window=7d)",
+  "window_days": 7,
+  "cost_per_gb": 0.3,
+  "scan_duration": "8.7s",
+  "total_savings_gb_per_month": 12.510446410884391,
+  "total_savings_usd_per_month": 3.753133923265317,
+  "findings": [
+    {
+      "id": "F-001",
+      "category": "traces",
+      "severity": "high",
+      "title": "7801417 near-identical success spans are prime tail-sampling candidates",
+      "evidence": [
+        "browser-frontend \"HTTP GET\": 481468 near-identical spans, error rate 0.000%, distinct-duration ratio 0.67",
+        "frontend \"HTTP GET\": 481466 near-identical spans, error rate 0.000%, distinct-duration ratio 0.53",
+        "product-catalog \"sql.rows\": 361053 near-identical spans, error rate 0.000%, distinct-duration ratio 0.03",
+        "product-catalog \"sql.conn.query\": 361053 near-identical spans, error rate 0.000%, distinct-duration ratio 0.03",
+        "product-catalog \"GetProduct\": 361053 near-identical spans, error rate 0.000%, distinct-duration ratio 0.07",
+        "recommendation \"GET / http send\": 240736 near-identical spans, error rate 0.000%, distinct-duration ratio 0.02",
+        "recommendation \"get_product_list\": 240733 near-identical spans, error rate 0.000%, distinct-duration ratio 0.05",
+        "recommendation \"GET /recommendations http send\": 240730 near-identical spans, error rate 0.000%, distinct-duration ratio 0.02",
+        "ad \"getAds\": 240730 near-identical spans, error rate 0.000%, distinct-duration ratio 0.16",
+        "quote-python \"POST /quote http send\": 228734 near-identical spans, error rate 0.000%, distinct-duration ratio 0.02",
+        "catalog \"catalog.enrich_pricing\": 137352 near-identical spans, error rate 0.000%, distinct-duration ratio 0.15",
+        "catalog \"catalog.cache_check\": 137352 near-identical spans, error rate 0.000%, distinct-duration ratio 0.07",
+        "catalog \"catalog.lookup_products\": 137352 near-identical spans, error rate 0.000%, distinct-duration ratio 0.35",
+        "catalog \"catalog.db_query\": 137351 near-identical spans, error rate 0.000%, distinct-duration ratio 0.29",
+        "browser-frontend \"submit - checkout-form\": 120370 near-identical spans, error rate 0.000%, distinct-duration ratio 0.04",
+        "browser-frontend \"web-vitals\": 120370 near-identical spans, error rate 0.000%, distinct-duration ratio 0.03",
+        "frontend \"GET /api/cart\": 120368 near-identical spans, error rate 0.000%, distinct-duration ratio 0.98",
+        "recommendation \"GET /\": 120368 near-identical spans, error rate 0.000%, distinct-duration ratio 0.45",
+        "frontend \"GET /api/products\": 120367 near-identical spans, error rate 0.000%, distinct-duration ratio 0.71",
+        "frontend \"GET /api/ads\": 120366 near-identical spans, error rate 0.000%, distinct-duration ratio 0.58",
+        "frontend \"GET /api/recommendations\": 120365 near-identical spans, error rate 0.000%, distinct-duration ratio 0.68",
+        "recommendation \"GET /recommendations\": 120365 near-identical spans, error rate 0.000%, distinct-duration ratio 0.42",
+        "checkout \"getAds\": 120360 near-identical spans, error rate 0.000%, distinct-duration ratio 0.49",
+        "checkout \"PlaceOrder\": 120360 near-identical spans, error rate 0.000%, distinct-duration ratio 0.99",
+        "checkout \"chargeCard\": 120360 near-identical spans, error rate 0.000%, distinct-duration ratio 0.45",
+        "checkout \"getCurrencyConversion\": 120360 near-identical spans, error rate 0.000%, distinct-duration ratio 0.23",
+        "checkout \"getProductDetails\": 120360 near-identical spans, error rate 0.000%, distinct-duration ratio 0.62",
+        "checkout \"getRecommendations\": 120360 near-identical spans, error rate 0.000%, distinct-duration ratio 0.64",
+        "checkout \"prepareOrderItemsAndShippingQuoteFromCart\": 120360 near-identical spans, error rate 0.000%, distinct-duration ratio 0.99",
+        "frontend \"HTTP POST\": 120359 near-identical spans, error rate 0.000%, distinct-duration ratio 0.99",
+        "frontend \"POST /api/checkout\": 120359 near-identical spans, error rate 0.000%, distinct-duration ratio 1.00",
+        "browser-frontend \"page-session\": 120358 near-identical spans, error rate 0.000%, distinct-duration ratio 0.99",
+        "browser-frontend \"HTTP POST\": 120358 near-identical spans, error rate 0.000%, distinct-duration ratio 0.99",
+        "product-catalog \"ListProducts\": 120353 near-identical spans, error rate 0.000%, distinct-duration ratio 0.07",
+        "currency \"Convert\": 120352 near-identical spans, error rate 0.000%, distinct-duration ratio 0.05",
+        "quote-python \"POST /quote\": 114367 near-identical spans, error rate 0.000%, distinct-duration ratio 0.39",
+        "quote-python \"calculate-quote\": 114367 near-identical spans, error rate 0.000%, distinct-duration ratio 0.07",
+        "quote-python \"POST /quote http receive\": 114367 near-identical spans, error rate 0.000%, distinct-duration ratio 0.03",
+        "checkout \"shipOrder\": 114362 near-identical spans, error rate 0.000%, distinct-duration ratio 0.67",
+        "checkout \"sendOrderConfirmation\": 114362 near-identical spans, error rate 0.000%, distinct-duration ratio 0.48",
+        "checkout \"orders publish\": 114362 near-identical spans, error rate 0.000%, distinct-duration ratio 0.86",
+        "fraud-detection \"orders receive\": 114355 near-identical spans, error rate 0.000%, distinct-duration ratio 0.06",
+        "shipping \"HTTP POST\": 114355 near-identical spans, error rate 0.000%, distinct-duration ratio 0.63",
+        "shipping \"createQuoteFromCount\": 114355 near-identical spans, error rate 0.000%, distinct-duration ratio 0.64",
+        "fraud-detection \"detectFraud\": 114355 near-identical spans, error rate 0.000%, distinct-duration ratio 0.02",
+        "shipping \"ship\": 114355 near-identical spans, error rate 0.000%, distinct-duration ratio 0.64",
+        "accounting \"processOrder\": 114347 near-identical spans, error rate 0.000%, distinct-duration ratio 0.04",
+        "accounting \"orders receive\": 114347 near-identical spans, error rate 0.000%, distinct-duration ratio 0.08"
+      ],
+      "est_gb_per_month": 9.668491630884391,
+      "est_usd_per_month": 2.900547489265317,
+      "remediation": "Add a tail_sampling processor: keep 100% of errors, keep traces \u003e= 750 ms, sample the remaining successes at 5%. Run `telelens simulate` for the safety proof.",
+      "fix": {
+        "kind": "tail_sampling",
+        "sampling_pct": 5,
+        "latency_threshold_ms": 750
+      }
+    },
+    {
+      "id": "F-002",
+      "category": "logs",
+      "severity": "medium",
+      "title": "INFO firehose: checkout is 35% of your log volume",
+      "evidence": [
+        "service=checkout severity=INFO: 2724075 records, 0.45 GB in window — 35% of ALL log bytes",
+        "dominant template (132 occurrences): \"FetchProduct\""
+      ],
+      "est_gb_per_month": 1.92029124,
+      "est_usd_per_month": 0.576087372,
+      "remediation": "Review \"checkout\"'s chattiest INFO templates: demote per-request noise to DEBUG (then filter), or aggregate to metrics. Not auto-dropped: INFO may carry real signal.",
+      "fix": {
+        "kind": "none",
+        "service": "checkout"
+      }
+    },
+    {
+      "id": "F-003",
+      "category": "metrics",
+      "severity": "high",
+      "title": "86 more metrics are written but read by no dashboard or alert",
+      "evidence": [
+        "86 further unread metrics totaling 1936809 samples in window; checked 31 dashboards and 21 alert rules — zero references",
+        "full list: system.cpu.time, http.client.request.duration.bucket, http.server.request.size.bucket, signoz_calls_total, signoz_latency.count, signoz_latency.sum, system.cpu.utilization, app.email.latency.bucket, app.payment.latency.bucket, http.client.duration.bucket, otel.sdk.processor.span.processed, app.payment.transactions, otel.sdk.span.started, system.cpu.load_average.5m, system.cpu.load_average.1m, system.cpu.load_average.15m, checkout.orders.count, app.frontend.requests, system.network.io, http.server.response.size.max, http.server.response.size.count, http.server.response.size.sum, http.server.response.size.min, http.server.duration.sum, http.server.duration.max, http.server.duration.count, http.server.duration.min, system.network.dropped, system.network.errors, system.network.packets, otel.sdk.span.live, checkout.cart.value.min, checkout.cart.value.sum, checkout.cart.value.max, otel.sdk.metric_reader.collection.duration.count, otel.sdk.metric_reader.collection.duration.max, otel.sdk.metric_reader.collection.duration.sum, system.memory.utilization, system.memory.usage, signoz_external_call_latency_sum, signoz_external_call_latency_count, http.server.active_requests, system.network.connections, app.email.sent, http.client.request.duration.min, http.client.request.duration.sum, http.client.request.duration.count, http.server.request.size.sum, http.server.request.size.max, http.server.request.size.min, http.server.request.size.count, quote.amount.bucket, process.cpu.time, signoz_db_latency_sum, signoz_db_latency_count, http.client.duration.max, http.client.duration.sum, http.client.duration.count, http.client.duration.min, argus.tokens, system.paging.operations, process.runtime.cpython.gc_count, app.accounting.revenue_total, app.accounting.orders_processed, process.runtime.cpython.memory, process.runtime.cpython.cpu_time, process.open_file_descriptor.count, app.recommendations.count, process.runtime.cpython.cpu.utilization, process.runtime.cpython.thread_count, redis.cmd.latency, redis.cpu.time, browser.web_vitals.ttfb.sum, browser.web_vitals.ttfb.max, browser.web_vitals.ttfb.count, browser.web_vitals.ttfb.min, browser.web_vitals.fcp.sum, browser.web_vitals.lcp.min, browser.web_vitals.fcp.max, browser.web_vitals.fcp.min, browser.web_vitals.fcp.count, browser.web_vitals.lcp.sum, browser.web_vitals.lcp.max, browser.web_vitals.inp.min, browser.web_vitals.inp.sum, browser.web_vitals.inp.max"
+      ],
+      "est_gb_per_month": 0.26561952,
+      "est_usd_per_month": 0.079685856,
+      "remediation": "Same story at lower volume: drop them at the collector, or delete the instruments. The generated filter/drop_unread_metrics block lists every name.",
+      "fix": {
+        "kind": "drop_metric",
+        "metric": "system.cpu.time",
+        "metrics": [
+          "http.client.request.duration.bucket",
+          "http.server.request.size.bucket",
+          "signoz_calls_total",
+          "signoz_latency.count",
+          "signoz_latency.sum",
+          "system.cpu.utilization",
+          "app.email.latency.bucket",
+          "app.payment.latency.bucket",
+          "http.client.duration.bucket",
+          "otel.sdk.processor.span.processed",
+          "app.payment.transactions",
+          "otel.sdk.span.started",
+          "system.cpu.load_average.5m",
+          "system.cpu.load_average.1m",
+          "system.cpu.load_average.15m",
+          "checkout.orders.count",
+          "app.frontend.requests",
+          "system.network.io",
+          "http.server.response.size.max",
+          "http.server.response.size.count",
+          "http.server.response.size.sum",
+          "http.server.response.size.min",
+          "http.server.duration.sum",
+          "http.server.duration.max",
+          "http.server.duration.count",
+          "http.server.duration.min",
+          "system.network.dropped",
+          "system.network.errors",
+          "system.network.packets",
+          "otel.sdk.span.live",
+          "checkout.cart.value.min",
+          "checkout.cart.value.sum",
+          "checkout.cart.value.max",
+          "otel.sdk.metric_reader.collection.duration.count",
+          "otel.sdk.metric_reader.collection.duration.max",
+          "otel.sdk.metric_reader.collection.duration.sum",
+          "system.memory.utilization",
+          "system.memory.usage",
+          "signoz_external_call_latency_sum",
+          "signoz_external_call_latency_count",
+          "http.server.active_requests",
+          "system.network.connections",
+          "app.email.sent",
+          "http.client.request.duration.min",
+          "http.client.request.duration.sum",
+          "http.client.request.duration.count",
+          "http.server.request.size.sum",
+          "http.server.request.size.max",
+          "http.server.request.size.min",
+          "http.server.request.size.count",
+          "quote.amount.bucket",
+          "process.cpu.time",
+          "signoz_db_latency_sum",
+          "signoz_db_latency_count",
+          "http.client.duration.max",
+          "http.client.duration.sum",
+          "http.client.duration.count",
+          "http.client.duration.min",
+          "argus.tokens",
+          "system.paging.operations",
+          "process.runtime.cpython.gc_count",
+          "app.accounting.revenue_total",
+          "app.accounting.orders_processed",
+          "process.runtime.cpython.memory",
+          "process.runtime.cpython.cpu_time",
+          "process.open_file_descriptor.count",
+          "app.recommendations.count",
+          "process.runtime.cpython.cpu.utilization",
+          "process.runtime.cpython.thread_count",
+          "redis.cmd.latency",
+          "redis.cpu.time",
+          "browser.web_vitals.ttfb.sum",
+          "browser.web_vitals.ttfb.max",
+          "browser.web_vitals.ttfb.count",
+          "browser.web_vitals.ttfb.min",
+          "browser.web_vitals.fcp.sum",
+          "browser.web_vitals.lcp.min",
+          "browser.web_vitals.fcp.max",
+          "browser.web_vitals.fcp.min",
+          "browser.web_vitals.fcp.count",
+          "browser.web_vitals.lcp.sum",
+          "browser.web_vitals.lcp.max",
+          "browser.web_vitals.inp.min",
+          "browser.web_vitals.inp.sum",
+          "browser.web_vitals.inp.max"
+        ]
+      }
+    },
+    {
+      "id": "F-004",
+      "category": "metrics",
+      "severity": "high",
+      "title": "Metric \"signoz_latency.bucket\" is written but read by no dashboard or alert",
+      "evidence": [
+        "metric=signoz_latency.bucket series=8516 samples_in_window=1869768; checked 31 dashboards and 21 alert rules — zero references"
+      ],
+      "est_gb_per_month": 0.2564253257142857,
+      "est_usd_per_month": 0.07692759771428571,
+      "remediation": "Stop shipping \"signoz_latency.bucket\": drop it at the collector (filter processor) or remove the instrument. If it is consumed outside SigNoz, allow-list it in telelens config.",
+      "fix": {
+        "kind": "drop_metric",
+        "metric": "signoz_latency.bucket"
+      }
+    },
+    {
+      "id": "F-005",
+      "category": "traces",
+      "severity": "low",
+      "title": "Browser RUM telemetry bill: \"browser-frontend\" ships 120358 session spans across 1 sessions",
+      "evidence": [
+        "service=browser-frontend spans_with_session.id=120358 sessions=1 attr_bytes=240716"
+      ],
+      "est_gb_per_month": 0.15577764,
+      "est_usd_per_month": 0.046733291999999996,
+      "remediation": "Attribution, not waste: this is the frontend-observability bill. Scale it by expected sessions/month before rollout; RUM SDK sampleRate is the knob.",
+      "fix": {
+        "kind": "none",
+        "service": "browser-frontend"
+      }
+    },
+    {
+      "id": "F-006",
+      "category": "metrics",
+      "severity": "high",
+      "title": "Metric \"http.server.duration.bucket\" is written but read by no dashboard or alert",
+      "evidence": [
+        "metric=http.server.duration.bucket series=832 samples_in_window=296912; checked 31 dashboards and 21 alert rules — zero references"
+      ],
+      "est_gb_per_month": 0.04071936,
+      "est_usd_per_month": 0.012215808,
+      "remediation": "Stop shipping \"http.server.duration.bucket\": drop it at the collector (filter processor) or remove the instrument. If it is consumed outside SigNoz, allow-list it in telelens config.",
+      "fix": {
+        "kind": "drop_metric",
+        "metric": "http.server.duration.bucket"
+      }
+    },
+    {
+      "id": "F-007",
+      "category": "metrics",
+      "severity": "high",
+      "title": "Metric \"http.server.response.size.bucket\" is written but read by no dashboard or alert",
+      "evidence": [
+        "metric=http.server.response.size.bucket series=832 samples_in_window=296912; checked 31 dashboards and 21 alert rules — zero references"
+      ],
+      "est_gb_per_month": 0.04071936,
+      "est_usd_per_month": 0.012215808,
+      "remediation": "Stop shipping \"http.server.response.size.bucket\": drop it at the collector (filter processor) or remove the instrument. If it is consumed outside SigNoz, allow-list it in telelens config.",
+      "fix": {
+        "kind": "drop_metric",
+        "metric": "http.server.response.size.bucket"
+      }
+    },
+    {
+      "id": "F-008",
+      "category": "metrics",
+      "severity": "high",
+      "title": "Metric \"checkout.cart.value.bucket\" is written but read by no dashboard or alert",
+      "evidence": [
+        "metric=checkout.cart.value.bucket series=32 samples_in_window=263792; checked 31 dashboards and 21 alert rules — zero references"
+      ],
+      "est_gb_per_month": 0.03617718857142857,
+      "est_usd_per_month": 0.01085315657142857,
+      "remediation": "Stop shipping \"checkout.cart.value.bucket\": drop it at the collector (filter processor) or remove the instrument. If it is consumed outside SigNoz, allow-list it in telelens config.",
+      "fix": {
+        "kind": "drop_metric",
+        "metric": "checkout.cart.value.bucket"
+      }
+    },
+    {
+      "id": "F-009",
+      "category": "metrics",
+      "severity": "high",
+      "title": "Metric \"otel.sdk.metric_reader.collection.duration.bucket\" is written but read by no dashboard or alert",
+      "evidence": [
+        "metric=otel.sdk.metric_reader.collection.duration.bucket series=32 samples_in_window=263696; checked 31 dashboards and 21 alert rules — zero references"
+      ],
+      "est_gb_per_month": 0.03616402285714286,
+      "est_usd_per_month": 0.010849206857142859,
+      "remediation": "Stop shipping \"otel.sdk.metric_reader.collection.duration.bucket\": drop it at the collector (filter processor) or remove the instrument. If it is consumed outside SigNoz, allow-list it in telelens config.",
+      "fix": {
+        "kind": "drop_metric",
+        "metric": "otel.sdk.metric_reader.collection.duration.bucket"
+      }
+    },
+    {
+      "id": "F-010",
+      "category": "traces",
+      "severity": "medium",
+      "title": "Span attribute \"url.full\" has 57315 distinct values",
+      "evidence": [
+        "key=\"url.full\" cardinality=57315 occurrences=65033 avg value 60B — bloats attribute indexes and filter latency"
+      ],
+      "est_gb_per_month": 0.016677488571428572,
+      "est_usd_per_month": 0.005003246571428571,
+      "remediation": "No action needed for cost — span cardinality is cheap here. Watch two edges: \"url.full\" must never become a metric label, and if its values grow large the jumbo-attribute finding will propose a truncation.",
+      "fix": {
+        "kind": "none",
+        "attribute": "url.full"
+      }
+    },
+    {
+      "id": "F-011",
+      "category": "traces",
+      "severity": "medium",
+      "title": "Span attribute \"db.statement\" has 54630 distinct values",
+      "evidence": [
+        "key=\"db.statement\" cardinality=54630 occurrences=62897 avg value 52B — bloats attribute indexes and filter latency"
+      ],
+      "est_gb_per_month": 0.014133968571428571,
+      "est_usd_per_month": 0.004240190571428572,
+      "remediation": "No action needed for cost — span cardinality is cheap here. Watch two edges: \"db.statement\" must never become a metric label, and if its values grow large the jumbo-attribute finding will propose a truncation.",
+      "fix": {
+        "kind": "none",
+        "attribute": "db.statement"
+      }
+    },
+    {
+      "id": "F-012",
+      "category": "traces",
+      "severity": "medium",
+      "title": "Span attribute \"shipping.tracking.id\" has 53051 distinct values",
+      "evidence": [
+        "key=\"shipping.tracking.id\" cardinality=53051 occurrences=53199 avg value 36B — bloats attribute indexes and filter latency"
+      ],
+      "est_gb_per_month": 0.008207845714285714,
+      "est_usd_per_month": 0.002462353714285714,
+      "remediation": "No action needed for cost — span cardinality is cheap here. Watch two edges: \"shipping.tracking.id\" must never become a metric label, and if its values grow large the jumbo-attribute finding will propose a truncation.",
+      "fix": {
+        "kind": "none",
+        "attribute": "shipping.tracking.id"
+      }
+    },
+    {
+      "id": "F-013",
+      "category": "traces",
+      "severity": "medium",
+      "title": "Span attribute \"payment.transaction.id\" has 53243 distinct values",
+      "evidence": [
+        "key=\"payment.transaction.id\" cardinality=53243 occurrences=53183 avg value 36B — bloats attribute indexes and filter latency"
+      ],
+      "est_gb_per_month": 0.008205377142857143,
+      "est_usd_per_month": 0.002461613142857143,
+      "remediation": "No action needed for cost — span cardinality is cheap here. Watch two edges: \"payment.transaction.id\" must never become a metric label, and if its values grow large the jumbo-attribute finding will propose a truncation.",
+      "fix": {
+        "kind": "none",
+        "attribute": "payment.transaction.id"
+      }
+    },
+    {
+      "id": "F-014",
+      "category": "traces",
+      "severity": "medium",
+      "title": "Span attribute \"app.shipping.tracking.id\" has 53045 distinct values",
+      "evidence": [
+        "key=\"app.shipping.tracking.id\" cardinality=53045 occurrences=53182 avg value 36B — bloats attribute indexes and filter latency"
+      ],
+      "est_gb_per_month": 0.008205222857142857,
+      "est_usd_per_month": 0.002461566857142857,
+      "remediation": "No action needed for cost — span cardinality is cheap here. Watch two edges: \"app.shipping.tracking.id\" must never become a metric label, and if its values grow large the jumbo-attribute finding will propose a truncation.",
+      "fix": {
+        "kind": "none",
+        "attribute": "app.shipping.tracking.id"
+      }
+    },
+    {
+      "id": "F-015",
+      "category": "traces",
+      "severity": "medium",
+      "title": "Span attribute \"app.payment.transaction.id\" has 53062 distinct values",
+      "evidence": [
+        "key=\"app.payment.transaction.id\" cardinality=53062 occurrences=52987 avg value 36B — bloats attribute indexes and filter latency"
+      ],
+      "est_gb_per_month": 0.008175137142857144,
+      "est_usd_per_month": 0.002452541142857143,
+      "remediation": "No action needed for cost — span cardinality is cheap here. Watch two edges: \"app.payment.transaction.id\" must never become a metric label, and if its values grow large the jumbo-attribute finding will propose a truncation.",
+      "fix": {
+        "kind": "none",
+        "attribute": "app.payment.transaction.id"
+      }
+    },
+    {
+      "id": "F-016",
+      "category": "traces",
+      "severity": "medium",
+      "title": "Span attribute \"app.order.id\" has 65591 distinct values",
+      "evidence": [
+        "key=\"app.order.id\" cardinality=65591 occurrences=65582 avg value 25B — bloats attribute indexes and filter latency"
+      ],
+      "est_gb_per_month": 0.007027114285714286,
+      "est_usd_per_month": 0.002108134285714286,
+      "remediation": "No action needed for cost — span cardinality is cheap here. Watch two edges: \"app.order.id\" must never become a metric label, and if its values grow large the jumbo-attribute finding will propose a truncation.",
+      "fix": {
+        "kind": "none",
+        "attribute": "app.order.id"
+      }
+    },
+    {
+      "id": "F-017",
+      "category": "traces",
+      "severity": "medium",
+      "title": "Span attribute \"http.url\" has 10068 distinct values",
+      "evidence": [
+        "key=\"http.url\" cardinality=10068 occurrences=27724 avg value 55B — bloats attribute indexes and filter latency"
+      ],
+      "est_gb_per_month": 0.006501732857142857,
+      "est_usd_per_month": 0.001950519857142857,
+      "remediation": "No action needed for cost — span cardinality is cheap here. Watch two edges: \"http.url\" must never become a metric label, and if its values grow large the jumbo-attribute finding will propose a truncation.",
+      "fix": {
+        "kind": "none",
+        "attribute": "http.url"
+      }
+    },
+    {
+      "id": "F-018",
+      "category": "traces",
+      "severity": "medium",
+      "title": "Span attribute \"order.id\" has 68176 distinct values",
+      "evidence": [
+        "key=\"order.id\" cardinality=68176 occurrences=95794 avg value 12B — bloats attribute indexes and filter latency"
+      ],
+      "est_gb_per_month": 0.0049265485714285705,
+      "est_usd_per_month": 0.0014779645714285711,
+      "remediation": "No action needed for cost — span cardinality is cheap here. Watch two edges: \"order.id\" must never become a metric label, and if its values grow large the jumbo-attribute finding will propose a truncation.",
+      "fix": {
+        "kind": "none",
+        "attribute": "order.id"
+      }
+    },
+    {
+      "id": "F-019",
+      "category": "traces",
+      "severity": "medium",
+      "title": "Span attribute \"app.email.message_id\" has 54780 distinct values",
+      "evidence": [
+        "key=\"app.email.message_id\" cardinality=54780 occurrences=54829 avg value 12B — bloats attribute indexes and filter latency"
+      ],
+      "est_gb_per_month": 0.0028197771428571427,
+      "est_usd_per_month": 0.0008459331428571428,
+      "remediation": "No action needed for cost — span cardinality is cheap here. Watch two edges: \"app.email.message_id\" must never become a metric label, and if its values grow large the jumbo-attribute finding will propose a truncation.",
+      "fix": {
+        "kind": "none",
+        "attribute": "app.email.message_id"
+      }
+    },
+    {
+      "id": "F-020",
+      "category": "traces",
+      "severity": "medium",
+      "title": "Span attribute \"app.email.recipient\" has 10011 distinct values",
+      "evidence": [
+        "key=\"app.email.recipient\" cardinality=10011 occurrences=27212 avg value 21B — bloats attribute indexes and filter latency"
+      ],
+      "est_gb_per_month": 0.0024361114285714287,
+      "est_usd_per_month": 0.0007308334285714286,
+      "remediation": "No action needed for cost — span cardinality is cheap here. Watch two edges: \"app.email.recipient\" must never become a metric label, and if its values grow large the jumbo-attribute finding will propose a truncation.",
+      "fix": {
+        "kind": "none",
+        "attribute": "app.email.recipient"
+      }
+    },
+    {
+      "id": "F-021",
+      "category": "traces",
+      "severity": "medium",
+      "title": "Span attribute \"app.user.id\" has 43377 distinct values",
+      "evidence": [
+        "key=\"app.user.id\" cardinality=43377 occurrences=55262 avg value 10B — bloats attribute indexes and filter latency"
+      ],
+      "est_gb_per_month": 0.002407101428571429,
+      "est_usd_per_month": 0.0007221304285714286,
+      "remediation": "No action needed for cost — span cardinality is cheap here. Watch two edges: \"app.user.id\" must never become a metric label, and if its values grow large the jumbo-attribute finding will propose a truncation.",
+      "fix": {
+        "kind": "none",
+        "attribute": "app.user.id"
+      }
+    },
+    {
+      "id": "F-022",
+      "category": "traces",
+      "severity": "low",
+      "title": "Browser RUM telemetry bill: \"meridian-web\" ships 223 session spans across 38 sessions",
+      "evidence": [
+        "service=meridian-web spans_with_session.id=223 sessions=38 attr_bytes=1188 (1.8 KB/session uncompressed)"
+      ],
+      "est_gb_per_month": 0.00029180571428571425,
+      "est_usd_per_month": 0.00008754171428571427,
+      "remediation": "Attribution, not waste: this is the frontend-observability bill. Scale it by expected sessions/month before rollout; RUM SDK sampleRate is the knob.",
+      "fix": {
+        "kind": "none",
+        "service": "meridian-web"
+      }
+    },
+    {
+      "id": "F-023",
+      "category": "traces",
+      "severity": "low",
+      "title": "AI-agent telemetry bill: \"argus\" ships 35 gen_ai spans (204665 tokens tracked)",
+      "evidence": [
+        "service=argus gen_ai spans=35 attr_bytes=208 tokens_tracked=204665 — LLM telemetry per the gen_ai.* semantic conventions"
+      ],
+      "est_gb_per_month": 0.000045891428571428574,
+      "est_usd_per_month": 0.000013767428571428572,
+      "remediation": "Attribution, not waste: this is what observing your AI agent costs. Compare it against the agent's own LLM spend to budget observability per investigation.",
+      "fix": {
+        "kind": "none",
+        "service": "argus"
+      }
+    },
+    {
+      "id": "F-024",
+      "category": "metrics",
+      "severity": "high",
+      "title": "Unbounded ID \"session.id\" is a metric label on browser.sessions.count",
+      "evidence": [
+        "metric \"browser.sessions.count\" carries label \"session.id\" on 37 series",
+        "an unbounded ID as a metric label multiplies series count by user/session/request count — a structural time bomb at ANY current cardinality (today: 37 series)"
+      ],
+      "est_gb_per_month": 0,
+      "est_usd_per_month": 0,
+      "remediation": "Delete label \"session.id\" from these metrics at the collector (transform processor). Per-session.id analysis belongs in traces/logs, where high cardinality is free.",
+      "fix": {
+        "kind": "drop_metric_label",
+        "attribute": "session.id",
+        "metric": "browser.sessions.count"
+      }
+    },
+    {
+      "id": "F-025",
+      "category": "quality",
+      "severity": "low",
+      "title": "Cardinality discipline held: 2 unbounded ID attribute(s) stay off metric labels",
+      "evidence": [
+        "order.id (68176 distinct values on spans)",
+        "user.id (500 distinct values on spans)",
+        "these IDs live on spans (where cardinality is free) and appear on NO metric series — exactly right"
+      ],
+      "est_gb_per_month": 0,
+      "est_usd_per_month": 0,
+      "remediation": "Nothing to fix — keep it this way. This is the discipline the label-bomb findings ask for.",
+      "fix": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "F-026",
+      "category": "quality",
+      "severity": "low",
+      "title": "demo-app mixes severity casing (\"Info\")",
+      "evidence": [
+        "service=\"demo-app\" severity_text=\"Info\" count=344 — case-sensitive filters will miss these"
+      ],
+      "est_gb_per_month": 0,
+      "est_usd_per_month": 0,
+      "remediation": "Uppercase severity_text at the SDK or collector so filters match once.",
+      "fix": {
+        "kind": "none",
+        "service": "demo-app"
+      }
+    }
+  ],
+  "simulation": {
+    "policy": {
+      "sampling_pct": 5,
+      "latency_threshold_ms": 750
+    },
+    "total_traces": 168711,
+    "kept_traces": 113522,
+    "error_traces": 110430,
+    "errors_kept": 110430,
+    "slow_traces": 145,
+    "slow_kept": 145,
+    "boring_traces": 58136,
+    "boring_kept": 2947,
+    "total_spans": 8953804,
+    "kept_spans": 8332657,
+    "safe": true
+  }
+}

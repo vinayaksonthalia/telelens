@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="sketch.css">
+</head>
+<body>
+  <div class="title" style="left:60px; top:44px;">where the bill comes from</div>
+  <div class="subtitle" style="left:64px; top:118px;">your telemetry, priced pattern by pattern &mdash; TELELENS</div>
+
+  <div class="box" id="w1" style="left:80px; top:230px; width:420px; height:140px;">
+    <div class="label" style="font-size:27px;">debug-log firehose</div>
+    <div class="sub">50% of all log volume &mdash; $11/mo</div>
+  </div>
+
+  <div class="box" id="w2" style="left:80px; top:430px; width:420px; height:140px;">
+    <div class="label" style="font-size:27px;">label bombs</div>
+    <div class="sub">user_id on http metrics &rarr;<br>cardinality explosion &mdash; $3.8/mo</div>
+  </div>
+
+  <div class="box" id="w3" style="left:80px; top:630px; width:420px; height:140px;">
+    <div class="label" style="font-size:27px;">write-only telemetry</div>
+    <div class="sub">shipped every day,<br>queried by nobody, ever</div>
+  </div>
+
+  <div class="box thick" id="ch" style="left:920px; top:330px; width:400px; height:280px;">
+    <div class="label">ClickHouse</div>
+    <div class="sub">your storage, your bill<br><br><span style="font-size:26px; color:var(--ink); font-family:'Marker Felt','Chalkboard SE',cursive;">~$39/mo of it = pure waste</span></div>
+  </div>
+
+  <div class="small-gray" style="left:1355px; top:445px; width:220px;">130 GB/month,<br>found &amp; priced<br>by one read-only scan</div>
+
+  <div class="note" id="note" style="left:790px; top:700px; width:620px;">
+    you're paying to store data nobody reads
+  </div>
+
+<script src="sketch.js"></script>
+<script>
+window.addEventListener("load", () => {
+  Sketch.init();
+  Sketch.underline(".title");
+  Sketch.connect("#w1", "#ch", { from: "right", to: "topleft", curve: -30, seed: 16 });
+  Sketch.connect("#w2", "#ch", { from: "right", to: "left", seed: 27 });
+  Sketch.connect("#w3", "#ch", { from: "right", to: "bottomleft", curve: 30, seed: 38 });
+  // red dotted callback from the note up into the ClickHouse box
+  Sketch.arrow(1100, 692, 1120, 618, { color: "var(--red)", dotted: true, curve: -22, seed: 92, width: 2.8 });
+  window.__sketchDone = true;
+});
+</script>
+</body>
+</html>

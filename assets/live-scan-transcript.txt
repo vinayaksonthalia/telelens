@@ -1,0 +1,47 @@
+telelens scan · source: clickhouse (http://localhost:8123, window=7d)
+  traces     13 findings
+  logs       1 findings
+  metrics    0 findings
+  usage-xref 6 findings
+  ecosystem  5 findings
+  quality    1 findings
+
+ID     SEV      CATEGORY  FINDING                                                         GB/mo      $/mo
+F-001  high     traces    7793325 near-identical success spans are prime tail-sampl…        9.7      2.90
+F-002  medium   logs      INFO firehose: checkout is 35% of your log volume                 1.9      0.58
+F-003  high     metrics   86 more metrics are written but read by no dashboard or a…        0.3      0.08
+F-004  high     metrics   Metric "signoz_latency.bucket" is written but read by no …        0.3      0.08
+F-005  low      traces    Browser RUM telemetry bill: "browser-frontend" ships 1203…        0.2      0.05
+F-006  high     metrics   Metric "http.server.duration.bucket" is written but read …        0.0      0.01
+F-007  high     metrics   Metric "http.server.response.size.bucket" is written but …        0.0      0.01
+F-008  high     metrics   Metric "checkout.cart.value.bucket" is written but read b…        0.0      0.01
+F-009  high     metrics   Metric "otel.sdk.metric_reader.collection.duration.bucket…        0.0      0.01
+F-010  medium   traces    Span attribute "url.full" has 57315 distinct values               0.0      0.01
+F-011  medium   traces    Span attribute "db.statement" has 54630 distinct values           0.0      0.00
+F-012  medium   traces    Span attribute "shipping.tracking.id" has 53051 distinct …        0.0      0.00
+F-013  medium   traces    Span attribute "payment.transaction.id" has 53243 distinc…        0.0      0.00
+F-014  medium   traces    Span attribute "app.shipping.tracking.id" has 53045 disti…        0.0      0.00
+F-015  medium   traces    Span attribute "app.payment.transaction.id" has 53062 dis…        0.0      0.00
+F-016  medium   traces    Span attribute "app.order.id" has 65591 distinct values           0.0      0.00
+F-017  medium   traces    Span attribute "http.url" has 10068 distinct values               0.0      0.00
+F-018  medium   traces    Span attribute "order.id" has 67721 distinct values               0.0      0.00
+F-019  medium   traces    Span attribute "app.email.message_id" has 54780 distinct …        0.0      0.00
+F-020  medium   traces    Span attribute "app.email.recipient" has 10011 distinct v…        0.0      0.00
+F-021  medium   traces    Span attribute "app.user.id" has 43377 distinct values            0.0      0.00
+F-022  low      traces    Browser RUM telemetry bill: "meridian-web" ships 223 sess…        0.0      0.00
+F-023  low      traces    AI-agent telemetry bill: "argus" ships 35 gen_ai spans (2…        0.0      0.00
+F-024  high     metrics   Unbounded ID "session.id" is a metric label on browser.se…          —         —
+F-025  low      quality   Cardinality discipline held: 2 unbounded ID attribute(s) …          —         —
+F-026  low      quality   demo-app mixes severity casing ("Info")                             —         —
+
+Total identified savings: 12.5 GB/month ≈ $3.75/month
+
+Sampling simulator replay (166180 traces, 8938987 spans)
+  policy: keep errors + keep >= 750 ms + sample 5.0% of the rest
+  error traces:  110597 / 110597 kept
+  slow traces:   145 / 145 kept
+  boring traces: 2816 / 55438 kept (94.9% dropped)
+  span volume dropped: 6.6%
+  verdict: SAFE — policy retains 100% of error traces and 100% of slow traces
+
+scan completed in 3.74s · outputs in out-live/
