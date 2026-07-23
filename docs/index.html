@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TELELENS — Waste Report</title>
+<style>
+:root{
+  --bg:#0A0B0D; --surface:#111214; --raised:#17181B;
+  --hairline:rgba(255,255,255,.08); --border:rgba(255,255,255,.14);
+  --text-1:#EDEDEF; --text-2:#9A9BA3; --text-3:#6C6D75;
+  --teal:#14B8A6; --teal-bright:#2DD4BF; --teal-dim:rgba(20,184,166,.14);
+  --high:#E5484D; --med:#F5A623; --low:#5B8DEF; --green:#3DD68C;
+  --mono:"JetBrains Mono","SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  --sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text-1);font-family:var(--sans);
+  font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+a{color:var(--teal-bright);text-decoration:none} a:hover{text-decoration:underline}
+.wrap{max-width:960px;margin:0 auto;padding:0 24px}
+
+.topbar{border-bottom:1px solid var(--hairline);background:var(--surface);
+  position:sticky;top:0;z-index:10}
+.topbar-in{max-width:960px;margin:0 auto;padding:15px 24px;display:flex;
+  align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:baseline;gap:11px}
+.brand .mark{color:var(--teal);font-size:18px;transform:translateY(1px)}
+.brand .word{font-weight:600;letter-spacing:.16em;font-size:15px}
+.brand .sub{color:var(--text-3);font-size:12px;letter-spacing:.02em}
+.repo-link{font-size:12.5px;color:var(--text-2);border:1px solid var(--border);
+  border-radius:999px;padding:6px 13px}
+.repo-link:hover{border-color:var(--teal);color:var(--text-1);text-decoration:none}
+
+.hero{padding:40px 0 8px}
+.hero h1{font-size:27px;font-weight:600;letter-spacing:-.02em;margin:0 0 8px}
+.hero .lede{color:var(--text-2);font-size:15px;max-width:640px;margin:0 0 24px}
+.meta{display:flex;gap:22px;flex-wrap:wrap;font-size:12.5px;color:var(--text-3);
+  border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);
+  padding:13px 0;margin-bottom:26px}
+.meta b{color:var(--text-1);font-weight:600}
+.meta .k{display:block;text-transform:uppercase;letter-spacing:.05em;font-size:10.5px;
+  color:var(--text-3);margin-bottom:2px}
+
+.savings{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:14px;margin-bottom:26px}
+.stat{background:var(--surface);border:1px solid var(--hairline);border-radius:12px;padding:16px 18px}
+.stat.big{background:linear-gradient(135deg,rgba(20,184,166,.14),rgba(20,184,166,.04));
+  border-color:rgba(20,184,166,.3)}
+.stat .v{font-size:24px;font-weight:700;font-family:var(--mono);letter-spacing:-.01em}
+.stat.big .v{color:var(--teal-bright)}
+.stat .l{font-size:11.5px;color:var(--text-3);margin-top:3px}
+.stat .high{color:var(--high)} .stat .med{color:var(--med)} .stat .low{color:var(--low)}
+
+.banner{background:var(--surface);border:1px solid rgba(20,184,166,.3);border-left:3px solid var(--teal);
+  border-radius:12px;padding:18px 22px;margin-bottom:16px;display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+.banner .measure{font-size:40px;font-weight:700;color:var(--teal-bright);font-family:var(--mono);line-height:1}
+.banner .body{flex:1;min-width:260px}
+.banner .body .h{font-weight:600;font-size:15px;margin-bottom:4px}
+.banner .body p{margin:0;color:var(--text-2);font-size:13px}
+.caveat{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.26);border-radius:10px;
+  padding:12px 16px;margin-bottom:26px;font-size:13px;color:var(--text-2)}
+.caveat b{color:var(--med)}
+
+.section-h{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-2);
+  font-weight:600;margin:28px 0 12px;display:flex;align-items:center;gap:10px}
+.chip{text-transform:none;letter-spacing:normal;font-weight:500;font-size:11px;color:var(--text-3);
+  background:var(--raised);border:1px solid var(--hairline);padding:1.5px 8px;border-radius:999px}
+
+.verdict{background:var(--surface);border:1px solid var(--hairline);border-radius:12px;overflow:hidden;margin-bottom:8px}
+.verdict-head{display:flex;align-items:center;gap:12px;padding:15px 20px;border-bottom:1px solid var(--hairline)}
+.verdict-stamp{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--green);
+  background:rgba(61,214,140,.12);border:1px solid rgba(61,214,140,.32);border-radius:999px;padding:4px 12px}
+.verdict-policy{color:var(--text-2);font-size:13px;font-family:var(--mono)}
+.verdict-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--hairline)}
+.vcell{background:var(--surface);padding:14px 18px}
+.vcell .v{font-family:var(--mono);font-size:15px;font-weight:600}
+.vcell .v .keep{color:var(--green)}
+.vcell .l{font-size:11.5px;color:var(--text-3);margin-top:3px}
+
+table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:8px}
+thead th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--text-3);font-weight:600;padding:9px 10px;border-bottom:1px solid var(--border)}
+thead th.num{text-align:right}
+tbody td{padding:10px;border-bottom:1px solid var(--hairline);vertical-align:top}
+tbody tr:hover{background:var(--surface)}
+td.id{color:var(--text-3);white-space:nowrap}
+td.cat{color:var(--text-2)}
+td.finding{color:var(--text-1);line-height:1.45}
+td.num{text-align:right;white-space:nowrap;color:var(--text-1)}
+.sev-badge{font-size:10px;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:999px;
+  border:1px solid transparent;white-space:nowrap}
+.sev-badge.sev-high{color:var(--high);background:rgba(229,72,77,.12);border-color:rgba(229,72,77,.3)}
+.sev-badge.sev-medium{color:var(--med);background:rgba(245,166,35,.12);border-color:rgba(245,166,35,.3)}
+.sev-badge.sev-low{color:var(--low);background:rgba(91,141,239,.12);border-color:rgba(91,141,239,.3)}
+.table-scroll{overflow-x:auto;border:1px solid var(--hairline);border-radius:12px;background:var(--bg)}
+.table-scroll table{margin:0} .table-scroll thead th{padding-left:14px;padding-right:14px}
+.table-scroll tbody td{padding-left:14px;padding-right:14px}
+
+.disclaimer{color:var(--text-3);font-size:12px;margin:18px 0 8px;line-height:1.6}
+.footer{border-top:1px solid var(--hairline);margin-top:36px;background:var(--surface)}
+.footer-in{max-width:960px;margin:0 auto;padding:22px 24px;font-size:12.5px;color:var(--text-3)}
+.footer-in .gen{margin-bottom:12px;color:var(--text-2)}
+.family{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.family .lbl{color:var(--text-2);font-weight:500}
+.family .dot{color:var(--text-3)} .family .sub,.family .sub a{color:var(--text-3)}
+@media (max-width:720px){.savings{grid-template-columns:1fr 1fr}.banner .measure{font-size:32px}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <span class="mark" aria-hidden="true">◹</span>
+      <span class="word">TELELENS</span>
+      <span class="sub">Waste Report</span>
+    </div>
+    <a class="repo-link" href="https://github.com/vinayaksonthalia/telelens">github.com/vinayaksonthalia/telelens ↗</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>Telemetry waste report</h1>
+    <p class="lede">A real, read-only scan of our demo SigNoz instance — the profiler
+      reads ClickHouse directly (SELECT/GET only), prices every finding, and proves its
+      headline fix is safe before anyone applies it.</p>
+    <div class="meta">
+      <div><span class="k">Scanned</span><b>2026-07-18T06:08:02.230961Z</b></div>
+      <div><span class="k">Source</span><b>clickhouse (http://localhost:8123, window=7d)</b></div>
+      <div><span class="k">Scan duration</span><b>8.7s</b></div>
+      <div><span class="k">Pricing basis</span><b>$0.3 / uncompressed-ingest GB</b></div>
+    </div>
+
+    <div class="savings">
+      <div class="stat big">
+        <div class="v">12.5 GB<span style="font-size:15px">/mo</span></div>
+        <div class="l">total identified savings ≈ <b style="color:var(--teal-bright)">$3.75/mo</b></div>
+      </div>
+      <div class="stat"><div class="v high">8</div><div class="l">high severity</div></div>
+      <div class="stat"><div class="v med">13</div><div class="l">medium severity</div></div>
+      <div class="stat"><div class="v low">5</div><div class="l">low / directional</div></div>
+    </div>
+  </section>
+
+  <div class="section-h">The headline fix — tail sampling <span class="chip">F-001</span></div>
+  <div class="banner">
+    <div class="measure">−95%</div>
+    <div class="body">
+      <div class="h">94.9% of “boring” traces dropped</div>
+      <p>Keep 100% of errors, keep every trace ≥ 750 ms, sample the
+      remaining successful/fast traces at 5%. Of 58,136
+      boring traces, only 2,947 are kept.</p>
+    </div>
+  </div>
+  <div class="caveat">
+    <b>The honest counterweight:</b> dropping 95% of boring <em>traces</em> is not the same as
+    dropping 95% of the <em>bill</em>. Because errors and slow traces are retained in full,
+    total span volume falls by only <b>6.9%</b>
+    (8,953,804 → 8,332,657 spans). Safety first, savings second —
+    the profiler never conflates the two.
+  </div>
+
+  <div class="section-h">Sampling safety proof <span class="chip">telelens simulate — replayed on the real scan</span></div>
+  <div class="verdict">
+    <div class="verdict-head">
+      <span class="verdict-stamp">✓ VERDICT: SAFE</span>
+      <span class="verdict-policy">keep errors + keep ≥ 750 ms + sample 5% of the rest</span>
+    </div>
+    <div class="verdict-grid">
+      <div class="vcell"><div class="v"><span class="keep">110,430</span> / 110,430</div><div class="l">error traces kept (100%)</div></div>
+      <div class="vcell"><div class="v"><span class="keep">145</span> / 145</div><div class="l">slow traces kept (100%)</div></div>
+      <div class="vcell"><div class="v">2,947 / 58,136</div><div class="l">boring traces kept (5.1%)</div></div>
+      <div class="vcell"><div class="v">113,522 / 168,711</div><div class="l">traces kept overall</div></div>
+    </div>
+  </div>
+  <p class="disclaimer">Replay of 168,711 traces / 8,953,804 spans.
+    The policy is judged SAFE because it retains 100% of error traces and 100% of slow traces —
+    the two classes you actually page on.</p>
+
+  <div class="section-h">All findings <span class="chip">26 total, priced against the scan window</span></div>
+  <div class="table-scroll">
+  <table>
+    <thead><tr>
+      <th>#</th><th>Sev</th><th>Category</th><th>Finding</th>
+      <th class="num">GB/mo</th><th class="num">$/mo</th>
+    </tr></thead>
+    <tbody>
+<tr class="sev-high"><td class="mono id">F-001</td><td><span class="sev-badge sev-high">HIGH</span></td><td class="mono cat">traces</td><td class="finding">7801417 near-identical success spans are prime tail-sampling candidates</td><td class="num mono">9.7</td><td class="num mono">$2.90</td></tr>
+<tr class="sev-high"><td class="mono id">F-003</td><td><span class="sev-badge sev-high">HIGH</span></td><td class="mono cat">metrics</td><td class="finding">86 more metrics are written but read by no dashboard or alert</td><td class="num mono">0.3</td><td class="num mono">$0.08</td></tr>
+<tr class="sev-high"><td class="mono id">F-004</td><td><span class="sev-badge sev-high">HIGH</span></td><td class="mono cat">metrics</td><td class="finding">Metric &quot;signoz_latency.bucket&quot; is written but read by no dashboard or alert</td><td class="num mono">0.3</td><td class="num mono">$0.08</td></tr>
+<tr class="sev-high"><td class="mono id">F-006</td><td><span class="sev-badge sev-high">HIGH</span></td><td class="mono cat">metrics</td><td class="finding">Metric &quot;http.server.duration.bucket&quot; is written but read by no dashboard or alert</td><td class="num mono">0.0</td><td class="num mono">$0.01</td></tr>
+<tr class="sev-high"><td class="mono id">F-007</td><td><span class="sev-badge sev-high">HIGH</span></td><td class="mono cat">metrics</td><td class="finding">Metric &quot;http.server.response.size.bucket&quot; is written but read by no dashboard or alert</td><td class="num mono">0.0</td><td class="num mono">$0.01</td></tr>
+<tr class="sev-high"><td class="mono id">F-008</td><td><span class="sev-badge sev-high">HIGH</span></td><td class="mono cat">metrics</td><td class="finding">Metric &quot;checkout.cart.value.bucket&quot; is written but read by no dashboard or alert</td><td class="num mono">0.0</td><td class="num mono">$0.01</td></tr>
+<tr class="sev-high"><td class="mono id">F-009</td><td><span class="sev-badge sev-high">HIGH</span></td><td class="mono cat">metrics</td><td class="finding">Metric &quot;otel.sdk.metric_reader.collection.duration.bucket&quot; is written but read by no dashboard or alert</td><td class="num mono">0.0</td><td class="num mono">$0.01</td></tr>
+<tr class="sev-high"><td class="mono id">F-024</td><td><span class="sev-badge sev-high">HIGH</span></td><td class="mono cat">metrics</td><td class="finding">Unbounded ID &quot;session.id&quot; is a metric label on browser.sessions.count</td><td class="num mono">—</td><td class="num mono">—</td></tr>
+<tr class="sev-medium"><td class="mono id">F-002</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">logs</td><td class="finding">INFO firehose: checkout is 35% of your log volume</td><td class="num mono">1.9</td><td class="num mono">$0.58</td></tr>
+<tr class="sev-medium"><td class="mono id">F-010</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;url.full&quot; has 57315 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.01</td></tr>
+<tr class="sev-medium"><td class="mono id">F-011</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;db.statement&quot; has 54630 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
+<tr class="sev-medium"><td class="mono id">F-012</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;shipping.tracking.id&quot; has 53051 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
+<tr class="sev-medium"><td class="mono id">F-013</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;payment.transaction.id&quot; has 53243 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
+<tr class="sev-medium"><td class="mono id">F-014</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;app.shipping.tracking.id&quot; has 53045 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
+<tr class="sev-medium"><td class="mono id">F-015</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;app.payment.transaction.id&quot; has 53062 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
+<tr class="sev-medium"><td class="mono id">F-016</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;app.order.id&quot; has 65591 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
+<tr class="sev-medium"><td class="mono id">F-017</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;http.url&quot; has 10068 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
+<tr class="sev-medium"><td class="mono id">F-018</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;order.id&quot; has 68176 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
+<tr class="sev-medium"><td class="mono id">F-019</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;app.email.message_id&quot; has 54780 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
+<tr class="sev-medium"><td class="mono id">F-020</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;app.email.recipient&quot; has 10011 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
+<tr class="sev-medium"><td class="mono id">F-021</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;app.user.id&quot; has 43377 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
+<tr class="sev-low"><td class="mono id">F-005</td><td><span class="sev-badge sev-low">LOW</span></td><td class="mono cat">traces</td><td class="finding">Browser RUM telemetry bill: &quot;browser-frontend&quot; ships 120358 session spans across 1 sessions</td><td class="num mono">0.2</td><td class="num mono">$0.05</td></tr>
+<tr class="sev-low"><td class="mono id">F-022</td><td><span class="sev-badge sev-low">LOW</span></td><td class="mono cat">traces</td><td class="finding">Browser RUM telemetry bill: &quot;meridian-web&quot; ships 223 session spans across 38 sessions</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
+<tr class="sev-low"><td class="mono id">F-023</td><td><span class="sev-badge sev-low">LOW</span></td><td class="mono cat">traces</td><td class="finding">AI-agent telemetry bill: &quot;argus&quot; ships 35 gen_ai spans (204665 tokens tracked)</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
+<tr class="sev-low"><td class="mono id">F-025</td><td><span class="sev-badge sev-low">LOW</span></td><td class="mono cat">quality</td><td class="finding">Cardinality discipline held: 2 unbounded ID attribute(s) stay off metric labels</td><td class="num mono">—</td><td class="num mono">—</td></tr>
+<tr class="sev-low"><td class="mono id">F-026</td><td><span class="sev-badge sev-low">LOW</span></td><td class="mono cat">quality</td><td class="finding">demo-app mixes severity casing (&quot;Info&quot;)</td><td class="num mono">—</td><td class="num mono">—</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="disclaimer">Estimates are uncompressed-ingest figures extrapolated from the scan window;
+    findings shown as “—” are directional (cardinality / quality risks that are not reliably priceable).
+    TELELENS profilers are read-only — nothing is applied without a human running <span class="mono">foundryctl cast</span>.</p>
+</main>
+
+<footer class="footer">
+  <div class="footer-in">
+    <div class="gen">Generated from a real scan of our demo SigNoz instance, July 2026 — every number on this page comes straight from the scan artifact.</div>
+    <div class="family">
+      <span class="lbl">Part of a three-tool family —</span>
+      <a href="https://github.com/vinayaksonthalia/telelens">TELELENS</a>
+      <span class="dot">·</span>
+      <a href="https://vinayaksonthalia.github.io/argus/">ARGUS demo</a>
+      <span class="sub">(<a href="https://github.com/vinayaksonthalia/argus">repo</a>)</span>
+      <span class="dot">·</span>
+      <a href="https://vinayaksonthalia.github.io/glasspane/">GLASSPANE demo</a>
+      <span class="sub">(<a href="https://github.com/vinayaksonthalia/glasspane">repo</a>)</span>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
