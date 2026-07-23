@@ -1,0 +1,20 @@
+<svg width="196" height="48" viewBox="0 0 196 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TELELENS">
+  <defs>
+    <linearGradient id="tl-blade" x1="14" y1="14" x2="50" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2DD4BF"/>
+      <stop offset="1" stop-color="#14B8A6"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(4,4) scale(0.625)">
+    <circle cx="32" cy="32" r="18" stroke="#14B8A6" stroke-width="4" fill="none"/>
+    <g stroke="url(#tl-blade)" stroke-width="3.5" stroke-linecap="round" fill="none">
+      <path d="M38.5 35.75 L20.71 46.02"/>
+      <path d="M32 39.5 L14.21 29.23"/>
+      <path d="M25.5 35.75 L25.5 15.21"/>
+      <path d="M25.5 28.25 L43.29 17.98"/>
+      <path d="M32 24.5 L49.79 34.77"/>
+      <path d="M38.5 28.25 L38.5 48.79"/>
+    </g>
+  </g>
+  <text x="50" y="32.3" font-family="Inter, -apple-system, sans-serif" font-size="23" font-weight="600" letter-spacing="2.4" fill="#111214">TELELENS</text>
+</svg>
