@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/brand/logo-1200.png" alt="TELELENS" width="420">
+<img src="assets/brand/logo-1200.png" alt="TELELENS — telemetry cost and cardinality profiler for SigNoz" width="420">
 
 # TELELENS
 
