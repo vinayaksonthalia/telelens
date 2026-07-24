@@ -83,4 +83,4 @@ Pricing is a **transparent model, not a cloud invoice** (directional where it ca
 - [hard-questions-answered.md](hard-questions-answered.md) — the full FAQ.
 - [newbie-glossary.md](newbie-glossary.md) — definitions for tail sampling, cardinality, meter, spanmetrics, and more.
 - [../06-bug-hunt.md](../06-bug-hunt.md) — how we found these limits (including the ones we caught in ourselves).
-- [../DOCS.md](../DOCS.md) — the canonical honest-caveats list and rollback runbook.
+- [../../DOCS.md](../../DOCS.md) — the canonical honest-caveats list and rollback runbook.

@@ -72,6 +72,8 @@ Sampling simulator replay (1195 traces, 3976 spans)
 SigNoz `GET`s. The live client refuses non-SELECT statements in code, and `.env.example` documents
 the least-privilege `telelens_ro` ClickHouse user that enforces it at the database. The only writes
 TELELENS performs are files in `out/`; applying them is always a human running `foundryctl cast`.
+(Foundry is SigNoz's official deployment tool — [github.com/SigNoz/foundry](https://github.com/SigNoz/foundry);
+a *casting* is its config, and `foundryctl cast` applies it.)
 
 ## Quickstart
 
@@ -177,7 +179,8 @@ service of a real analysis:
 | #11677 | cross-context group-by + having | every profiler query (`GROUP BY … HAVING …`); dashboards group point data by resource attributes |
 | #11678 | order-by + limit | every profiler query ends `ORDER BY <cost> DESC LIMIT n` — the Waste Report *is* an order-by over money |
 
-The raw-ClickHouse forms live in `internal/store/clickhouse.go` (queries Q1–Q9).
+The queries Q1–Q12 are defined in `internal/store/store.go` (row types + the Q-numbering);
+their raw-ClickHouse SQL forms live in `internal/store/clickhouse.go`.
 
 ## Testing
 
@@ -195,7 +198,7 @@ the generated collector fragment and casting patch (`testdata/golden/`, refresh 
 
 - **Done (P0):** all six profilers (traces/logs/metrics/usage-xref/ecosystem/quality), ranked
   waste report (md+json), config generator (tail_sampling / filter / transform, annotated per
-  finding), casting patch variant, fixture mode, offline test suite (38 tests across 7 packages).
+  finding), casting patch variant, fixture mode, offline test suite (41 tests across 7 packages; 86 incl. subtests).
 - **Done (P1):** sampling simulator with safety invariant, Telemetry Bill dashboard pack +
   guardrail alerts with parameterized channel (`dashboards/import.sh`), usage cross-reference,
   `--json` agent/MCP surface, design-system CLI (lipgloss, NO_COLOR-safe, `Error:/Why:/Try:`).

@@ -75,4 +75,4 @@ Because it's the *deepest schema-level engagement in the field*: raw ClickHouse 
 - [honest-limits-what-we-dont-claim.md](honest-limits-what-we-dont-claim.md) — the boundaries we deliberately don't cross.
 - [newbie-glossary.md](newbie-glossary.md) — every term above, in plain English.
 - [../06-bug-hunt.md](../06-bug-hunt.md) — the OOM, the self-contradicting report, and F-024 in full.
-- [../DOCS.md](../DOCS.md) — the rollback runbook and the honest caveats.
+- [../../DOCS.md](../../DOCS.md) — the rollback runbook and the honest caveats.
