@@ -20,6 +20,15 @@ observability.
 
 <img src="assets/illustrations/01-where-the-bill-comes-from.png" alt="Where the telemetry bill comes from" width="100%">
 
+## The story
+
+The storage bill lands and it's climbing. Cutting telemetry blindly is scary — so
+TELELENS scans, ranks the waste, and proves the fix keeps every error *before* you apply it.
+
+<p align="center">
+  <img src="assets/illustrations/05-the-story.png" alt="Four panels: (1) wincing at a $39/mo and climbing storage bill; (2) one telelens scan ranks the waste (F-001 crit, F-002 high, F-006 crit); (3) the sampling valve keeps every error (40/40) and slow trace (55/55), verdict SAFE; (4) span storage drops 95 percent, measured not projected." width="900">
+</p>
+
 **Measured, not projected:** applied to a live SigNoz ingester, the generated config cut span
 storage **95.0%** on healthy known-volume traffic while keeping **31/31** injected error traces
 and leaving RED metrics untouched — then was reverted and the revert verified
