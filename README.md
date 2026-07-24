@@ -125,6 +125,13 @@ Live mode needs the ClickHouse HTTP port reachable (the default Foundry compose 
 (`signoz_index_v3` / `logs_v2` / `time_series_v4`) and refuses unrecognized versions with a clear
 error instead of guessing.
 
+### SigNoz Cloud
+
+Live mode requires direct ClickHouse access, so it works with **self-hosted SigNoz only** —
+SigNoz Cloud does not expose ClickHouse to customers. Cloud users can still run the full
+fixtures demo (`telelens scan --fixtures`), which exercises every profiler and generator
+against the recorded corpus.
+
 ## What the profilers find
 
 | Profiler | Findings |
@@ -215,6 +222,17 @@ the generated collector fragment and casting patch (`testdata/golden/`, refresh 
 - **Live mode caveats:** SigNoz v0.13x schemas with startup drift detection; heavy queries are
   time-sliced + memory-guarded (learned live — see `LEARNINGS.md`); meter buckets are hourly, so
   sub-hour A/B measurements count storage rows instead.
+
+## Compatibility & uninstall
+
+**Compatibility:** live-verified against **self-hosted SigNoz v0.132.2** (schemas
+`signoz_index_v3` / `logs_v2` / `time_series_v4`, with startup drift detection). Live mode is
+self-hosted only (see SigNoz Cloud note above); the fixtures demo runs anywhere.
+
+**Uninstall:** delete the `telelens` binary and the `out/` directory — TELELENS keeps no other
+state and mutates nothing. If you created the least-privilege `telelens_ro` ClickHouse user for
+live mode, drop it (`DROP USER telelens_ro`). Any dashboards or guardrail alerts you imported are
+removed from the SigNoz UI (or via the Dashboards/Rules APIs).
 
 ## Learn
 
