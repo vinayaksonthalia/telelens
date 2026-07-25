@@ -27,7 +27,7 @@ Point TELELENS at a SigNoz instance and it tells you — with evidence, GB/month
 |---|---|---|
 | Span storage cut on healthy known-volume traffic | **−95.0%** | [`assets/live-apply-measure-m4-evidence.md`](assets/live-apply-measure-m4-evidence.md) |
 | Injected error traces kept | **31 / 31** (live) · **40 / 40** (fixtures) | same |
-| Simulator replayed over real last-24h traces | **162,760 traces — SAFE** | [`assets/live-scan-m2-evidence.md`](assets/live-scan-m2-evidence.md) |
+| Simulator replayed over real last-24h traces | **162,760 traces — SAFE** | [`assets/live-simulator-m3-evidence.txt`](assets/live-simulator-m3-evidence.txt) |
 | Honest counterweight: droppable on an error-storm day | **~6%** (the policy refuses to drop errors) | [DOCS §Honest caveats](DOCS.md) |
 
 ```
@@ -164,7 +164,7 @@ Recommending sampling without proving it safe is malpractice. Before TELELENS em
 |---|---|
 | **P0** — all six profilers, ranked waste report (md+json), config generator (tail_sampling / filter / transform), casting patch, fixture mode, offline test suite | ✅ Done |
 | **P1** — sampling simulator with safety invariant, Telemetry Bill dashboard pack + guardrail alerts, usage cross-reference, `--json` agent/MCP surface, design-system CLI | ✅ Done |
-| **Live-verified (Jul 18)** — full scan of a real mixed-workload instance (3.9 s, 26 findings); simulator over ALL 162,760 last-24h traces (SAFE); generated config applied to a live ingester measuring **−95.0% span storage with zero error-trace loss**, then reverted; 3 dashboards + 3 alert rules via API; MCP data-quality hook demoed with a real agent | ✅ Evidence in [`assets/`](assets/) |
+| **Live-verified (Jul 18)** — full scan of a real mixed-workload instance (3.74 s, 26 findings); simulator over ALL 162,760 last-24h traces (SAFE); generated config applied to a live ingester measuring **−95.0% span storage with zero error-trace loss** on healthy known-volume traffic (on an error-storm day the same policy can only drop ~6% — it refuses to touch errors), then reverted; 3 dashboards + 3 alert rules via API; MCP data-quality hook demoed with a real agent | ✅ Evidence in [`assets/`](assets/) |
 | **P2 / roadmap** — web panel, `--explain` LLM narration, `telelens verify` automated savings assertion, `--import` flag, `otelcol validate` in CI, multi-cluster scan | ❌ Not done |
 | **Live-mode caveats** — SigNoz v0.13x schemas with startup drift detection; heavy queries time-sliced + memory-guarded; meter buckets are hourly, so sub-hour A/B measurements count storage rows instead | ⚠️ Known |
 

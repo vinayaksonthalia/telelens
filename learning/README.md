@@ -38,4 +38,4 @@ Every file follows the same shape: **In one line → an ELI10 analogy → the re
 2. **Price** — transparent uncompressed-bytes × `$/GB` math (deterministic, no LLM); unpriceable findings ship "directional."
 3. **Rank** — the Waste Report is an order-by over money; ranking is a feature, not formatting.
 4. **Generate** — an annotated collector fragment + Foundry casting patch, one block per finding — a proposal a human applies.
-5. **Prove** — the simulator replays the policy over your real traces and returns a binary SAFE/UNSAFE verdict; live, −95.0% measured with 31/31 errors kept, then reverted.
+5. **Prove** — the simulator replays the policy over your real traces and returns a binary SAFE/UNSAFE verdict; live, −95.0% measured on healthy known-volume traffic with 31/31 errors kept, then reverted (on an error-storm day the same policy only drops ~6%, because it will not drop errors — see [honest-limits](04-faq/honest-limits-what-we-dont-claim.md)).

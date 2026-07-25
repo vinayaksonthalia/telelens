@@ -3,7 +3,7 @@
 **Command:** `telelens scan --window 7 --out out-live` against the live stack
 (ClickHouse HTTP via a socat forwarder on :8123 — the Foundry compose does not
 publish the port; SigNoz API :8080 with SIGNOZ-API-KEY). Scan completed in
-**3.9 s** (NFR-1 budget: 90 s). Full transcript: `live-scan-transcript.txt`;
+**3.74 s** (NFR-1 budget: 90 s). Full transcript: `live-scan-transcript.txt`;
 report: `live-waste-report.md` + `live-findings.json`; generated fixes:
 `live-collector-fragment.yaml` + `live-casting-patch.yaml`.
 
@@ -18,7 +18,7 @@ report: `live-waste-report.md` + `live-findings.json`; generated fixes:
 
 ## Headline results (26 ranked findings, honest numbers for a small instance)
 
-- **Total identified savings: 12.5 GB/month ≈ $3.74/month** at $0.30/GB
+- **Total identified savings: 12.5 GB/month ≈ $3.75/month** at $0.30/GB
   uncompressed-ingest pricing (the instance is tiny; the *ratios* are the story).
 - F-001: 7.79M near-identical success spans → tail-sampling candidate (9.7 GB/mo).
 - F-002: INFO firehose — `checkout` is 35% of all log bytes.
