@@ -207,6 +207,8 @@ Live-verified against **self-hosted SigNoz v0.132.2** (`signoz_index_v3` / `logs
 
 ---
 
+Contributions welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## AI disclosure
 
 AI coding assistants were used during development. The profilers, config generator, sampling simulator, and dashboards are original work; the analysis itself is deterministic SQL and arithmetic — there is no LLM in the cost loop — and every live number in this README is backed by evidence under [`assets/`](assets/).
