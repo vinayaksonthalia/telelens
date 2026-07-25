@@ -76,7 +76,11 @@ func main() {
 func run(args []string) error {
 	if len(args) == 0 {
 		usage()
-		return fmt.Errorf("missing subcommand")
+		return hintErr{
+			err: fmt.Errorf("missing subcommand"),
+			why: "telelens needs to know what to do: scan, report, generate, or simulate.",
+			try: "start with `telelens scan --fixtures` — it needs no SigNoz instance and writes a full report to out/.",
+		}
 	}
 	switch args[0] {
 	case "scan":
@@ -92,7 +96,11 @@ func run(args []string) error {
 		return nil
 	default:
 		usage()
-		return fmt.Errorf("unknown subcommand %q", args[0])
+		return hintErr{
+			err: fmt.Errorf("unknown subcommand %q", args[0]),
+			why: "the only subcommands are scan, report, generate, simulate and help.",
+			try: "run `telelens help` for the full usage, or `telelens scan --fixtures` for the offline demo.",
+		}
 	}
 }
 
@@ -218,7 +226,11 @@ func cmdScan(args []string) error {
 	if f, ok := tailPolicy(ranked); ok {
 		traces, err := st.TraceSummaries(ctx)
 		if err != nil {
-			return fmt.Errorf("simulator: %w", err)
+			return hintErr{
+				err: fmt.Errorf("simulator: %w", err),
+				why: "the profilers found a tail-sampling candidate, but fetching the trace summaries for the safety replay failed — so the policy could not be proven safe, and shipping an unproven policy is not something telelens will do.",
+				try: "re-run with a smaller --window (the replay reads every trace in the window), or check ClickHouse memory pressure.",
+			}
 		}
 		res := analyze.Simulate(analyze.Policy{
 			SamplingPct:        f.Fix.SamplingPct,
@@ -385,10 +397,18 @@ func loadReport(path string) (generate.Report, error) {
 	var r generate.Report
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return r, fmt.Errorf("read findings (run `telelens scan` first): %w", err)
+		return r, hintErr{
+			err: fmt.Errorf("read findings: %s", path),
+			why: "report and generate re-render a report that a previous scan produced; that findings file does not exist yet.",
+			try: "run `telelens scan --fixtures` (or a live scan) first, then re-run with --findings pointing at out/findings.json.",
+		}
 	}
 	if err := json.Unmarshal(data, &r); err != nil {
-		return r, fmt.Errorf("parse %s: %w", path, err)
+		return r, hintErr{
+			err: fmt.Errorf("parse %s: %w", path, err),
+			why: "the file exists but is not a findings report written by `telelens scan` (truncated, hand-edited, or a different JSON file).",
+			try: "re-run `telelens scan` to regenerate it, or point --findings at the out/findings.json a scan produced.",
+		}
 	}
 	return r, nil
 }
@@ -480,7 +500,11 @@ func cmdSimulate(args []string) error {
 		fmt.Println(res.SafetyReport())
 	}
 	if !res.Safe {
-		return fmt.Errorf("policy rejected by safety invariant (NFR-4)")
+		return hintErr{
+			err: fmt.Errorf("policy rejected by safety invariant (NFR-4)"),
+			why: "the replay dropped at least one error or slow trace. TELELENS refuses to recommend a policy that loses the traces you need during an incident — this is the product's core invariant, not a warning.",
+			try: "raise --sampling-pct or lower --latency-ms until the replay keeps 100% of error and slow traces, then re-run; the report above shows which class was lost.",
+		}
 	}
 	return nil
 }
