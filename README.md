@@ -6,12 +6,14 @@
 
 **A telemetry cost & cardinality profiler for SigNoz: it finds the waste, generates the fix, and proves it drops zero error traces first.**
 
+**−95.0% span storage measured on a live ingester** (honest counterweight: only **~6%** on an error-storm day — the policy refuses to drop errors) · **14.1M spans profiled in 895 ms** · **31 / 31 error traces kept** · **41 tests, 7 packages, 86 subtests** · **read-only by design** · **MIT**
+
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Go 1.24+](https://img.shields.io/badge/go-1.24%2B-00ADD8.svg)](go.mod)
 [![Last commit](https://img.shields.io/github/last-commit/vinayaksonthalia/telelens.svg)](https://github.com/vinayaksonthalia/telelens/commits)
 [![Repo size](https://img.shields.io/github/repo-size/vinayaksonthalia/telelens.svg)](https://github.com/vinayaksonthalia/telelens)
 
-[See it work](#see-it-work) · [Why TELELENS](#why-telelens) · [Quickstart](#quickstart) · [Profilers](#what-the-profilers-find) · [Query Builder](#query-builder-coverage) · [Safety proof](#the-safety-proof) · [Architecture](#architecture) · [Status](#honest-status) · [Learn](#learn)
+[See it work](#see-it-work) · [Why TELELENS](#why-telelens) · [The 15-minute tour](#the-15-minute-tour) · [Quickstart](#quickstart) · [Profilers](#what-the-profilers-find) · [Query Builder](#query-builder-coverage) · [Safety proof](#the-safety-proof) · [Architecture](#architecture) · [Status](#honest-status) · [Learn](#learn)
 
 </div>
 
@@ -65,6 +67,103 @@ The storage bill lands and it's climbing. Cutting telemetry blindly is scary —
 <p align="center">
   <img src="assets/illustrations/05-the-story.png" alt="Four panels: (1) wincing at a $39/mo and climbing storage bill; (2) one telelens scan ranks the waste (F-001 crit, F-002 high, F-006 crit); (3) the sampling valve keeps every error (40/40) and slow trace (55/55), verdict SAFE; (4) span storage drops 95 percent, measured not projected." width="900">
 </p>
+
+## The 15-minute tour
+
+Copy-pasteable, in order. **Steps 1–6 need no SigNoz, no Docker, no network** — the whole
+product runs against the committed fixture corpus. The live path (7–8) is optional.
+
+**1. Clone and build** — one static binary, one non-stdlib dependency.
+
+```bash
+git clone https://github.com/vinayaksonthalia/telelens
+cd telelens
+go build -o telelens ./cmd/telelens
+```
+> *Expect:* no output. `./telelens --help` lists `scan`, `simulate`, `report`, `generate`.
+
+**2. Prove the suite is green** — offline, no fixtures of the "mock the thing under test" kind.
+
+```bash
+go test ./...
+```
+> *Expect:* `ok` for 7 packages (41 tests, 86 including subtests), including
+> `TestSimulateSafetyInvariant` in `internal/analyze`.
+
+**3. Find the waste** — the ranked bill, in colour, in well under a second.
+
+```bash
+./telelens scan --fixtures
+```
+> *Expect:* six profilers reporting in, then a severity-coloured table
+> (`F-001 critical logs DEBUG-log firehose from catalog is 50% of your log volume  37.0  11.10`),
+> ending in `Total identified savings: 130.2 GB/month ≈ $39.06/month` and
+> `scan completed in 6ms · outputs in out/`.
+
+**4. Prove the fix is safe** — before anything is applied, the policy is replayed trace by trace.
+
+```bash
+./telelens simulate --fixtures --sample-pct 5 --latency-ms 750
+```
+> *Expect:* `error traces: 40 / 40 kept`, `slow traces: 55 / 55 kept`,
+> `boring traces: 53 / 1100 kept (95.2% dropped)`, and
+> `verdict: SAFE — policy retains 100% of error traces and 100% of slow traces`.
+> The verdict is binary: a policy that would drop **one** error or slow trace prints UNSAFE and
+> exits non-zero. That the generator can never emit such a policy is itself asserted by
+> `TestSimulateSafetyInvariant` (`internal/analyze/simulator_test.go`), which sweeps trace sets
+> across error and slow-trace counts looking for a counter-example.
+
+**5. Read the generated fix** — this is the artifact you'd actually merge.
+
+```bash
+./telelens report   --findings out/findings.json    # re-renders out/waste-report.md
+./telelens generate --findings out/findings.json    # re-renders the collector fragment + casting patch
+sed -n '40,60p' out/collector-fragment.yaml
+```
+> *Expect:* `wrote out/waste-report.md`, then `wrote out/collector-fragment.yaml` /
+> `wrote out/casting-patch.yaml`. In the fragment, the `filter/drop_unread_metrics` block ships
+> **deliberately commented out** under the banner
+> `# REVIEW BEFORE ENABLING — this block is deliberately commented out.` — "unread" can only see
+> SigNoz dashboards and alert rules, never external consumers. The review step is the product.
+
+**6. Take the agent surface** — the same findings as stable JSON on stdout (progress goes to stderr).
+
+```bash
+./telelens scan --fixtures --json | jq '.findings[] | select(.category=="quality")'
+```
+> *Expect:* well-formed JSON objects. `NO_COLOR=1 ./telelens scan --fixtures | cat` degrades cleanly too.
+
+**7. (Optional) Point it at your own SigNoz** — read-only: ClickHouse `SELECT`s and SigNoz `GET`s only.
+
+```bash
+cp .env.example .env    # CLICKHOUSE_HTTP_URL, SIGNOZ_API_URL, SIGNOZ_API_KEY, COST_PER_GB
+set -a; source .env; set +a
+./telelens scan --window 7 --cost-per-gb 0.30
+```
+> *Expect:* `telelens scan · source: clickhouse (…, window=7d)` and a real ranked bill.
+> The Foundry compose does not publish ClickHouse's `:8123` — see
+> [DOCS §Path 2](DOCS.md) for the one-line `socat` proxy (or run inside `signoz-network`),
+> plus the least-privilege `telelens_ro` user. SigNoz Cloud does not expose ClickHouse, so
+> live mode is self-hosted only.
+
+**8. (Optional) Import the dashboards and guardrails.**
+
+```bash
+export SIGNOZ_URL=http://localhost:8080 SIGNOZ_API_KEY=...
+./dashboards/import.sh
+```
+> *Expect:* 3 dashboards + 3 alert rules created. The **Savings Tracker** is where the ingest
+> cliff shows up after a fix lands, with the error-span panel staying flat beside it.
+
+**Where the flagship proof lives.** The −95.0% is a measured apply → measure → revert run on a
+live ingester, not a projection — full protocol, both measurement windows, the 31/31 error-trace
+check, the unchanged RED metrics, the verified revert, **and the honest counterweight** (on an
+error-storm day the same policy can only drop ~6%, because it refuses to drop errors) are in
+[`assets/live-apply-measure-m4-evidence.md`](assets/live-apply-measure-m4-evidence.md).
+The console capture behind the recording above is
+[`assets/live-scan-2026-07-25.txt`](assets/live-scan-2026-07-25.txt); the whole-instance simulator
+replay is [`assets/live-simulator-m3-evidence.txt`](assets/live-simulator-m3-evidence.txt);
+[`assets/README.md`](assets/README.md) indexes the rest.
 
 ## Quickstart
 
