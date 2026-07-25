@@ -19,15 +19,17 @@ GLASSPANE/Meridian browser RUM, ARGUS gen_ai self-telemetry).
 | `live-apply-measure-m4-evidence.md` | M4: APPLY→MEASURE→REVERT — **span storage −95.0% measured** (13,404→672, identical loadgen), 31/31 injected error traces kept, RED metrics unchanged, revert verified |
 | `live-mcp-quality-hook-m6-evidence.md` | M6: `scan --json` → claude CLI quality assessment + SigNoz MCP cross-check of F-024 (ideas-board #11666) |
 | `live-cli-scan-output.ansi.txt` | M7: colored CLI output capture (lipgloss severity colors; view with `cat` in a terminal) |
+| `live-scan-2026-07-25.txt` | Fresh live scan against the same instance grown to 14,103,470 spans: 15 findings, 2.5 GB/mo ≈ $0.75/mo, simulator replay over 75,586 traces — SAFE, **895 ms** end to end. This is the run `scan.gif` animates. |
+| `scan.gif` | The `live-scan-2026-07-25.txt` run rendered frame by frame from a pty capture with the process's own per-chunk wall-clock timings (no re-typing, no sped-up or slowed-down playback) |
 
 ## Screenshots (`screenshots/`, retina 2x, real data)
 
-| File | What it shows |
-|---|---|
-| `m5-01-cost-overview.png` | Telemetry Bill — Cost Overview: ingest by signal, span/log bytes by service, **$22.03 projected monthly cost** value panel |
-| `m5-02-cardinality-explorer.png` | Cardinality Explorer: series per metric, label-bomb table (incl. `browser.sessions.count` × `session.id` = 37), span-attr cardinality, RUM EXISTS panel |
-| `m5-03-savings-tracker.png` | Savings Tracker: cliff chart, 13.61 trace-GB window value, error-span safety panel |
-| `m5-04-guardrail-alert-rules.png` | The 3 TELELENS guardrail rules created via /api/v2/rules, all evaluating OK |
+| File | Captured | What it shows |
+|---|---|---|
+| `m5-01-cost-overview.png` | Jul 18 | Telemetry Bill — Cost Overview: ingest by signal, span/log bytes by service, **$22.03 projected monthly cost** value panel. Kept at the Jul 18 window deliberately — that week contains the high-volume day the cost panels were built to show. |
+| `m5-02-cardinality-explorer.png` | **Jul 25** | Cardinality Explorer on current data: series per metric (`signoz_latency.bucket` = 4,122), label-bomb table (`operation` = 59 distinct), span-attr cardinality (`order.id` = 158,575 distinct over 192,511 spans), RUM `session.id` EXISTS panel |
+| `m5-03-savings-tracker.png` | Jul 18 | Savings Tracker: cliff chart, 13.61 trace-GB window value, error-span safety panel. **Not re-shot on purpose** — the cliff *is* the apply/measure/revert experiment of Jul 17–18; a current 1-week window no longer contains it. |
+| `m5-04-guardrail-alert-rules.png` | Jul 18 | The 3 TELELENS guardrail rules created via /api/v2/rules, all evaluating OK |
 
 ## Why the simulator trace counts differ between files
 

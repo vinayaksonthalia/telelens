@@ -1,6 +1,4 @@
 .env
-out/
-out-live/
-out-live-refix/
+out*/
 /telelens
 /dist/

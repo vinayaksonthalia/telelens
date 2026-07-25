@@ -17,7 +17,15 @@
 
 ## See it work
 
-Point TELELENS at a SigNoz instance and it tells you — with evidence, GB/month, and dollars — which telemetry is burning your storage and which nobody ever queries, then generates the OpenTelemetry Collector config that fixes it. The **Savings Tracker** dashboard is the proof: watch ingest fall off a cliff when the generated config lands, while the error-span panel stays flat.
+Point TELELENS at a SigNoz instance and it tells you — with evidence, GB/month, and dollars — which telemetry is burning your storage and which nobody ever queries, then generates the OpenTelemetry Collector config that fixes it.
+
+<p align="center">
+  <img src="assets/scan.gif" alt="Terminal recording of telelens scan against a live SigNoz instance: six profilers report in, a ranked findings table appears with severity-coloured rows, total identified savings of 2.5 GB/month, and a sampling-simulator replay over 75,586 real traces ending in a green SAFE verdict — 895 ms end to end." width="100%">
+</p>
+
+One command, 895 ms, against a live SigNoz instance holding 14.1M spans: six profilers, a ranked bill, and a replay of the recommended sampling policy over 75,586 real traces that keeps 100% of error and slow traces. Nothing was written to the cluster. *(Real recording, real timings — [`assets/live-scan-2026-07-25.txt`](assets/live-scan-2026-07-25.txt) is the console capture it was rendered from.)*
+
+The **Savings Tracker** dashboard is the other half of the proof: watch ingest fall off a cliff when the generated config lands, while the error-span panel stays flat.
 
 [<img src="assets/screenshots/m5-03-savings-tracker.png" alt="SigNoz 'Telemetry Bill — Savings Tracker' dashboard: the total ingest-rate cliff chart drops to near zero after the generated config is applied, a 13.61 GB-in-window counter, and an error-spans-per-service safety panel that stays intact." width="100%">](assets/screenshots/m5-03-savings-tracker.png)
 
