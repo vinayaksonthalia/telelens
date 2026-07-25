@@ -187,6 +187,7 @@ button.tlink{background:none;border:0;cursor:pointer;font-family:var(--mono);
 .stages{list-style:none;margin:0 0 16px;padding:0;display:grid;
   grid-template-columns:repeat(4,1fr);border-top:1px solid var(--ink-line-2)}
 .stage{padding:16px 26px 4px 0;position:relative;border-right:1px solid var(--ink-line)}
+.stage + .stage{padding-left:20px}
 .stage:last-child{border-right:0;padding-right:0}
 .stage:not(:last-child)::after{content:"→";position:absolute;right:-7px;top:19px;
   width:14px;text-align:center;color:var(--teal-2);font-size:12px;
@@ -511,6 +512,7 @@ a.fam:hover{text-decoration:underline;text-underline-offset:4px}
   .btn{flex:1 1 auto;justify-content:center}
   .stages{grid-template-columns:1fr}
   .stage{border-right:0;padding-right:0;border-top:1px solid var(--ink-line);padding-top:14px}
+  .stage + .stage{padding-left:0}
   .stage:first-child{border-top:0;padding-top:16px}
   .stage::after{content:none !important}
   .pad,.bill-head,.amount,.stamped,.rubric,.exp-head,.exp-src,.bill-foot{
@@ -897,9 +899,9 @@ a.fam:hover{text-decoration:underline;text-underline-offset:4px}
     <div class="gen">Generated from a real scan of our demo SigNoz instance, July 2026 — every number on this page comes straight from the scan artifact.</div>
     <div class="family">
       <p class="fam-row">
-        <a class="fam fam-argus" href="https://vinayaksonthalia.github.io/argus/">ARGUS</a>
+        <a class="fam fam-argus" href="https://argus-ai-sre.vercel.app">ARGUS</a>
         <span class="fam-sep" aria-hidden="true">·</span>
-        <a class="fam fam-glasspane" href="https://vinayaksonthalia.github.io/glasspane/">GLASSPANE</a>
+        <a class="fam fam-glasspane" href="https://glasspane-rum.vercel.app">GLASSPANE</a>
         <span class="fam-sep" aria-hidden="true">·</span>
         <span class="fam fam-telelens" aria-current="page">TELELENS</span>
       </p>
