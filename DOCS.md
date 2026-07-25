@@ -52,6 +52,11 @@ GB/month + $ line, and a simulator verdict that keeps 100% of error traces.
    set -a; source .env; set +a
    ./telelens scan --window 7 --cost-per-gb 0.30
    ```
+   On startup TELELENS feature-detects the SigNoz schema (`signoz_index_v3` /
+   `logs_v2` / `time_series_v4`) and refuses unrecognized versions with a clear
+   error. SigNoz Cloud does not expose ClickHouse to customers, so live mode is
+   self-hosted only; Cloud users run Path 1, which exercises every profiler and
+   generator against the recorded corpus.
 3. **Review the fixes.** `out/collector-fragment.yaml` is annotated per finding;
    `out/casting-patch.yaml` is the Foundry `ingester.config.data` variant.
    The review step is the product: drop the blocks that do not fit your
@@ -65,7 +70,8 @@ GB/month + $ line, and a simulator verdict that keeps 100% of error traces.
    casting), restart the collector, and watch the Savings Tracker dashboard.
    Our measured run: **−95.0% span storage on identical known-volume traffic,
    31/31 injected error traces kept, RED metrics unchanged**
-   (`assets/live-apply-measure-m4-evidence.md`).
+   (`assets/live-apply-measure-m4-evidence.md`) — on an error-storm day the same
+   policy can only drop **~6%**, because it refuses to drop errors.
 6. **Import the dashboard pack + guardrails.**
    ```bash
    export SIGNOZ_URL=http://localhost:8080 SIGNOZ_API_KEY=...
@@ -106,6 +112,44 @@ the worked example with real numbers).
    data in a real collector — the replay simulator cannot model this, so
    watch your longest-running workflows in the first minutes after apply.
 
+## The safety proof, in detail
+
+Recommending sampling without proving it safe is malpractice. Before TELELENS
+emits a `tail_sampling` policy it replays that policy over real trace summaries
+(the last 24 h in live mode, the fixture set offline): keep all errors, keep
+everything over the latency threshold, hash-sample the rest deterministically.
+
+The verdict is binary. A policy that would drop **one** error or slow trace is
+rejected — `telelens simulate` prints UNSAFE and exits non-zero:
+
+```bash
+./telelens simulate --fixtures --sample-pct 5 --latency-ms 750
+#   error traces:  40 / 40 kept
+#   slow traces:   55 / 55 kept
+#   boring traces: 53 / 1100 kept (95.2% dropped)
+#   verdict: SAFE — policy retains 100% of error traces and 100% of slow traces
+```
+
+That the generator can never emit such a policy in the first place is itself
+asserted by `TestSimulateSafetyInvariant`
+(`internal/analyze/simulator_test.go`), which sweeps trace sets across error and
+slow-trace counts looking for a counter-example. The live whole-instance replay
+over all 162,760 last-24h traces is in
+`assets/live-simulator-m3-evidence.txt`.
+
+## Dashboards & guardrail alerts
+
+`dashboards/` ships the three-part **Telemetry Bill** pack (import via
+`./dashboards/import.sh`, the SigNoz UI, or `POST /api/v1/dashboards`):
+
+- **Cost Overview** — ingest rate by signal and service, projected monthly $.
+- **Cardinality Explorer** — series counts, label bombs, builder-vs-SQL panels.
+- **Savings Tracker** — the ingest cliff after a fix lands, with the error-span
+  safety panel beside it (the screenshot in the README).
+
+`alerts/guardrails.json` seeds three rules — ingest-bytes spike, cardinality
+explosion, log-volume anomaly — so waste cannot silently return.
+
 ## The MCP / agent data-quality hook (ideas-board #11666)
 
 `telelens scan --json` prints the full findings report as pure JSON on stdout
@@ -145,6 +189,31 @@ Environment: `CLICKHOUSE_HTTP_URL`, `CLICKHOUSE_USER`/`CLICKHOUSE_PASSWORD`,
 `TELELENS_OUT_DIR`, `TELELENS_MCP_URL`. Errors follow `Error:/Why:/Try:`;
 output degrades cleanly under `NO_COLOR` and pipes; `--json` is stable for
 machines.
+
+## Pricing model
+
+Every priced finding uses one transparent formula: uncompressed-ingest bytes,
+extrapolated to 30 days, multiplied by `--cost-per-gb` (default `$0.30`). The
+envelope constants are documented in `internal/analyze/pricing.go`. Findings
+that cannot be priced reliably ship as **directional** — ranked by severity,
+with no hard dollar figure attached.
+
+## Query Builder coverage
+
+SigNoz's ideas board has six Query Builder showcase cards; TELELENS exercises
+each capability in service of a real analysis, not a demo for its own sake.
+
+| Card | Capability | Where it's used |
+|---|---|---|
+| #11673 | boolean search, EXISTS / NOT EXISTS | Cardinality Explorer "BOTH tracking IDs" panel; usage-xref is NOT-EXISTS over stored vs referenced metrics |
+| #11674 | JSON body paths | log profiler's body mining; body-path filters in the debug-logs panel |
+| #11675 | hasAll array search | span-events array filter in Cardinality Explorer |
+| #11676 | sumIf / count_distinct / rate | `rate` on meter metrics; `count_distinct` on attributes; `countIf` in the duplicate-span profiler |
+| #11677 | cross-context group-by + having | every profiler query (`GROUP BY … HAVING …`); dashboards group by resource attributes |
+| #11678 | order-by + limit | every profiler query ends `ORDER BY <cost> DESC LIMIT n` — the Waste Report *is* an order-by over money |
+
+Queries Q1–Q12 are defined in `internal/store/store.go`; their raw-ClickHouse
+SQL forms live in `internal/store/clickhouse.go`.
 
 ## Honest caveats
 
