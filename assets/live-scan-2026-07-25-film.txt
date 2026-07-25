@@ -1,0 +1,46 @@
+$ telelens scan --window 7 --cost-per-gb 0.30
+# Live scan, 2026-07-25 (filming run), against the same self-hosted SigNoz
+# v0.132.2, on a quieter window than assets/live-scan-2026-07-25.txt. Read-only:
+# ClickHouse SELECTs + SigNoz GETs, nothing written to the cluster. Captured
+# through a pty. This is the run the demo film shows in shots 4-6, and the
+# source of its on-screen numbers: 16 findings, 30/30 error traces,
+# 251/251 slow traces, 1.011 s.
+
+telelens scan · source: clickhouse (http://localhost:8123, window=7d)
+  traces     5 findings
+  logs       2 findings
+  metrics    0 findings
+  usage-xref 6 findings
+  ecosystem  3 findings
+  quality    0 findings
+
+ID     SEV      CATEGORY  FINDING                                                       GB/MO     $/MO
+──────────────────────────────────────────────────────────────────────────────────────────────────────
+F-001  high     traces    1575221 near-identical success spans are prime tail-sampl…      1.9     0.58
+F-002  high     metrics   Metric "checkout.cart.value.bucket" is written but read b…      0.0     0.01
+F-003  high     metrics   37 more metrics are written but read by no dashboard or a…      0.0     0.01
+F-004  high     metrics   Metric "http.server.duration.bucket" is written but read …      0.0     0.01
+F-005  high     metrics   Metric "http.server.response.size.bucket" is written but …      0.0     0.01
+F-006  medium   traces    Span attribute "url.full" has 57315 distinct values             0.0     0.01
+F-007  high     metrics   Metric "http.server.request.size.bucket" is written but r…      0.0     0.00
+F-008  high     traces    Span attribute "order.id" has 189831 distinct values            0.0     0.00
+F-009  medium   logs      INFO firehose: gateway is 76% of your log volume                0.0     0.00
+F-010  high     metrics   Metric "http.client.duration.bucket" is written but read …      0.0     0.00
+F-011  medium   traces    Span attribute "app.order.id" has 65591 distinct values         0.0     0.00
+F-012  medium   logs      INFO firehose: orders is 23% of your log volume                 0.0     0.00
+F-013  low      traces    Browser RUM telemetry bill: "meridian-web" ships 171 sess…      0.0     0.00
+F-014  low      traces    AI-agent telemetry bill: "argus" ships 5 gen_ai spans (72…      0.0     0.00
+F-015  medium   traces    9 more span attributes exceed 10000 distinct values               —        —
+F-016  low      quality   Cardinality discipline held: 2 unbounded ID attribute(s) …        —        —
+
+Total identified savings: 2.1 GB/month ≈ $0.64/month
+
+Sampling simulator replay (109686 traces, 1225536 spans)
+  policy: keep errors + keep >= 750 ms + sample 5.0% of the rest
+  error traces:  30 / 30 kept
+  slow traces:   251 / 251 kept
+  boring traces: 5617 / 109405 kept (94.9% dropped)
+  span volume dropped: 94.7%
+  verdict: SAFE — policy retains 100% of error traces and 100% of slow traces
+
+scan completed in 1.011s · outputs in out/

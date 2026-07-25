@@ -48,7 +48,7 @@ Yes, and it's the ecosystem story no solo project can tell. Scanning the shared 
 
 ## What was the "database observing itself" bug?
 
-The most on-theme bug of the weekend. The first live scan kept getting OOM-killed on a server claiming ~7 GiB of memory pressure that wasn't ours. The culprit: `system.metric_log` (ClickHouse's *own* internal metrics table, ~1300 columns) was merging in a loop — **~80 merges/minute, each peaking 6.2 GiB** — and the OvercommitTracker killed whatever query was running. We also found `system.trace_log` at 1.29 GiB / 76M rows, *larger than all of `signoz_traces`.* A cost profiler found the platform's own introspection to be the biggest waste on the box. Documented system tables with documented knobs; the mitigation was two revertable lines. (Full story: [../02-signoz-deep-dive.md](../02-signoz-deep-dive.md).)
+The most on-theme bug we hit. The first live scan kept getting OOM-killed on a server claiming ~7 GiB of memory pressure that wasn't ours. The culprit: `system.metric_log` (ClickHouse's *own* internal metrics table, ~1300 columns) was merging in a loop — **~80 merges/minute, each peaking 6.2 GiB** — and the OvercommitTracker killed whatever query was running. We also found `system.trace_log` at 1.29 GiB / 76M rows, *larger than all of `signoz_traces`.* A cost profiler found the platform's own introspection to be the biggest waste on the box. Documented system tables with documented knobs; the mitigation was two revertable lines. (Full story: [../02-signoz-deep-dive.md](../02-signoz-deep-dive.md).)
 
 ---
 
@@ -64,9 +64,9 @@ Because a cost tool that auto-applies is a liability, and we learned that the ha
 
 ---
 
-## How is this "Best Use of SigNoz" if it's just reading ClickHouse?
+## Is this really "using SigNoz" if it's just reading ClickHouse?
 
-Because it's the *deepest schema-level engagement in the field*: raw ClickHouse over `signoz_index_v3`/`logs_v2`/`time_series_v4` **and** the `distributed_samples_v4` datapoint table **and** the undocumented `signoz_meter` DB, `query_range` v5 with `source:"meter"`, the dashboards API (a 3-pack), `/api/v2/rules` guardrails, `meta.rowsScanned` cost-aware querying, and the Collector config applied through Foundry — the mandated install tool used as an *application surface.* And it maps the six official Query Builder showcase cards to real analyses (EXISTS/NOT-EXISTS, `sumIf`/`count_distinct`/`rate`, group-by+having, order-by+limit). Reading one API is table stakes; turning the platform's own storage into a bill is the flex.
+Because it engages SigNoz at the schema level, not just at one endpoint: raw ClickHouse over `signoz_index_v3`/`logs_v2`/`time_series_v4` **and** the `distributed_samples_v4` datapoint table **and** the undocumented `signoz_meter` DB, `query_range` v5 with `source:"meter"`, the dashboards API (a 3-pack), `/api/v2/rules` guardrails, `meta.rowsScanned` cost-aware querying, and the Collector config applied through Foundry — SigNoz's own deployment tool used as an *application surface.* And it maps all six SigNoz Query Builder showcase capabilities to real analyses (EXISTS/NOT-EXISTS, `sumIf`/`count_distinct`/`rate`, group-by+having, order-by+limit). Reading one API is table stakes; turning the platform's own storage into a bill is the point.
 
 ---
 

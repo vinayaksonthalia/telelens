@@ -70,8 +70,12 @@ func OtelcolFragment(fs []findings.Finding) string {
 		b.WriteString("    trace_statements:\n")
 		b.WriteString("      - context: span\n")
 		b.WriteString("        statements:\n")
-		for _, f := range dropAttrs {
-			fmt.Fprintf(&b, "          # %s: %s (saves ~%s)\n", f.ID, f.Title, gbmo(f))
+		uniqDrops, alsoDrops := dedupeFixes(dropAttrs, func(f findings.Finding) string {
+			return f.Fix.Attribute
+		})
+		for _, f := range uniqDrops {
+			fmt.Fprintf(&b, "          # %s%s: %s (saves ~%s)\n",
+				f.ID, alsoNote(alsoDrops[f.Fix.Attribute]), f.Title, gbmo(f))
 			fmt.Fprintf(&b, "          - delete_key(attributes, %q)\n", f.Fix.Attribute)
 		}
 		for _, f := range truncAttrs {
@@ -82,15 +86,20 @@ func OtelcolFragment(fs []findings.Finding) string {
 		processors = append(processors, "transform/span_attribute_diet")
 	}
 
-	// transform: metric label bombs.
+	// transform: metric label bombs. Two profilers can independently ask for
+	// the same (label, metric) pair — the metrics cardinality profiler as a
+	// series bomb, the ecosystem profiler as a structurally unbounded ID — so
+	// emit one OTTL statement per pair and credit every finding that wanted it.
 	if bombs := fixes(fs, findings.FixDropMetricLabel); len(bombs) > 0 {
 		b.WriteString("  transform/defuse_label_bombs:\n")
 		b.WriteString("    error_mode: ignore\n")
 		b.WriteString("    metric_statements:\n")
 		b.WriteString("      - context: datapoint\n")
 		b.WriteString("        statements:\n")
-		for _, f := range bombs {
-			fmt.Fprintf(&b, "          # %s: %s (saves ~%s)\n", f.ID, f.Title, gbmo(f))
+		uniqBombs, alsoBombs := dedupeFixes(bombs, labelBombKey)
+		for _, f := range uniqBombs {
+			fmt.Fprintf(&b, "          # %s%s: %s (saves ~%s)\n",
+				f.ID, alsoNote(alsoBombs[labelBombKey(f)]), f.Title, gbmo(f))
 			fmt.Fprintf(&b, "          - delete_key(attributes, %q) where metric.name == %q\n",
 				f.Fix.Attribute, f.Fix.Metric)
 		}
@@ -184,6 +193,40 @@ func fixes(fs []findings.Finding, kind findings.FixKind) []findings.Finding {
 	}
 	sort.SliceStable(out, func(i, j int) bool { return out[i].ID < out[j].ID })
 	return out
+}
+
+// labelBombKey identifies the OTTL statement a drop-metric-label fix produces:
+// the same (label, metric) pair yields a byte-identical statement.
+func labelBombKey(f findings.Finding) string {
+	return f.Fix.Attribute + "\x00" + f.Fix.Metric
+}
+
+// dedupeFixes keeps the first finding per statement key, in order, and returns
+// the IDs of the later findings that asked for that same statement. Emitting a
+// duplicate OTTL line is not wrong — delete_key is idempotent — but a config a
+// human is asked to review must not repeat itself.
+func dedupeFixes(fs []findings.Finding, key func(findings.Finding) string) ([]findings.Finding, map[string][]string) {
+	var uniq []findings.Finding
+	seen := map[string]bool{}
+	also := map[string][]string{}
+	for _, f := range fs {
+		k := key(f)
+		if seen[k] {
+			also[k] = append(also[k], f.ID)
+			continue
+		}
+		seen[k] = true
+		uniq = append(uniq, f)
+	}
+	return uniq, also
+}
+
+// alsoNote credits the extra findings that asked for an already-emitted line.
+func alsoNote(ids []string) string {
+	if len(ids) == 0 {
+		return ""
+	}
+	return " (also " + strings.Join(ids, ", ") + ")"
 }
 
 func sanitize(s string) string {

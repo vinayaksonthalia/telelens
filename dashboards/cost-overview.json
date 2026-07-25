@@ -72,7 +72,7 @@
     {
       "id": "tb-ingest-by-signal",
       "title": "Ingest rate by signal (bytes/hr)",
-      "description": "increase() over the signoz.meter.* size counters — the SigNoz usage-metering backbone (hourly buckets). [QB rubric #11676: rate/increase aggregations]",
+      "description": "increase() over the signoz.meter.* size counters — the SigNoz usage-metering backbone (hourly buckets). [Query Builder: rate/increase aggregations]",
       "panelTypes": "graph",
       "fillSpans": false,
       "isStacked": false,
@@ -199,7 +199,7 @@
     {
       "id": "tb-span-bytes-by-service",
       "title": "Span bytes by service (top movers)",
-      "description": "Cross-context group-by on service.name over the meter counter. [QB rubric #11677 group-by, #11678 order-by+limit]",
+      "description": "Cross-context group-by on service.name over the meter counter. [Query Builder: cross-context group-by, order-by + limit]",
       "panelTypes": "graph",
       "fillSpans": false,
       "isStacked": false,

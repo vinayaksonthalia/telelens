@@ -79,7 +79,9 @@ errors + slow kept, placed AFTER `signozspanmetrics` so RED metrics keep
 seeing everything) + the session.id label transform. Deliberately NOT applied:
 `filter/drop_unread_metrics` — the "unread" set included `argus.tokens` and
 `browser.web_vitals.*`, live evidence for the sibling projects. Identical
-1,006-request loadgen windows: 13,404 → 672 spans stored (−95.0%); injected
+1,006-request loadgen windows: 13,404 → 672 spans stored (−95.0%) — that is
+the healthy-traffic number; the same policy could only drop ~6% on the
+error-storm day, because it refuses to drop errors. Injected
 error storm under sampling: 31/31 error traces kept; `signoz_calls_total`
 unchanged. Then reverted from the backup and re-verified full collection.
 Lessons: **the operator-review step is the product** (a generated config is a
@@ -122,5 +124,5 @@ config file's own comment block.
 ## If you're joining this codebase
 
 Start with `assets/README.md` (evidence index), then run Path 1 in DOCS.md.
-`go build ./... && go test ./...` must be green (41 tests, 86 subtests, 7 packages)
+`go build ./... && go test ./...` must be green (41 tests, 45 subtests, 7 packages — 86 cases total)
 before you believe anything else.

@@ -38,7 +38,7 @@ Think of TELELENS as a home energy auditor. It walks through your house (reads y
 
 Everything reads through a single `TelemetryStore` interface with two implementations: `fixtures` (a committed "Noisy Neighborhood" corpus of recorded query results — every classic waste pattern, no SigNoz needed) and `clickhouse` (a live instance). This one seam is why every profiler runs identically offline and live, and why every live bug we hit landed *in the store*, not in a profiler. On startup in live mode, the store **feature-detects the SigNoz schema** (`signoz_index_v3` / `logs_v2` / `time_series_v4`) and *refuses unrecognized versions with a clear error* rather than guessing.
 
-**Read-only by construction:** the live client refuses any non-`SELECT` statement in code, and `.env.example` documents a least-privilege `telelens_ro` ClickHouse user that enforces it at the database. The only writes TELELENS performs are files in `out/`.
+**Read-only by construction:** the live client refuses any non-`SELECT` statement in code, and `.env.example` documents a least-privilege `telelens_ro` ClickHouse user that enforces it at the database. The only writes the profiler performs are files in `out/` — the one exception is the opt-in `dashboards/import.sh`, which POSTs the dashboard pack and guardrail rules only when you run it.
 
 ---
 
@@ -90,7 +90,7 @@ Before you apply anything, `telelens simulate` replays the proposed tail-samplin
 
 ![The safety proof: the sampling valve keeps 100% of error traces and 100% of slow traces, dropping only boring duplicates — simulated over your real last-24h traces first, with a SAFE verdict stamp.](../assets/illustrations/03-the-safety-proof.png)
 
-Live, the simulator replayed all **162,760 real last-24h traces** (8.9M spans) and returned SAFE — every one of 110,597 error traces kept. (The full apply-and-measure story — how we got a measured −95% without breaking the sibling projects — is [02-signoz-deep-dive.md](02-signoz-deep-dive.md) and [06-bug-hunt.md](06-bug-hunt.md).)
+Live, the simulator replayed all **162,760 real last-24h traces** (8.9M spans) and returned SAFE — every one of 110,597 error traces kept. (The full apply-and-measure story — how we got a measured −95% on healthy traffic — ~6% on an error-storm day — without breaking the sibling projects — is [02-signoz-deep-dive.md](02-signoz-deep-dive.md) and [06-bug-hunt.md](06-bug-hunt.md).)
 
 ---
 

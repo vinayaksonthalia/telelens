@@ -90,7 +90,7 @@ Three concrete refinements, all traceable in the shipped product:
    a single figure under scrutiny.
 
 3. **We made "measured, not projected" the headline** *because* it is the single most defensible
-   impact claim a cost tool can make. Every commercial rival stops at recommendations; we applied
+   impact claim a cost tool can make. The commercial tools we could find stop at recommendations; we applied
    the config to a live ingester and measured the drop. That decision is why the apply-and-measure
    wave (−95%, reverted, verified) exists at all.
 

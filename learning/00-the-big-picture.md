@@ -16,7 +16,7 @@ SigNoz stores your telemetry (all the little notes your computers write about wh
 
 Telemetry is data your systems emit about themselves — traces, logs, metrics. It's incredibly useful, and it's incredibly easy to emit *too much* of. A single chatty `DEBUG` log line, left on in production, can become half your log bill. A well-meaning engineer adds `user_id` as a label on a metric, and suddenly that one metric explodes into hundreds of thousands of separate time series. Health-check spans that all say "everything's fine" pile up by the millions. And a huge fraction of what gets stored is **never queried by anyone** — write-only telemetry you pay to keep and never read.
 
-The industry number is stark: the CNCF estimates **60–95% of telemetry spend is reducible.** But reducing it is scary, because the obvious lever — *sampling* (keeping only some traces) — feels like gambling with the exact data you need during an incident. "Turn on sampling" is a sentence anyone can say; "here's proof you won't lose a single error trace" is a product almost nobody builds.
+The industry rule of thumb is stark — practitioner surveys and vendor cost studies put the reducible share of telemetry spend somewhere in the **60–95%** range — but we could not source a single authoritative figure, so treat it as folklore and read the number TELELENS measures on *your* instance instead. But reducing it is scary, because the obvious lever — *sampling* (keeping only some traces) — feels like gambling with the exact data you need during an incident. "Turn on sampling" is a sentence anyone can say; "here's proof you won't lose a single error trace" is a product almost nobody builds.
 
 So the real problem is two problems stacked: **you can't see where the waste is, and even if you could, you're afraid to cut it.**
 
@@ -24,7 +24,7 @@ So the real problem is two problems stacked: **you can't see where the waste is,
 
 ## The market gap we aimed at
 
-SigNoz *Cloud* has a feature called Ingest Guard for exactly this. **Self-hosted SigNoz has nothing.** The 27,000-star open-source community — the people running SigNoz on their own hardware precisely to control costs — has *no* ingestion intelligence at all. TELELENS is the missing community edition of Ingest Guard: the cost-and-cardinality brain for the users who chose self-hosted to save money and then can't see where the money goes.
+SigNoz *Cloud* has a feature called Ingest Guard for exactly this. **Self-hosted SigNoz has nothing.** The large open-source community — the people running SigNoz on their own hardware precisely to control costs — has *no* ingestion intelligence at all. TELELENS is the missing community edition of Ingest Guard: the cost-and-cardinality brain for the users who chose self-hosted to save money and then can't see where the money goes.
 
 And the output is the most legible impact a tool like this can have: **money.** Not "a prettier dashboard" — an itemized bill with a savings number at the bottom.
 
@@ -54,7 +54,7 @@ TELELENS is a read-only telemetry cost & cardinality profiler for self-hosted Si
 
 ## Why it matters
 
-- **Measured, not projected.** The headline is a *before/after receipt* from a live ingester (−95.0%), not a hopeful estimate. Every commercial rival stops at "recommendations."
+- **Measured, not projected.** The headline is a *before/after receipt* from a live ingester (−95.0%), not a hopeful estimate. The commercial tools we could find stop at "recommendations."
 - **It audits its own siblings.** On a shared instance, TELELENS priced ARGUS's AI-agent telemetry and GLASSPANE's browser sessions — and *caught a real cardinality bug in GLASSPANE's own metrics.* An ecosystem story a single tool rarely gets to tell (see [06-bug-hunt.md](06-bug-hunt.md)).
 - **The most on-theme bug we hit.** The first thing TELELENS found on the live box was that *ClickHouse's own internal logging was out-consuming the telemetry it stores.* A cost profiler found the platform's introspection to be the biggest waste. (Full story in [02-signoz-deep-dive.md](02-signoz-deep-dive.md).)
 

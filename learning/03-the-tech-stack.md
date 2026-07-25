@@ -79,5 +79,5 @@ The result is a deterministic core where, as we saw live, the agent demo's "top 
 
 - [01-how-it-works.md](01-how-it-works.md) — where each component runs in the pipeline.
 - [02-signoz-deep-dive.md](02-signoz-deep-dive.md) — the ClickHouse realities the store seam absorbs.
-- [../internal/store/clickhouse.go](../internal/store/clickhouse.go) — the query catalogue (Q1–Q9) in code.
+- [../internal/store/store.go](../internal/store/store.go) — the query catalogue (Q1–Q12) in code; [../internal/store/clickhouse.go](../internal/store/clickhouse.go) — the live SELECT-only client.
 - [04-faq/honest-limits-what-we-dont-claim.md](04-faq/honest-limits-what-we-dont-claim.md) — where these trade-offs bite.

@@ -4,7 +4,7 @@ This folder explains TELELENS **twice over**: simply enough for a curious 10-yea
 
 Every file follows the same shape: **In one line → an ELI10 analogy → the real mechanics with real examples → honest limits → why it matters → links to related files.** Illustrations are the hand-drawn explainer set in `../assets/illustrations/`.
 
-> **The one-sentence version:** point it at a SigNoz instance; it reads your real ClickHouse read-only, tells you in GB/month and dollars which telemetry is waste, writes the OpenTelemetry Collector config that fixes it, *proves the fix is safe* by replaying it over your real traces, and — applied live — measured span storage falling **95.0%** with every error trace kept, then reverted cleanly. **Observability for your observability.**
+> **The one-sentence version:** point it at a SigNoz instance; it reads your real ClickHouse read-only, tells you in GB/month and dollars which telemetry is waste, writes the OpenTelemetry Collector config that fixes it, *proves the fix is safe* by replaying it over your real traces, and — applied live — measured span storage falling **95.0%** on healthy traffic — only **~6%** on an error-storm day, because the policy refuses to drop errors — with every error trace kept, then reverted cleanly. **Observability for your observability.**
 
 ---
 

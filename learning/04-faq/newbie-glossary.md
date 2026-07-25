@@ -61,7 +61,7 @@ Rate, Errors, Duration — the three vital-sign metrics for a service. Sampling 
 **→ in TELELENS:** the generated config keeps `signozspanmetrics` *before* `tail_sampling`, so RED metrics still see every span even while traces are sampled.
 
 ### read-only by construction
-The tool physically cannot write to your data — enforced in code, not just promised.
+The profiler refuses to write to your telemetry data — the client rejects any non-`SELECT` statement, and the least-privilege `telelens_ro` user in `.env.example` enforces the same rule at the database. Enforced in code, not just promised.
 **→ in TELELENS:** the live client refuses any non-`SELECT` statement, and a least-privilege `telelens_ro` DB user enforces it at the database.
 
 ### sampling / tail sampling
@@ -77,7 +77,7 @@ A **series** is one label-combination; a **sample** is one datapoint written to 
 **→ in TELELENS:** pricing must come from the table that stores the thing — mixing them was wrong by orders of magnitude.
 
 ### simulator / safety invariant
-A replay that tries a proposed sampling policy on your *real* traces and proves it won't drop anything important. The **invariant** is the unbreakable rule: never drop an error trace.
+A replay that tries a proposed sampling policy on your *real* traces and shows you, before you apply it, exactly which traces it would keep and drop. The **invariant** is the rule the tool refuses to violate: never emit a policy that drops an error trace — a violation prints UNSAFE and exits non-zero. (What the replay cannot model is the collector's `decision_wait` window; see [honest-limits-what-we-dont-claim.md](honest-limits-what-we-dont-claim.md).)
 **→ in TELELENS:** `simulate` returns a binary SAFE/UNSAFE verdict and *exits non-zero* if the policy would drop one error trace.
 
 ### usage cross-reference (write-only telemetry)

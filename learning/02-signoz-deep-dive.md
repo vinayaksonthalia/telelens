@@ -50,7 +50,7 @@ Related: the meter connector (`signoz_meter`) flushes **hourly buckets.** For a 
 SigNoz speaks two query languages, and mastering both is what real query work demands:
 
 - **The v5 Query Builder** (`query_range`, `source:"meter"` for the meter DB) — the high-level, dashboard-friendly form.
-- **Raw ClickHouse `SELECT`** — the low-level form, where the profilers live (queries catalogued Q1–Q9 in the implementation plan).
+- **Raw ClickHouse `SELECT`** — the low-level form, where the profilers live (queries catalogued Q1–Q12 in the implementation plan).
 
 The Telemetry Bill dashboards deliberately *mix both* — v5 builder panels next to raw-ClickHouse panels — because the deep cardinality and duplicate-span analysis simply can't be expressed in the builder, and showing both is the mastery display. Lesson: **the builder is right for portable dashboard panels; raw ClickHouse is right for schema-level forensics** — and a serious cost tool needs both.
 
@@ -82,7 +82,7 @@ When we cross-checked findings through the official SigNoz MCP server (its `sign
 
 ## The good part — SigNoz's schema is deep enough to profile itself
 
-The whole project is only possible because SigNoz stores telemetry in a *queryable* ClickHouse with a coherent schema you can `SELECT` against — separate tables for the label dimension and the sample volume, an undocumented-but-real `signoz_meter` usage DB, native typed columns like `has_error`, and `meta.rowsScanned` on every response so a cost tool can measure *its own* query cost. And the guardrail loop closes: TELELENS writes back three Telemetry Bill dashboards and three alert rules (ingest-spike, cardinality-explosion, log-anomaly) via the same APIs, so waste can't silently return after a cleanup. **Lesson: the deepest "Best Use of SigNoz" isn't reading one endpoint — it's engaging the storage schema honestly enough to turn the platform's own data into a bill.**
+The whole project is only possible because SigNoz stores telemetry in a *queryable* ClickHouse with a coherent schema you can `SELECT` against — separate tables for the label dimension and the sample volume, an undocumented-but-real `signoz_meter` usage DB, native typed columns like `has_error`, and `meta.rowsScanned` on every response so a cost tool can measure *its own* query cost. And the guardrail loop closes: TELELENS writes back three Telemetry Bill dashboards and three alert rules (ingest-spike, cardinality-explosion, log-anomaly) via the same APIs, so waste can't silently return after a cleanup. **Lesson: using SigNoz deeply isn't reading one endpoint — it's engaging the storage schema honestly enough to turn the platform's own data into a bill.**
 
 ---
 

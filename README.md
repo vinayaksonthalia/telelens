@@ -6,12 +6,16 @@
 
 **A telemetry cost & cardinality profiler for SigNoz: it finds the waste, generates the fix, and proves it drops zero error traces first.**
 
-**31 / 31 error traces kept · every slow trace kept · the error-span panel stayed flat** — and only then the number: **−95.0% span storage measured on a live ingester** (honest counterweight: only **~6%** on an error-storm day — the policy refuses to drop errors) · **14.1M spans profiled in 895 ms** · **41 tests, 7 packages, 86 subtests** · **read-only by design** · **MIT**
+**31 / 31 error traces kept · every slow trace kept · the error-span panel stayed flat** — and only then the number: **−95.0% span storage measured on a live ingester** (honest counterweight: only **~6%** on an error-storm day — the policy refuses to drop errors) · **14.1M spans profiled in 895 ms** · **41 tests, 45 subtests, 7 packages** · **read-only by design** · **MIT**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Go 1.24+](https://img.shields.io/badge/go-1.24%2B-00ADD8.svg)](go.mod)
 [![Last commit](https://img.shields.io/github/last-commit/vinayaksonthalia/telelens.svg)](https://github.com/vinayaksonthalia/telelens/commits)
 [![Repo size](https://img.shields.io/github/repo-size/vinayaksonthalia/telelens.svg)](https://github.com/vinayaksonthalia/telelens)
+
+### ⚡ [**Try it live → telelens.vercel.app**](https://telelens.vercel.app)
+
+One real scan, rendered as the bill it is — with the sampling policy explorer replaying **21 recorded positions** over 168,711 of our own traces. No install, no SigNoz, no network calls.
 
 [See it work](#see-it-work) · [The 15-minute tour](#the-15-minute-tour) · [Quickstart](#quickstart) · [Profilers](#what-the-profilers-find) · [Architecture](#architecture) · [Status](#honest-status) · [Compatibility](#compatibility--uninstall) · [Learn](#learn)
 
@@ -55,7 +59,7 @@ Console capture behind the recording: [`assets/live-scan-2026-07-25.txt`](assets
 
 Copy-pasteable, in order. **Steps 1–6 need no SigNoz, no Docker, no network** — everything runs against the committed fixture corpus; the live path (7–8) is optional.
 
-**1. Clone and build** — one static binary, one non-stdlib dependency.
+**1. Clone and build** — one static binary, one direct non-stdlib dependency.
 
 ```bash
 git clone https://github.com/vinayaksonthalia/telelens
@@ -120,7 +124,7 @@ export SIGNOZ_URL=http://localhost:8080 SIGNOZ_API_KEY=...
 
 ## Quickstart
 
-Requires Go ≥ 1.24. One static binary; the only non-stdlib dependency is charmbracelet/lipgloss.
+Requires Go ≥ 1.24. One static binary; the only direct non-stdlib dependency is charmbracelet/lipgloss.
 
 ```bash
 git clone https://github.com/vinayaksonthalia/telelens
@@ -179,7 +183,7 @@ flowchart TD
   <img src="assets/illustrations/04-system-architecture.png" alt="How TELELENS hangs together: ClickHouse (SELECT only) and the SigNoz API (GET only) feed the profilers (traces, logs, metrics, ecosystem), which feed the analyzers (cardinality, Drain log templates, tail-sampling simulator), which emit the priced waste report, the collector fragment and casting patch a human applies, the Telemetry Bill dashboards, and the guardrail rules plus the --json agent surface. Read-only by design: the client refuses anything but SELECT/GET." width="900">
 </p>
 
-**Read-only by design (the product invariant).** Profilers issue only ClickHouse `SELECT`s and SigNoz `GET`s; the live client refuses non-SELECT statements in code, and `.env.example` documents the least-privilege `telelens_ro` ClickHouse user that enforces it at the database. The only writes are files in `out/`. (Foundry is SigNoz's official deployment tool — [github.com/SigNoz/foundry](https://github.com/SigNoz/foundry); `foundryctl cast` applies a *casting*, its config.)
+**Read-only by design (the product invariant).** Profilers issue only ClickHouse `SELECT`s and SigNoz `GET`s; the live client refuses non-SELECT statements in code, and `.env.example` documents the least-privilege `telelens_ro` ClickHouse user that enforces it at the database. The only writes the profiler performs are files in `out/`; the one write path in the project is the opt-in `dashboards/import.sh`, which POSTs the dashboard pack and guardrail rules you explicitly ask for. (Foundry is SigNoz's official deployment tool — [github.com/SigNoz/foundry](https://github.com/SigNoz/foundry); `foundryctl cast` applies a *casting*, its config.)
 
 ## Honest status
 

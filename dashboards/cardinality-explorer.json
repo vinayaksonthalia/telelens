@@ -245,7 +245,7 @@
     {
       "id": "tb-rum-spans",
       "title": "Spans carrying session.id (RUM traffic), by service",
-      "description": "EXISTS filter isolates browser-RUM spans. [QB rubric #11673: EXISTS / boolean search]",
+      "description": "EXISTS filter isolates browser-RUM spans. [Query Builder: EXISTS / boolean search]",
       "panelTypes": "graph",
       "fillSpans": false,
       "isStacked": false,
