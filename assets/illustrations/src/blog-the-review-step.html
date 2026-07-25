@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="sketch.css">
+</head>
+<body>
+  <div class="title" style="left:60px; top:44px;">the suggestion we refused to ship</div>
+  <div class="subtitle" style="left:64px; top:126px;">the scariest bug of the project was in our own generated fix</div>
+
+  <div class="box" id="xref" style="left:70px; top:300px; width:360px; height:190px;">
+    <div class="label">"drop unread metrics"</div>
+    <div class="sub">91 metrics no dashboard<br>and no alert reads &mdash; correct</div>
+  </div>
+
+  <div class="box thick red" id="oops" style="left:600px; top:290px; width:400px; height:210px;">
+    <div class="label red-ink">&hellip; including<br>signoz_calls_total</div>
+    <div class="sub">and signoz_latency.* &mdash; the<br>spanmetrics behind the APM page</div>
+  </div>
+
+  <div class="box" id="fix" style="left:1170px; top:300px; width:370px; height:190px;">
+    <div class="label">shipped commented out</div>
+    <div class="sub">plus a denylist of platform-<br>consumed signoz_* + SDK internals</div>
+  </div>
+
+  <div class="note" id="note" style="left:560px; top:552px; width:480px;">
+    no dashboard "reads" them.<br>the platform does.
+  </div>
+
+  <div class="small-gray" style="left:1150px; top:532px; width:410px; font-size:22px;">applying our own suggestion<br>would have blanked a user's<br>services view</div>
+
+  <div class="caption" style="bottom:38px;">a question for a human, not an instruction for a collector &mdash; the review step is the product</div>
+
+<script src="sketch.js"></script>
+<script src="character.js"></script>
+<script>
+window.addEventListener("load", () => {
+  Sketch.init();
+  Sketch.underline(".title");
+
+  // the engineer catching it in the audit pass
+  Character.draw(Sketch.overlay(), 285, 620, { pose: "paged", scale: 1.05, seed: 7 });
+
+  Sketch.connect("#xref", "#oops", { from: "right", to: "left", curve: -10, seed: 21, width: 3 });
+  Sketch.connect("#oops", "#fix", { from: "right", to: "left", curve: -10, seed: 33, width: 3 });
+  // red dotted tie from the note up to the red box
+  Sketch.arrow(800, 544, 800, 512, { color: "var(--red)", dotted: true, seed: 94, width: 2.8, head: 14 });
+
+  window.__sketchDone = true;
+});
+</script>
+</body>
+</html>

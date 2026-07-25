@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="sketch.css">
+<style>
+  body { --accent: #14B8A6; }
+  .title { font-size: 52px; }
+  .badge { position:absolute; font-family:"Marker Felt","Chalkboard SE",cursive; font-size:22px; color:var(--accent); z-index:3; }
+  .phead { position:absolute; font-family:"Marker Felt","Chalkboard SE",cursive; font-size:24px; color:var(--ink); z-index:3; }
+  .pcap  { position:absolute; font-size:21px; color:var(--gray); line-height:1.3; z-index:3; }
+  .pcap b { color:var(--ink); font-weight:normal; }
+  .screen { padding:12px 16px; }
+  .cardtop { justify-content:flex-start; padding-top:12px; }
+  .mono { font-family:"Courier New",monospace; font-size:15px; letter-spacing:-0.3px; line-height:1.45; }
+  .storycap { position:absolute; font-family:"Marker Felt","Chalkboard SE",cursive; font-size:27px; color:var(--ink); text-align:center; width:100%; left:0; z-index:3; }
+  .storycap .em { color:var(--accent); }
+</style>
+</head>
+<body>
+  <div class="title" style="left:56px; top:34px;">the OOM whodunit</div>
+  <div class="subtitle" style="left:60px; top:100px;">the first live scans kept dying &mdash; and the killer was the database's own logging. &mdash; TELELENS</div>
+
+<script src="sketch.js"></script>
+<script src="character.js"></script>
+<script src="story-builder.js"></script>
+<script>
+window.addEventListener("load", () => {
+  Sketch.init();
+  Sketch.underline(".title");
+  const S = Story, A = S.getAccent();
+
+  // ---- panel 1: the scan dies -------------------------------------------
+  S.frame(0); S.badge(0, 1);
+  S.headline(0, "the scan dies");
+  S.screen(0, '<div class="mono" style="text-align:left; width:100%;"><span style="color:var(--gray)">$</span> telelens scan<br><span style="color:var(--red)">Code: 241</span><br><span style="color:var(--red)">MEMORY_LIMIT_EXCEEDED</span><br>would use 6.98 GiB</div>', 52, 268, 128, "cardtop", "var(--red)");
+  S.character(0, "frustrated", { cy: 404 });
+  S.caption(0, "112 OOM events.<br><b>our query used 23 MiB.</b>");
+
+  // ---- panel 2: wrong hypothesis ----------------------------------------
+  S.frame(1); S.badge(1, 2);
+  S.headline(1, "wrong hypothesis");
+  S.screen(1, '<div class="mono" style="text-align:left; width:100%;">sliced 24h &rarr; 6 x 4h<br>max_threads=2<br>spill to disk<br><span style="color:var(--gray)">...still dying</span></div>', 52, 268, 128, "cardtop");
+  S.character(1, "puzzled", { cy: 406 });
+  S.caption(1, "our queries <i>were</i> greedy.<br><b>fixing them didn't help.</b>");
+
+  // ---- panel 3: ask the database ----------------------------------------
+  S.frame(2); S.badge(2, 3);
+  S.headline(2, "ask the database");
+  S.screen(2, '<div class="mono" style="text-align:left; width:100%;">system.part_log:<br><span style="color:var(--accent)">metric_log</span> 807 merges<br>in 10 min, peak<br><span style="color:var(--red)">6.22 GiB</span> per merge</div>', 52, 268, 128, "cardtop");
+  S.character(2, "aha", { cy: 406 });
+  S.caption(2, "~80 merges a minute,<br><b>each bigger than the box.</b>");
+
+  // ---- panel 4: the killer named ----------------------------------------
+  S.frame(3); S.badge(3, 4);
+  S.headline(3, "the killer, named");
+  S.screen(3, '<div class="mono" style="text-align:left; width:100%;">SYSTEM STOP MERGES<br>&nbsp;&nbsp;system.metric_log<br><br><span style="color:var(--accent)">scan: 3.9s, clean</span></div>', 52, 268, 128, "cardtop");
+  S.character(3, "relieved", { cy: 406, noSymbol: true });
+  S.caption(3, "the observability database<br><b>observing itself.</b>");
+
+  // ---- sequence arrows ---------------------------------------------------
+  [0,1,2].forEach(i => S.seqArrow(i, 452));
+
+  S.el("storycap",
+    'the biggest waste on the box was <span class="em">the platform\'s own introspection.</span>',
+    'top:690px;');
+
+  window.__sketchDone = true;
+});
+</script>
+</body>
+</html>

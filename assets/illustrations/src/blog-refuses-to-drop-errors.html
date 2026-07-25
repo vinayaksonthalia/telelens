@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="sketch.css">
+</head>
+<body>
+  <div class="title" style="left:60px; top:44px;">the number that refuses to flatter you</div>
+  <div class="subtitle" style="left:64px; top:126px;">one policy, two days &mdash; and it will not round the awkward one up</div>
+
+  <div class="box thick" id="policy" style="left:470px; top:370px; width:330px; height:180px;">
+    <div class="label">one policy</div>
+    <div class="sub">keep 100% of errors,<br>100% of slow, 5% of boring</div>
+  </div>
+
+  <div class="box" id="healthy" style="left:1010px; top:240px; width:470px; height:180px;">
+    <div class="label">healthy traffic day</div>
+    <div class="sub">span storage 13,404 &rarr; 672 = <b>&minus;95.0%</b><br>31 of 31 injected error traces kept</div>
+  </div>
+
+  <div class="box" id="storm" style="left:1010px; top:560px; width:470px; height:180px;">
+    <div class="label">error-storm day</div>
+    <div class="sub">68% of traces carry errors &rarr;<br>only <b>~6%</b> of span volume droppable</div>
+  </div>
+
+  <div class="note" id="note" style="left:1010px; top:452px; width:470px; font-size:25px;">
+    same policy. it just refuses to drop errors.
+  </div>
+
+  <div class="small-ink" style="left:105px; top:632px; width:330px; font-size:24px;">whatever your<br>last 24h actually was</div>
+
+  <div class="caption" style="bottom:26px;">on a failing system the report says your problem is the errors, not the storage</div>
+
+<script src="sketch.js"></script>
+<script src="character.js"></script>
+<script>
+window.addEventListener("load", () => {
+  Sketch.init();
+  Sketch.underline(".title");
+
+  // the on-call engineer, reading both numbers without flinching
+  Character.draw(Sketch.overlay(), 250, 470, { pose: "determined", scale: 1.2, seed: 7 });
+
+  // traffic in -> policy
+  Sketch.arrow(338, 528, 462, 478, { seed: 18, width: 3, curve: -8 });
+  // policy -> the two regimes
+  Sketch.connect("#policy", "#healthy", { from: "right", to: "left", fromOffset: -34, curve: -26, seed: 29, width: 3.2 });
+  Sketch.connect("#policy", "#storm", { from: "right", to: "left", fromOffset: 34, curve: 26, seed: 41, width: 3.2 });
+  // red dotted ties from the note out to both regimes, routed left of the text
+  Sketch.arrow(960, 470, 1035, 426, { color: "var(--red)", dotted: true, curve: -14, seed: 94, width: 2.8, head: 14 });
+  Sketch.arrow(960, 496, 1035, 556, { color: "var(--red)", dotted: true, curve: 14, seed: 95, width: 2.8, head: 14 });
+
+  window.__sketchDone = true;
+});
+</script>
+</body>
+</html>
