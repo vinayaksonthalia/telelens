@@ -198,6 +198,9 @@ button.tlink{background:none;border:0;cursor:pointer;font-family:var(--mono);
   font-weight:700;letter-spacing:-.03em;color:var(--on-ink);line-height:1.1}
 .st-v.safe{color:var(--teal)}
 .st-d{font-size:12.5px;color:var(--on-ink-3);margin-top:7px;line-height:1.5;max-width:30ch}
+.how .how-note{margin:0 0 14px;font-size:12px;line-height:1.6;color:var(--on-ink-3);
+  max-width:88ch}
+.how .how-note .mono{color:var(--on-ink-2)}
 .how .claim-line{margin:0;font-size:13.5px;color:var(--on-ink-2);max-width:76ch;
   border-left:2px solid var(--teal-2);padding-left:14px}
 .how .claim-line b{color:var(--on-ink);font-weight:600}
@@ -268,6 +271,19 @@ button.tlink{background:none;border:0;cursor:pointer;font-family:var(--mono);
   font-size:72px;font-weight:700;line-height:.86;letter-spacing:-.055em}
 .stamp .of{font-family:var(--mono);font-size:10px;letter-spacing:.12em;
   margin-top:9px;text-transform:uppercase}
+/* the preserved ledger: printed above the reduction, in the same ruled
+   vocabulary as the rest of the bill */
+.preserved{border-top:1px solid var(--ink-text);border-bottom:1px solid var(--rule);
+  padding:12px 0 12px;margin:0 0 18px;max-width:46ch}
+.preserved .lab{color:var(--stamp);margin:0 0 9px}
+.preserved dl{margin:0}
+.preserved dl>div{display:flex;align-items:baseline;justify-content:space-between;
+  gap:18px;padding:5px 0;border-top:1px solid var(--rule-soft)}
+.preserved dl>div:first-child{border-top:0}
+.preserved dt{font-size:13px;color:var(--ink-text-2)}
+.preserved dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums;
+  font-size:14px;font-weight:700;letter-spacing:-.02em;color:var(--stamp);white-space:nowrap}
+.preserved .p-note{margin:9px 0 0;font-size:12px;line-height:1.5;color:var(--ink-text-3)}
 .stamped .body h2{margin:0 0 8px;font-size:19px;font-weight:600;
   letter-spacing:-.02em;color:var(--ink-text)}
 .stamped .body p{margin:0;font-size:14px;line-height:1.6;max-width:56ch}
@@ -579,9 +595,10 @@ a.fam:hover{text-decoration:underline;text-underline-offset:4px}
     <div class="summary">
       <p class="lab lab-ink">Statement summary</p>
       <dl>
+        <div class="srow"><dt>Error traces kept · SAFE</dt><dd>110,430 / 110,430</dd></div>
+        <div class="srow"><dt>Traces ≥ 750 ms kept</dt><dd>145 / 145</dd></div>
         <div class="srow"><dt>Boring traces dropped</dt><dd class="t">−94.9%</dd></div>
         <div class="srow"><dt>Total span volume — errors kept in full</dt><dd class="a">−6.9%</dd></div>
-        <div class="srow"><dt>Error traces kept · SAFE</dt><dd>110,430 / 110,430</dd></div>
         <div class="srow"><dt>Waste found across 26 findings</dt><dd>12.5 GB/mo</dd></div>
       </dl>
     </div>
@@ -645,6 +662,17 @@ a.fam:hover{text-decoration:underline;text-underline-offset:4px}
         <div class="st-d">collector config written as a proposal — 0 applied by TELELENS.</div>
       </li>
     </ol>
+    <!-- Why 8.7 s is a real number and what it buys: read from
+         internal/store/clickhouse.go — day-sliced GROUP BY queries with top-N
+         LIMITs, uniqCombined (approximate distinct count) for cardinality, and
+         an exact per-trace roll-up (GROUP BY trace_id over the window) as the
+         simulator's input. -->
+    <p class="how-note">That 8.7 s is aggregates, not a row scan: day-sliced
+      <span class="mono">GROUP BY</span> queries with top-N limits, and attribute
+      cardinality from ClickHouse's <span class="mono">uniqCombined</span> — an
+      approximate distinct count, so cardinality figures are estimates. The safety
+      replay is exact: its input is one row per trace,
+      <span class="mono">GROUP BY trace_id</span> across the whole window.</p>
     <p class="claim-line"><b>TELELENS never applies anything. It proves, you decide.</b>
       When a human did apply it, one of the three generated processors was rejected on
       review — that step is the product.</p>
@@ -694,7 +722,19 @@ a.fam:hover{text-decoration:underline;text-underline-offset:4px}
         <div class="of">tail sampling</div>
       </div>
       <div class="body">
-        <h2>94.9% of “boring” traces dropped</h2>
+        <!-- What survived is printed before what was removed. A bill lists what
+             it is not charging you for above the total; the same order is the
+             only honest one here. -->
+        <div class="preserved">
+          <p class="lab">Kept in full — never sampled</p>
+          <dl>
+            <div><dt>Error traces</dt><dd>110,430 / 110,430</dd></div>
+            <div><dt>Traces ≥ 750 ms</dt><dd>145 / 145</dd></div>
+          </dl>
+          <p class="p-note">A policy that would lose one of either exits non-zero
+            before anything is generated.</p>
+        </div>
+        <h2>Only then the reduction: 94.9% of “boring” traces dropped</h2>
         <p>Keep 100% of errors, keep every trace ≥ 750 ms, sample the
           remaining successful/fast traces at 5%. Of 58,136
           boring traces, only 2,947 are kept.</p>
@@ -997,10 +1037,11 @@ var TOUR = [
     body: 'TELELENS is a read-only profiler you point at your own SigNoz: it prices the waste, ' +
       'proves a fix is safe, and writes the collector config for a human to review. This page is ' +
       'one real scan of our demo instance — 26 findings from a 7-day window — rendered as the bill it is.' },
-  { sel: '.stamped', title: 'The stamp, and its counterweight',
-    body: 'Tail sampling drops 94.9% of “boring” traces. That is not 95% off the bill: because every ' +
-      'error and every trace ≥ 750 ms is kept in full, total span volume falls only 6.9%. Both numbers ' +
-      'are the point — the second is what makes the first trustworthy.' },
+  { sel: '.stamped', title: 'What survives first, then the number',
+    body: 'All 110,430 error traces and all 145 traces ≥ 750 ms are kept in full — the policy cannot ' +
+      'drop them and exits non-zero if it would. Only then does tail sampling remove 94.9% of what is ' +
+      'left, which is why total span volume falls just 6.9%. Read in that order, the number is a ' +
+      'measurement rather than a scare.' },
   { sel: '#proof', title: 'It refuses to drop errors',
     body: 'Before anything is applied, the policy is replayed over all 168,711 real traces in the window. ' +
       '110,430 of 110,430 error traces and 145 of 145 slow traces survive — that is what makes the verdict ' +

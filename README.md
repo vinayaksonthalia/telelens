@@ -6,7 +6,7 @@
 
 **A telemetry cost & cardinality profiler for SigNoz: it finds the waste, generates the fix, and proves it drops zero error traces first.**
 
-**−95.0% span storage measured on a live ingester** (honest counterweight: only **~6%** on an error-storm day — the policy refuses to drop errors) · **14.1M spans profiled in 895 ms** · **31 / 31 error traces kept** · **41 tests, 7 packages, 86 subtests** · **read-only by design** · **MIT**
+**31 / 31 error traces kept · every slow trace kept · the error-span panel stayed flat** — and only then the number: **−95.0% span storage measured on a live ingester** (honest counterweight: only **~6%** on an error-storm day — the policy refuses to drop errors) · **14.1M spans profiled in 895 ms** · **41 tests, 7 packages, 86 subtests** · **read-only by design** · **MIT**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Go 1.24+](https://img.shields.io/badge/go-1.24%2B-00ADD8.svg)](go.mod)
@@ -25,6 +25,8 @@
 
 One command, 895 ms, against a live SigNoz instance holding 14.1M spans: six profilers, a ranked bill in GB/month and dollars, and a replay of the recommended sampling policy over 75,586 real traces that keeps every error and slow trace. Nothing was written to the cluster.
 
+> **Why that is fast, and what it costs in precision.** The profilers read aggregates rather than rows — day-sliced `GROUP BY` queries with top-N limits ([`internal/store/clickhouse.go`](internal/store/clickhouse.go)) — and attribute and series cardinality comes from ClickHouse's `uniqCombined`, an approximate distinct count. So cardinality figures are estimates, and the GB/month numbers are a transparent ingest model rather than an invoice. The safety replay is the exact one: its input is one row per trace, `GROUP BY trace_id` across the whole window, which is why it can claim every error trace by count.
+
 Cutting telemetry blindly is scary — drop the wrong span and you are blind during the next incident. TELELENS is observability *for* your observability: it ranks the waste with hard numbers, generates the exact OpenTelemetry Collector config that fixes it, and **proves by replay that the fix keeps every error and slow trace before you ever apply it.** It writes files to `out/`; a human reviews the diff and applies it.
 
 The **Savings Tracker** dashboard is the other half of the proof — ingest falls off a cliff when the generated config lands, while the error-span panel stays flat.
@@ -35,10 +37,11 @@ The **Savings Tracker** dashboard is the other half of the proof — ingest fall
 
 | Result | Measured | Evidence |
 |---|---|---|
-| Span storage cut on healthy known-volume traffic | **−95.0%** | [`assets/live-apply-measure-m4-evidence.md`](assets/live-apply-measure-m4-evidence.md) |
-| Honest counterweight: droppable on an error-storm day | **~6%** (the policy refuses to drop errors) | same |
-| Injected error traces kept | **31 / 31** (live) · **40 / 40** (fixtures) | same |
+| Injected error traces kept | **31 / 31** (live) · **40 / 40** (fixtures) | [`assets/live-apply-measure-m4-evidence.md`](assets/live-apply-measure-m4-evidence.md) |
 | Simulator replayed over real last-24h traces | **162,760 traces — SAFE** | [`assets/live-simulator-m3-evidence.txt`](assets/live-simulator-m3-evidence.txt) |
+| Error-spans-per-service dashboard panel after the config landed | **flat — no drop** | [`assets/screenshots/m5-03-savings-tracker.png`](assets/screenshots/m5-03-savings-tracker.png) |
+| Only then: span storage cut on healthy known-volume traffic | **−95.0%** | [`assets/live-apply-measure-m4-evidence.md`](assets/live-apply-measure-m4-evidence.md) |
+| Honest counterweight: droppable on an error-storm day | **~6%** (the policy refuses to drop errors) | same |
 
 Console capture behind the recording: [`assets/live-scan-2026-07-25.txt`](assets/live-scan-2026-07-25.txt); [`assets/README.md`](assets/README.md) indexes the rest.
 
