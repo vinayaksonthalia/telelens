@@ -158,6 +158,88 @@ a.fam:hover{text-decoration:underline;text-underline-offset:3px}
 [aria-current="page"].fam{border-bottom:1.5px solid currentColor;padding-bottom:1px}
 .fam-sep{color:var(--text-3)}
 .fam-tag{margin:5px 0 0;font-size:12px;color:var(--text-3)}
+/* --- "How this report happened": the four stages that produced this page,
+   each carrying its own recorded number. The strip is one connected object
+   (shared hairlines + arrows on the seams) because the product is a motion,
+   not a dashboard. Numbers: assets/live-findings.json (scan_duration,
+   findings[], simulation) and assets/live-collector-fragment.yaml. --- */
+.pipeline{border-bottom:1px solid var(--hairline);
+  background:linear-gradient(180deg,var(--bg),var(--surface))}
+.pipeline-in{max-width:960px;margin:0 auto;padding:24px}
+.pipeline h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--text-2);font-weight:600;margin:0 0 13px}
+.stages{list-style:none;margin:0 0 12px;padding:0;display:grid;
+  grid-template-columns:repeat(4,1fr);gap:1px;background:var(--hairline);
+  border:1px solid var(--hairline);border-radius:12px;overflow:visible}
+.stage{background:var(--surface);padding:14px 16px;position:relative}
+.stage:first-child{border-radius:12px 0 0 12px}
+.stage:last-child{border-radius:0 12px 12px 0}
+.stage:not(:last-child)::after{content:"→";position:absolute;right:-10px;top:50%;
+  transform:translateY(-50%);width:20px;height:20px;border-radius:999px;
+  background:var(--raised);border:1px solid var(--border);color:var(--teal-bright);
+  font-size:11px;line-height:18px;text-align:center;z-index:2}
+.st-k{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--text-2);
+  display:flex;align-items:baseline;gap:7px;margin-bottom:7px}
+.st-n{font-family:var(--mono);font-size:10px;color:var(--teal);letter-spacing:0}
+.st-v{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:19px;
+  font-weight:700;letter-spacing:-.02em;color:var(--text-1);line-height:1.15}
+.st-v.safe{color:var(--green)}
+.st-d{font-size:11.5px;color:var(--text-3);margin-top:4px;line-height:1.45}
+.pipeline .claim{margin:0;font-size:13px;color:var(--text-2)}
+.pipeline .claim b{color:var(--teal-bright);font-weight:600}
+@media (max-width:719px){
+  .stages{grid-template-columns:1fr}
+  .stage:first-child{border-radius:12px 12px 0 0}
+  .stage:last-child{border-radius:0 0 12px 12px}
+  .stage:not(:last-child)::after{right:auto;left:50%;top:auto;bottom:-11px;
+    transform:translateX(-50%) rotate(90deg)}
+}
+
+/* --- Policy explorer: every displayed outcome is a recorded replay result,
+   not an interpolation. The control positions are limited to the ones the
+   evidence covers (3 thresholds x 7 sample rates). --- */
+.explorer{background:var(--surface);border:1px solid var(--hairline);
+  border-radius:12px;overflow:hidden;margin-bottom:8px}
+.exp-controls{display:grid;grid-template-columns:minmax(200px,.8fr) minmax(210px,1fr) minmax(230px,1.2fr);
+  gap:1px;background:var(--hairline)}
+.ctl{background:var(--surface);padding:15px 18px;border:0;margin:0;min-width:0}
+.ctl .ctl-l{font-size:11px;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--text-3);font-weight:600;padding:0;margin:0 0 10px;display:flex;
+  align-items:center;gap:6px}
+.exp-out .v{white-space:nowrap}
+.locked{display:inline-flex;align-items:center;gap:8px;background:rgba(61,214,140,.09);
+  border:1px solid rgba(61,214,140,.32);border-radius:999px;padding:5px 12px;
+  font-size:12.5px;color:var(--green);font-weight:600;cursor:not-allowed}
+.locked input{accent-color:var(--green);margin:0;pointer-events:none}
+.lock-note{font-size:11.5px;color:var(--text-3);margin:8px 0 0;line-height:1.45;
+  transition:color .18s ease}
+.lock-note.flash{color:var(--green)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.segopt{position:relative;display:inline-flex}
+.segopt input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.segopt span{display:block;border:1px solid var(--border);border-radius:6px;
+  padding:6px 11px;font-size:12.5px;font-family:var(--mono);color:var(--text-2);
+  transition:border-color .12s ease,color .12s ease,background .12s ease}
+.segopt input:hover+span{border-color:var(--teal);color:var(--text-1)}
+.segopt input:checked+span{border-color:var(--teal);background:var(--teal-dim);
+  color:var(--teal-bright);font-weight:600}
+.segopt input:focus-visible+span{outline:2px solid var(--teal-bright);outline-offset:2px}
+#exp-pct{width:100%;accent-color:var(--teal);margin:2px 0 0;height:22px;cursor:pointer}
+#exp-pct:focus-visible{outline:2px solid var(--teal-bright);outline-offset:4px;border-radius:4px}
+.ticks{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;
+  color:var(--text-3);margin-top:2px}
+.ticks span{flex:1;text-align:center}
+.ticks span:first-child{text-align:left}.ticks span:last-child{text-align:right}
+.ticks .on{color:var(--teal-bright);font-weight:700}
+.exp-head{display:flex;align-items:center;gap:12px;padding:14px 18px;
+  border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);flex-wrap:wrap}
+.exp-out{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:1px;background:var(--hairline)}
+.exp-foot{padding:13px 18px;font-size:12.5px;color:var(--text-2);
+  background:rgba(245,166,35,.07);border-top:1px solid rgba(245,166,35,.24)}
+.exp-foot b{color:var(--med)}
+.exp-src{font-size:11.5px;color:var(--text-3);padding:11px 18px;border-top:1px solid var(--hairline)}
+@media (max-width:719px){.exp-controls{grid-template-columns:1fr}}
 @media (max-width:720px){.savings{grid-template-columns:1fr 1fr}
   .masthead .prop{font-size:20px}
   .banner{padding:18px 18px;gap:16px}
@@ -211,6 +293,44 @@ a.fam:hover{text-decoration:underline;text-underline-offset:3px}
       <a class="btn btn-primary" href="https://github.com/vinayaksonthalia/telelens">GitHub →</a>
       <a class="btn btn-ghost" href="#findings">The findings ↓</a>
     </div>
+  </div>
+</section>
+
+<!-- How this report happened. Every number below is the recorded one:
+     8.7 s + 26 findings + the 168,711-trace replay from assets/live-findings.json
+     (scan_duration, findings[], simulation); 3 processors generated / 0 applied
+     from assets/live-collector-fragment.yaml (tail_sampling,
+     transform/defuse_label_bombs, filter/drop_unread_metrics) — and
+     assets/live-apply-measure-m4-evidence.md, where a human applied two of the
+     three and deliberately rejected the third. -->
+<section class="pipeline">
+  <div class="pipeline-in">
+    <h2>How this report happened</h2>
+    <ol class="stages">
+      <li class="stage">
+        <div class="st-k"><span class="st-n">01</span>SCAN</div>
+        <div class="st-v">8.7s</div>
+        <div class="st-d">read-only ClickHouse SELECTs + SigNoz GETs. Nothing written.</div>
+      </li>
+      <li class="stage">
+        <div class="st-k"><span class="st-n">02</span>PRICE</div>
+        <div class="st-v">26 findings</div>
+        <div class="st-d">each one costed in GB/mo and $/mo, not just listed.</div>
+      </li>
+      <li class="stage">
+        <div class="st-k"><span class="st-n">03</span>PROVE</div>
+        <div class="st-v safe">168,711 traces</div>
+        <div class="st-d">the fix replayed over every real trace → verdict SAFE.</div>
+      </li>
+      <li class="stage">
+        <div class="st-k"><span class="st-n">04</span>GENERATE</div>
+        <div class="st-v">3 processors</div>
+        <div class="st-d">collector config written as a proposal — 0 applied by TELELENS.</div>
+      </li>
+    </ol>
+    <p class="claim"><b>TELELENS never applies anything. It proves, you decide.</b>
+      When a human did apply it, one of the three generated processors was rejected on
+      review — that step is the product.</p>
   </div>
 </section>
 
@@ -274,6 +394,57 @@ a.fam:hover{text-decoration:underline;text-underline-offset:3px}
     The policy is judged SAFE because it retains 100% of error traces and 100% of slow traces —
     the two classes you actually page on.</p>
 
+  <div class="section-h" id="explorer">Try the policy yourself <span class="chip">every position is a recorded replay, not an interpolation</span></div>
+  <div class="explorer">
+    <div class="exp-controls">
+      <div class="ctl">
+        <div class="ctl-l" id="lbl-err">Keep error traces</div>
+        <span class="locked" title="The profiler refuses to drop errors — non-negotiable."
+              onclick="tlFlashLock()">
+          <input type="checkbox" checked disabled aria-labelledby="lbl-err" aria-describedby="lock-note">
+          <span aria-hidden="true">🔒</span> ON — locked
+        </span>
+        <p class="lock-note" id="lock-note">The profiler refuses to drop errors — non-negotiable.
+          A policy that would lose one error trace exits non-zero.</p>
+      </div>
+      <div class="ctl">
+        <div class="ctl-l" id="lbl-lat">Slow-trace threshold</div>
+        <div class="seg" role="radiogroup" aria-labelledby="lbl-lat">
+          <label class="segopt"><input type="radio" name="tl-lat" value="250"><span>250 ms</span></label>
+          <label class="segopt"><input type="radio" name="tl-lat" value="500"><span>500 ms</span></label>
+          <label class="segopt"><input type="radio" name="tl-lat" value="750" checked><span>750 ms</span></label>
+        </div>
+        <p class="lock-note">Only the three thresholds this window's replay actually covers.</p>
+      </div>
+      <div class="ctl">
+        <label class="ctl-l" for="exp-pct">Sample this % of boring traces</label>
+        <input type="range" id="exp-pct" min="0" max="6" step="1" value="2"
+               aria-describedby="exp-ticks" aria-valuetext="5 percent">
+        <div class="ticks" id="exp-ticks" aria-hidden="true">
+          <span>0</span><span>1</span><span>5</span><span>10</span><span>25</span><span>50</span><span>100</span>
+        </div>
+      </div>
+    </div>
+    <div class="exp-head">
+      <span class="verdict-stamp" id="exp-verdict">✓ VERDICT: SAFE</span>
+      <span class="verdict-policy" id="exp-policy">keep errors + keep ≥ 750 ms + sample 5% of the rest</span>
+    </div>
+    <div class="exp-out verdict-grid" aria-live="polite">
+      <div class="vcell"><div class="v"><span class="keep" id="o-err">110,430</span> / 110,430</div><div class="l">error traces kept (100%)</div></div>
+      <div class="vcell"><div class="v"><span class="keep" id="o-slow">145 / 145</span></div><div class="l" id="o-slow-l">slow traces kept (100%)</div></div>
+      <div class="vcell"><div class="v" id="o-boring">2,947 / 58,136</div><div class="l" id="o-boring-l">boring traces kept (5.1%)</div></div>
+      <div class="vcell"><div class="v" id="o-total">113,522 / 168,711</div><div class="l" id="o-total-l">traces kept overall (67.3%)</div></div>
+      <div class="vcell"><div class="v" id="o-span">−6.9%</div><div class="l">est. span-volume reduction</div></div>
+    </div>
+    <p class="exp-foot" id="exp-note"><b>The honest counterweight:</b> dropping 94.9% of boring
+      traces cuts span volume by only 6.9% — 65% of this window's traces carry an error, and
+      the policy keeps every one of them.</p>
+    <p class="exp-src">Recomputed from the recorded replay of 168,711 real traces / 8,953,804 spans
+      (<span class="mono">assets/live-findings.json</span>, scan of 2026-07-18). The 21 policy
+      positions offered here were each replayed through the same simulator that produced the
+      verdict above; the shipped default (750 ms / 5%) reproduces that record exactly.</p>
+  </div>
+
   <div class="section-h" id="findings">All findings <span class="chip">26 total, priced against the scan window</span></div>
   <div class="table-scroll">
   <table>
@@ -331,5 +502,95 @@ a.fam:hover{text-decoration:underline;text-underline-offset:3px}
     </div>
   </div>
 </footer>
+
+<script>
+/* TELELENS policy explorer — no dependencies, no network.
+ *
+ * SOURCE OF EVERY NUMBER BELOW: the Jul-18 2026 replay recorded in
+ * assets/live-findings.json ("simulation": 168,711 traces / 8,953,804 spans /
+ * 110,430 error traces). Each of the 21 (threshold, sample-%) positions was
+ * replayed through the repo's own internal/analyze.Simulate over that exact
+ * trace set — the same deterministic FNV-hash sampler the CLI ships — so these
+ * are recorded outcomes, not interpolations. The 750 ms / 5% position
+ * reproduces assets/live-findings.json field-for-field (kept_traces 113,522,
+ * kept_spans 8,332,657, boring_kept 2,947), which is what pins the rest.
+ *
+ * Positions deliberately NOT offered: thresholds above 750 ms. This window
+ * holds only 145 traces at or over 750 ms and none between there and 2 s, so
+ * 1000 ms and 2000 ms replay to numbers identical to 750 ms — real, but
+ * nothing for a control to say. Sample rates are the seven that were replayed.
+ */
+var TL = {
+  totalTraces: 168711, errorTraces: 110430, totalSpans: 8953804,
+  /* [boring_kept, kept_traces, kept_spans] keyed by threshold ms → sample % */
+  grid: {"250":{"slow":27802,"boring":30479,"stops":{"0":[0,138232,8687638],"1":[302,138534,8690334],"5":[1573,139805,8701286],"10":[3090,141322,8714387],"25":[7708,145940,8754698],"50":[15411,153643,8822402],"100":[30479,168711,8953804]}},"500":{"slow":146,"boring":58135,"stops":{"0":[0,110576,8299782],"1":[571,111147,8306244],"5":[2947,113523,8332671],"10":[5853,116429,8365288],"25":[14605,125181,8463585],"50":[29290,139866,8629280],"100":[58135,168711,8953804]}},"750":{"slow":145,"boring":58136,"stops":{"0":[0,110575,8299768],"1":[571,111146,8306230],"5":[2947,113522,8332657],"10":[5853,116428,8365274],"25":[14606,125181,8463585],"50":[29291,139866,8629280],"100":[58136,168711,8953804]}}},
+  pcts: [0, 1, 5, 10, 25, 50, 100]
+};
+
+function tlNum(n){ return n.toLocaleString('en-US'); }
+function tlPct(part, whole){ return whole === 0 ? '0.0' : (100 * part / whole).toFixed(1); }
+function tlEl(id){ return document.getElementById(id); }
+
+function tlFlashLock(){
+  var n = tlEl('lock-note');
+  n.classList.add('flash');
+  setTimeout(function(){ n.classList.remove('flash'); }, 700);
+}
+
+function tlRender(){
+  var ms = document.querySelector('input[name="tl-lat"]:checked').value;
+  var idx = parseInt(tlEl('exp-pct').value, 10);
+  var pct = TL.pcts[idx];
+  var row = TL.grid[ms];
+  var s = row.stops[String(pct)];
+  var boringKept = s[0], keptTraces = s[1], keptSpans = s[2];
+  var reduction = 100 * (TL.totalSpans - keptSpans) / TL.totalSpans;
+
+  tlEl('exp-pct').setAttribute('aria-valuetext', pct + ' percent');
+  Array.prototype.forEach.call(tlEl('exp-ticks').children, function(t, i){
+    t.classList.toggle('on', i === idx);
+  });
+
+  tlEl('exp-policy').textContent = 'keep errors + keep ≥ ' + ms + ' ms + sample ' + pct + '% of the rest';
+  /* The invariant is structural, not a coincidence of these numbers: errors and
+     slow traces are kept at every position, so the verdict is SAFE at all 21. */
+  tlEl('exp-verdict').textContent = '✓ VERDICT: SAFE';
+
+  tlEl('o-err').textContent = tlNum(TL.errorTraces);
+  tlEl('o-slow').textContent = tlNum(row.slow) + ' / ' + tlNum(row.slow);
+  tlEl('o-slow-l').textContent = 'slow traces kept (100%) — ≥ ' + ms + ' ms';
+  tlEl('o-boring').textContent = tlNum(boringKept) + ' / ' + tlNum(row.boring);
+  tlEl('o-boring-l').textContent = 'boring traces kept (' + tlPct(boringKept, row.boring) + '%)';
+  tlEl('o-total').textContent = tlNum(keptTraces) + ' / ' + tlNum(TL.totalTraces);
+  tlEl('o-total-l').textContent = 'traces kept overall (' + tlPct(keptTraces, TL.totalTraces) + '%)';
+  tlEl('o-span').textContent = (reduction === 0 ? '' : '−') + reduction.toFixed(1) + '%';
+
+  var dropped = tlPct(row.boring - boringKept, row.boring);
+  var errShare = tlPct(TL.errorTraces, TL.totalTraces);
+  var note;
+  if (pct === 100) {
+    note = '<b>Sampling is off at 100%:</b> every boring trace is kept, so span volume ' +
+      'falls by 0.0%. The slider’s left half is where the money is — and the ' +
+      'verdict stays SAFE the whole way, because errors were never on the table.';
+  } else if (pct === 0) {
+    note = '<b>Even at 0%:</b> every boring trace is discarded and all ' + tlNum(TL.errorTraces) +
+      ' error traces plus all ' + tlNum(row.slow) + ' slow traces still survive — span volume ' +
+      'falls only ' + reduction.toFixed(1) + '%. That floor is the whole argument.';
+  } else {
+    note = '<b>The honest counterweight:</b> dropping ' + dropped + '% of boring traces cuts span ' +
+      'volume by only ' + reduction.toFixed(1) + '% — ' + errShare + '% of this window’s traces ' +
+      'carry an error, and the policy keeps every one of them.';
+  }
+  tlEl('exp-note').innerHTML = note;
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  tlEl('exp-pct').addEventListener('input', tlRender);
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="tl-lat"]'), function(r){
+    r.addEventListener('change', tlRender);
+  });
+  tlRender();
+});
+</script>
 </body>
 </html>
