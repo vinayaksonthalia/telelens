@@ -6,7 +6,9 @@
 
 **A telemetry cost & cardinality profiler for SigNoz: it finds the waste, generates the fix, and proves it drops zero error traces first.**
 
-**31 / 31 error traces kept · every slow trace kept · the error-span panel stayed flat** — and only then the number: **−95.0% span storage measured on a live ingester** (honest counterweight: only **~6%** on an error-storm day — the policy refuses to drop errors) · **14.1M spans profiled in 895 ms** · **41 tests, 45 subtests, 7 packages** · **read-only by design** · **MIT**
+**31 / 31 error traces kept · every slow trace kept · the error-span panel stayed flat** — and only then the number: **−95.0% span storage measured on a live ingester** (honest counterweight: only **~6%** on an error-storm day — the policy refuses to drop errors) · **14.1M spans profiled in 895 ms** · **41 tests, 45 subtests, 7 packages** · **read-only by design — it exits non-zero rather than emit a policy that would drop one error trace** · **MIT**
+
+The first waste it ever found was ClickHouse's own `system.metric_log` — ~80 merges a minute, 6.2 GiB peaks, OOM-killing the very scan that discovered it.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Go 1.24+](https://img.shields.io/badge/go-1.24%2B-00ADD8.svg)](go.mod)
@@ -80,7 +82,7 @@ go test ./...
 ```bash
 ./telelens scan --fixtures
 ```
-> *Expect:* six profilers, a severity-coloured table, then `Total identified savings: 130.2 GB/month ≈ $39.06/month` and `scan completed in 6ms · outputs in out/`.
+> *Expect:* six profilers, a severity-coloured table, then `Total identified savings: 130.2 GB/month ≈ $39.06/month` and a `scan completed` line with `outputs in out/`.
 
 **4. Prove the fix is safe** — the policy is replayed trace by trace before anything is applied.
 

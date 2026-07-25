@@ -69,6 +69,8 @@ Input (quality + structural findings from the LIVE scan):
 
 Agent output (claude CLI, verbatim):
 Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+
+> [Clarification, added at review: the warning above is part of the verbatim capture — the harness printed it while buffering, but the agent did receive the piped scan; its assessment below cites F-024/F-025/F-026 from that scan directly.]
 **Data-quality assessment — SigNoz instance (7d window)**
 
 **Wrong (act on this):** F-024 — the metric `browser.sessions.count` carries `session.id`, an unbounded ID, as a label across 37 series. Cardinality is low *today*, but session IDs grow with every new session, so series count scales with traffic without bound. This is a structural time bomb, not a cost problem yet ($0/mo now).

@@ -111,16 +111,6 @@ When other cost-dashboard projects appear, these are the things a quick copy can
 
 ---
 
-## A note on the commit history
-
-The public commit history is a fresh, honest, coherent sequence — LICENSE first, then the
-read-only store and fixtures, the profilers, the report and generator, the safety simulator, the
-dashboards and guardrails, the CLI polish, and finally the live-verification evidence. It reads as
-coherent feature-stage development because that is what it was: the design was worked out first,
-then committed in the order a reader can follow. Every live number in the history has evidence in
-`../assets/`.
-
----
 
 ## Related
 
