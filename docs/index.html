@@ -1,250 +1,529 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TELELENS — Waste Report</title>
+<script>
+/* Applied before first paint so the chosen theme never flashes. Default is
+   dark; the OS preference decides when the reader has not chosen. */
+try{var t=localStorage.getItem('tl-theme');if(t==='light'||t==='dark')
+  document.documentElement.setAttribute('data-theme',t);}catch(e){}
+</script>
 <style>
+/* ============================================================================
+   TELELENS — "the telemetry bill".
+
+   The page is two materials. Deep ink is the desk: TELELENS talking about
+   itself. Warm paper is the DOCUMENT: every number that came out of the scan
+   sits on it. Receipt discipline — hairline rules, zero radius, tabular
+   figures, right-aligned amounts — applies INSIDE the bill only, because in
+   there it is not a style, it is what the artifact is.
+   ========================================================================== */
+/* Two themes, one composition. Dark: the sheet lies on an ink desk. Light: the
+   same sheet on a warmer, deeper desk — the bill metaphor only gets stronger
+   when the whole page is paper. Dark is the default; the OS preference decides
+   when the reader has not chosen; the masthead toggle overrides both. The
+   document's own tokens are identical in both, because a bill is a bill. */
 :root{
-  --bg:#0A0B0D; --surface:#111214; --raised:#17181B;
-  --hairline:rgba(255,255,255,.08); --border:rgba(255,255,255,.14);
-  --text-1:#EDEDEF; --text-2:#9A9BA3; --text-3:#6C6D75;
-  --teal:#14B8A6; --teal-bright:#2DD4BF; --teal-dim:rgba(20,184,166,.14);
-  --high:#E5484D; --med:#F5A623; --low:#5B8DEF; --green:#3DD68C;
-  --mono:"JetBrains Mono","SF Mono",ui-monospace,Menlo,Consolas,monospace;
-  --sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
+  color-scheme:dark;
+  /* the surround — TELELENS talking about itself */
+  --ink:#071214; --ink-2:#0C1A1D; --ink-3:#122528;
+  --ink-line:rgba(150,190,186,.15); --ink-line-2:rgba(150,190,186,.26);
+  --on-ink:#E8EDEC; --on-ink-2:#93A3A1; --on-ink-3:#7F8D8B;
+  --teal:#2DD4BF; --teal-2:#14B8A6; --amber-ink:#F5A623;
+  --btn-bg:#14B8A6; --btn-bg-hover:#2DD4BF; --btn-fg:#04201C;
+  --sheet-shadow:0 1px 0 rgba(0,0,0,.5),0 26px 60px -30px rgba(0,0,0,.85);
+  --veil:rgba(3,9,10,.74);
+
+  /* the document */
+  --paper:#F6F1E7; --paper-2:#EFE9DC; --paper-3:#E7E0D0;
+  --rule:#C8BFAE; --rule-soft:#DED6C6;
+  --ink-text:#10201F; --ink-text-2:#5A6360; --ink-text-3:#6F7773;
+  --stamp:#0E7C6B; --amber:#B45309;
+  --sev-high:#A3222A; --sev-med:#8A5A08; --sev-low:#2F4FA0;
+  --fam-argus:#8B5CF6; --fam-glasspane:#5B8DEF; --fam-telelens:#2DD4BF;
+
+  --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,system-ui,sans-serif;
+  --page:1080px;
+}
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]){
+    color-scheme:light;
+    --ink:#E9E2D4; --ink-2:#F1EBDE; --ink-3:#E3DACA;
+    --ink-line:rgba(16,32,31,.14); --ink-line-2:rgba(16,32,31,.26);
+    --on-ink:#10201F; --on-ink-2:#4E5754; --on-ink-3:#5E6663;
+    --teal:#0E7C6B; --teal-2:#0A5C50; --amber-ink:#9A4708;
+    --btn-bg:#0A5C50; --btn-bg-hover:#0E7C6B; --btn-fg:#F8F5EE;
+    --sheet-shadow:0 1px 0 rgba(60,45,15,.10),0 20px 44px -30px rgba(60,45,15,.55);
+    --veil:rgba(34,26,10,.58);
+    --paper:#FBF8F1; --paper-2:#F4EFE4; --paper-3:#EDE7DA;
+    --fam-argus:#6D34D6; --fam-glasspane:#2A5FC8; --fam-telelens:#0E7C6B;
+  }
+}
+[data-theme="light"]{
+  color-scheme:light;
+  --ink:#E9E2D4; --ink-2:#F1EBDE; --ink-3:#E3DACA;
+  --ink-line:rgba(16,32,31,.14); --ink-line-2:rgba(16,32,31,.26);
+  --on-ink:#10201F; --on-ink-2:#4E5754; --on-ink-3:#5E6663;
+  --teal:#0E7C6B; --teal-2:#0A5C50; --amber-ink:#9A4708;
+  --btn-bg:#0A5C50; --btn-bg-hover:#0E7C6B; --btn-fg:#F8F5EE;
+  --sheet-shadow:0 1px 0 rgba(60,45,15,.10),0 20px 44px -30px rgba(60,45,15,.55);
+  --veil:rgba(34,26,10,.58);
+  --paper:#FBF8F1; --paper-2:#F4EFE4; --paper-3:#EDE7DA;
+  --fam-argus:#6D34D6; --fam-glasspane:#2A5FC8; --fam-telelens:#0E7C6B;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--text-1);font-family:var(--sans);
-  font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body{background:var(--ink);color:var(--on-ink);font-family:var(--sans);
+  font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility}
 .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
-a{color:var(--teal-bright);text-decoration:none} a:hover{text-decoration:underline}
-.wrap{max-width:960px;margin:0 auto;padding:0 24px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+a{color:inherit}
+.wrap{max-width:var(--page);margin:0 auto;padding:0 24px}
 
-.topbar{border-bottom:1px solid var(--hairline);background:var(--surface);
-  position:sticky;top:0;z-index:10}
-.topbar-in{max-width:960px;margin:0 auto;padding:15px 24px;display:flex;
+/* the tracked-caps label — the bill's ACCOUNT / PERIOD / METER READ voice.
+   Used for every label on the page, ink side and paper side. */
+.lab{font-size:10.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  line-height:1.4;color:var(--ink-text-2)}
+.lab-ink{color:var(--on-ink-3)}
+
+/* ---------------------------------------------------------------- topbar -- */
+.topbar{border-bottom:1px solid var(--ink-line);background:var(--ink)}
+.topbar-in{max-width:var(--page);margin:0 auto;padding:13px 24px;display:flex;
   align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.brand{display:flex;align-items:baseline;gap:11px}
-.brand .mark{color:var(--teal);font-size:18px;transform:translateY(1px)}
-.brand .word{font-weight:600;letter-spacing:.16em;font-size:15px}
-.brand .sub{color:var(--text-3);font-size:12px;letter-spacing:.02em}
-.repo-link{font-size:12.5px;color:var(--text-2);border:1px solid var(--border);
-  border-radius:999px;padding:6px 13px}
-.repo-link:hover{border-color:var(--teal);color:var(--text-1);text-decoration:none}
+.brand{display:flex;align-items:baseline;gap:12px;font-family:var(--mono)}
+.brand .mark{color:var(--teal-2);font-size:15px;transform:translateY(1px)}
+.brand .word{font-weight:700;letter-spacing:.2em;font-size:13px;color:var(--on-ink)}
+.brand .sub{color:var(--on-ink-3);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+/* no pill: the repo is a text link with an arrow, like every other secondary
+   action on this page. */
+.repo-link{font-family:var(--mono);font-size:12px;color:var(--on-ink-2);
+  text-decoration:none;border-bottom:1px solid var(--ink-line-2);padding-bottom:2px}
+.repo-link:hover{color:var(--teal-2);border-color:var(--teal-2)}
+.top-right{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+/* the toggle names the mode you would switch to, so the label is the action */
+.theme-toggle{font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--on-ink-3);background:none;border:0;
+  border-bottom:1px solid transparent;padding:0 0 3px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px}
+.theme-toggle:hover{color:var(--teal-2);border-color:var(--teal-2)}
+.theme-toggle .dot{width:9px;height:9px;border-radius:50%;
+  background:linear-gradient(90deg,currentColor 0 50%,transparent 50% 100%);
+  box-shadow:inset 0 0 0 1px currentColor}
 
-/* --- masthead (compact hero band) --- */
-.masthead{border-bottom:1px solid var(--hairline);
-  background:
-    radial-gradient(1100px 340px at 12% -40%, rgba(20,184,166,.13), transparent 70%),
-    linear-gradient(180deg, var(--surface), var(--bg));}
-.masthead-in{max-width:960px;margin:0 auto;padding:34px 24px 30px}
-/* Wordmark quiet, claim loud: the brand mark only has to be legible, the
-   one-sentence claim is what the page is for. */
-.masthead .wordmark{display:block;height:34px;width:auto;margin:0 0 18px}
-.masthead .prop{font-size:24px;line-height:1.35;font-weight:600;letter-spacing:-.022em;
-  color:var(--text-1);max-width:680px;margin:0 0 20px}
-.masthead .prop em{font-style:normal;color:var(--teal-bright)}
-.chips{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 22px;padding:0;list-style:none}
-.chips li{background:var(--raised);border:1px solid var(--hairline);border-radius:999px;
-  padding:6px 13px;font-size:12.5px;color:var(--text-2);display:flex;align-items:baseline;gap:7px}
-.chips li b{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:700;
-  font-size:13px;color:var(--text-1);letter-spacing:-.01em}
-.chips li.accent{border-color:rgba(20,184,166,.34);background:var(--teal-dim)}
-.chips li.accent b{color:var(--teal-bright)}
-.chips li.safe{border-color:rgba(61,214,140,.3);background:rgba(61,214,140,.09)}
-.chips li.safe b{color:var(--green)}
-.chips li.honest{border-color:rgba(245,166,35,.28);background:rgba(245,166,35,.08)}
-.chips li.honest b{color:var(--med)}
-.cta{display:flex;flex-wrap:wrap;gap:10px}
-.btn{display:inline-flex;align-items:center;gap:7px;border-radius:6px;padding:9px 17px;
-  font-size:13.5px;font-weight:600;letter-spacing:-.005em;border:1px solid transparent;
-  text-decoration:none;transition:background .12s ease,border-color .12s ease}
-.btn:hover{text-decoration:none}
-.btn-primary{background:var(--teal);color:#06201C;border-color:var(--teal)}
-.btn-primary:hover{background:var(--teal-bright);border-color:var(--teal-bright)}
-.btn-ghost{background:transparent;color:var(--text-1);border-color:var(--border)}
-.btn-ghost:hover{border-color:var(--teal);color:var(--teal-bright)}
-.btn:focus-visible{outline:2px solid var(--teal-bright);outline-offset:2px}
-@media (max-width:520px){
-  .masthead-in{padding:26px 20px 24px}
-  .masthead .wordmark{height:34px;margin-bottom:14px}
-  .masthead .prop{font-size:16px;margin-bottom:16px}
-  .chips li{font-size:12px;padding:5px 11px}
-  .cta{gap:8px}.btn{flex:1 1 auto;justify-content:center}
-}
+/* ------------------------------------------------------- statement front -- */
+/* Asymmetric: the claim carries the left, the summary column on the right is
+   the bill's own summary box — a ruled list, not a row of chips. */
+.front{border-bottom:1px solid var(--ink-line);
+  background:linear-gradient(180deg,var(--ink-2),var(--ink) 78%)}
+.front-in{max-width:var(--page);margin:0 auto;padding:44px 24px 40px;
+  display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.95fr);
+  gap:52px;align-items:start}
+.wordmark{display:block;height:30px;width:auto;margin:0 0 26px;color:var(--on-ink)}
+.wordmark .lens{stroke:var(--teal-2)}
+.wordmark .blades stop:first-child{stop-color:var(--teal)}
+.wordmark .blades stop:last-child{stop-color:var(--teal-2)}
+.wordmark text{fill:currentColor}
+.claim{font-size:34px;line-height:1.2;font-weight:600;letter-spacing:-.028em;
+  color:var(--on-ink);margin:0 0 26px;max-width:20ch;text-wrap:balance}
+.claim em{font-style:normal;color:var(--teal);
+  box-shadow:inset 0 -.09em 0 rgba(45,212,191,.28)}
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:22px}
+/* exactly one filled button on the page */
+.btn{display:inline-flex;align-items:center;gap:9px;background:var(--btn-bg);
+  color:var(--btn-fg);border:0;border-radius:0;padding:12px 20px;font-size:13px;
+  font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  font-family:var(--mono);text-decoration:none;
+  transition:background .14s ease}
+.btn:hover{background:var(--btn-bg-hover)}
+.btn:focus-visible,.tlink:focus-visible,.repo-link:focus-visible,
+.theme-toggle:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+button.tlink{background:none;border:0;cursor:pointer;font-family:var(--mono);
+  font-size:12.5px;letter-spacing:.05em;border-bottom:1px solid var(--ink-line-2);
+  padding:0 0 3px;text-align:left}
+.tlink{font-family:var(--mono);font-size:12.5px;letter-spacing:.05em;
+  color:var(--on-ink-2);text-decoration:none;border-bottom:1px solid var(--ink-line-2);
+  padding-bottom:3px}
+.tlink:hover{color:var(--teal-2);border-color:var(--teal-2)}
 
-.hero{padding:40px 0 8px}
-.hero h1{font-size:27px;font-weight:600;letter-spacing:-.02em;margin:0 0 8px}
-.hero .lede{color:var(--text-2);font-size:15px;max-width:640px;margin:0 0 24px}
-.meta{display:flex;gap:22px;flex-wrap:wrap;font-size:12.5px;color:var(--text-3);
-  border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);
-  padding:13px 0;margin-bottom:26px}
-.meta b{color:var(--text-1);font-weight:600}
-.meta .k{display:block;text-transform:uppercase;letter-spacing:.05em;font-size:10.5px;
-  color:var(--text-3);margin-bottom:2px}
+/* the summary column: label left, figure right, hairline between — the four
+   headline numbers set as a statement summary instead of badged onto one. */
+.summary{padding-top:6px}
+.summary .lab{margin:0 0 4px}
+.summary dl{margin:0;border-top:1px solid var(--ink-line-2)}
+.summary .srow{display:flex;align-items:baseline;justify-content:space-between;
+  gap:18px;padding:11px 0;border-bottom:1px solid var(--ink-line)}
+.summary dt{font-size:12.5px;color:var(--on-ink-2);line-height:1.4;flex:1}
+.summary dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums;
+  font-size:15px;font-weight:700;letter-spacing:-.02em;color:var(--on-ink);
+  white-space:nowrap}
+.summary dd.t{color:var(--teal-2)}
+.summary dd.a{color:var(--amber-ink)}
 
-.savings{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:14px;margin-bottom:26px}
-.stat{background:var(--surface);border:1px solid var(--hairline);border-radius:12px;padding:16px 18px}
-.stat.big{background:linear-gradient(135deg,rgba(20,184,166,.14),rgba(20,184,166,.04));
-  border-color:rgba(20,184,166,.3)}
-.stat .v{font-size:24px;font-weight:700;font-family:var(--mono);letter-spacing:-.01em}
-.stat.big .v{color:var(--teal-bright)}
-.stat .l{font-size:11.5px;color:var(--text-3);margin-top:3px}
-.stat .high{color:var(--high)} .stat .med{color:var(--med)} .stat .low{color:var(--low)}
+/* ---------------------------------------------------------- what this is -- */
+/* Three ruled columns: the tool, this page, what to do here. A first-time
+   reader should be able to leave this band knowing all three. */
+.whatis{border-bottom:1px solid var(--ink-line);background:var(--ink)}
+.whatis-in{max-width:var(--page);margin:0 auto;padding:26px 24px 28px;
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  border-top:0}
+.wi{padding:0 26px 0 0;border-right:1px solid var(--ink-line)}
+.wi+.wi{padding-left:26px}
+.wi:last-child{border-right:0;padding-right:0}
+.wi .lab{color:var(--teal-2);margin:0 0 9px}
+.wi p{margin:0;font-size:13.5px;line-height:1.6;color:var(--on-ink-2);max-width:44ch}
+.wi p b{color:var(--on-ink);font-weight:600}
 
-/* The headline number and its honest counterweight are ONE unit. The number is
-   the largest thing on the page; the caveat is welded to it, sharing a border,
-   so nobody can read the −95% without reading what it does not mean. */
-.headline{border:1px solid rgba(20,184,166,.3);border-left:3px solid var(--teal);
-  border-radius:12px;overflow:hidden;margin-bottom:26px}
-.banner{background:var(--surface);
-  padding:22px 24px;display:flex;gap:26px;align-items:center;flex-wrap:wrap}
-.banner .measure{font-size:76px;font-weight:700;color:var(--teal-bright);font-family:var(--mono);
-  line-height:.92;letter-spacing:-.04em}
-.banner .body{flex:1;min-width:260px}
-.banner .body .h{font-weight:600;font-size:16px;margin-bottom:5px}
-.banner .body p{margin:0;color:var(--text-2);font-size:13px}
-.caveat{background:rgba(245,166,35,.08);border-top:1px solid rgba(245,166,35,.26);
-  padding:14px 18px;font-size:13px;color:var(--text-2)}
-.caveat b{color:var(--med)}
+/* ------------------------------------------------------------- pipeline -- */
+/* 01–04 is a real sequence: the four stages that produced this document, in
+   the order they ran. Separated by hairlines, joined by arrows in the seams. */
+.how{border-bottom:1px solid var(--ink-line);background:var(--ink)}
+.how-in{max-width:var(--page);margin:0 auto;padding:26px 24px 28px}
+.how h2{margin:0 0 16px;font-size:10.5px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--on-ink-3)}
+.stages{list-style:none;margin:0 0 16px;padding:0;display:grid;
+  grid-template-columns:repeat(4,1fr);border-top:1px solid var(--ink-line-2)}
+.stage{padding:16px 26px 4px 0;position:relative;border-right:1px solid var(--ink-line)}
+.stage:last-child{border-right:0;padding-right:0}
+.stage:not(:last-child)::after{content:"→";position:absolute;right:-7px;top:19px;
+  width:14px;text-align:center;color:var(--teal-2);font-size:12px;
+  background:var(--ink);line-height:1}
+.st-k{font-size:10.5px;font-weight:600;letter-spacing:.14em;color:var(--on-ink-2);
+  display:flex;align-items:baseline;gap:9px;margin-bottom:9px}
+.st-n{font-family:var(--mono);font-size:10.5px;color:var(--teal-2);letter-spacing:0}
+.st-v{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:21px;
+  font-weight:700;letter-spacing:-.03em;color:var(--on-ink);line-height:1.1}
+.st-v.safe{color:var(--teal)}
+.st-d{font-size:12.5px;color:var(--on-ink-3);margin-top:7px;line-height:1.5;max-width:30ch}
+.how .claim-line{margin:0;font-size:13.5px;color:var(--on-ink-2);max-width:76ch;
+  border-left:2px solid var(--teal-2);padding-left:14px}
+.how .claim-line b{color:var(--on-ink);font-weight:600}
 
-.section-h{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-2);
-  font-weight:600;margin:28px 0 12px;display:flex;align-items:center;gap:10px;scroll-margin-top:76px}
-.chip{text-transform:none;letter-spacing:normal;font-weight:500;font-size:11px;color:var(--text-3);
-  background:var(--raised);border:1px solid var(--hairline);padding:1.5px 8px;border-radius:999px}
+/* ================================================================== BILL == */
+/* The document. Everything the scan produced lives on this sheet. */
+.sheet{max-width:var(--page);margin:0 auto;padding:0 24px}
+.bill{position:relative;background:var(--paper);color:var(--ink-text);
+  border-radius:0;padding:0;isolation:isolate;box-shadow:var(--sheet-shadow)}
+/* faint paper grain — on the bill surface only */
+.bill::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  mix-blend-mode:multiply;opacity:.055;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E")}
+.bill>*{position:relative;z-index:1}
+.pad{padding:0 40px}
+.bill h1{font-size:27px;font-weight:600;letter-spacing:-.028em;margin:0 0 7px;
+  color:var(--ink-text)}
+.bill p{color:var(--ink-text-2)}
+.bill a{color:var(--stamp)}
 
-.verdict{background:var(--surface);border:1px solid var(--hairline);border-radius:12px;overflow:hidden;margin-bottom:8px}
-.verdict-head{display:flex;align-items:center;gap:12px;padding:15px 20px;border-bottom:1px solid var(--hairline)}
-.verdict-stamp{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--green);
-  background:rgba(61,214,140,.12);border:1px solid rgba(61,214,140,.32);border-radius:999px;padding:4px 12px}
-.verdict-policy{color:var(--text-2);font-size:13px;font-family:var(--mono)}
-.verdict-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--hairline)}
-.vcell{background:var(--surface);padding:14px 18px}
-.vcell .v{font-family:var(--mono);font-size:15px;font-weight:600}
-.vcell .v .keep{color:var(--green)}
-.vcell .l{font-size:11.5px;color:var(--text-3);margin-top:3px}
+/* --- bill header: account / period / meter read / rate ------------------- */
+.bill-head{padding:34px 40px 24px;border-bottom:2px solid var(--ink-text)}
+.doc-kind{display:flex;align-items:baseline;justify-content:space-between;
+  gap:20px;flex-wrap:wrap;margin-bottom:20px}
+.doc-kind .lab{color:var(--stamp)}
+.doc-kind .issue{font-family:var(--mono);font-size:11px;color:var(--ink-text-3);
+  letter-spacing:.04em}
+.lede{font-size:15px;color:var(--ink-text-2);max-width:64ch;margin:0 0 26px}
+.meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;
+  background:var(--rule);border-top:1px solid var(--rule)}
+.meta>div{background:var(--paper);padding:12px 16px 12px 0;min-width:0}
+.meta>div+div{padding-left:16px}
+.meta .k{display:block;margin-bottom:5px}
+.meta b{display:block;font-family:var(--mono);font-variant-numeric:tabular-nums;
+  font-size:12.5px;font-weight:600;color:var(--ink-text);letter-spacing:-.01em;
+  overflow-wrap:anywhere;line-height:1.45}
 
-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:8px}
-thead th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;
-  color:var(--text-3);font-weight:600;padding:9px 10px;border-bottom:1px solid var(--border)}
-thead th.num{text-align:right}
-tbody td{padding:10px;border-bottom:1px solid var(--hairline);vertical-align:top}
-tbody tr:hover{background:var(--surface)}
-td.id{color:var(--text-3);white-space:nowrap}
-td.cat{color:var(--text-2)}
-td.finding{color:var(--text-1);line-height:1.45}
-td.num{text-align:right;white-space:nowrap;color:var(--text-1)}
-.sev-badge{font-size:10px;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:999px;
-  border:1px solid transparent;white-space:nowrap}
-.sev-badge.sev-high{color:var(--high);background:rgba(229,72,77,.12);border-color:rgba(229,72,77,.3)}
-.sev-badge.sev-medium{color:var(--med);background:rgba(245,166,35,.12);border-color:rgba(245,166,35,.3)}
-.sev-badge.sev-low{color:var(--low);background:rgba(91,141,239,.12);border-color:rgba(91,141,239,.3)}
-.table-scroll{overflow-x:auto;border:1px solid var(--hairline);border-radius:12px;background:var(--bg)}
-.table-scroll table{margin:0} .table-scroll thead th{padding-left:14px;padding-right:14px}
-.table-scroll tbody td{padding-left:14px;padding-right:14px}
+/* --- amount box: what a bill puts at the top ---------------------------- */
+.amount{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;
+  flex-wrap:wrap;padding:26px 40px 24px;border-bottom:1px solid var(--rule)}
+.amount .fig{font-family:var(--mono);font-variant-numeric:tabular-nums;
+  font-size:46px;font-weight:700;letter-spacing:-.045em;line-height:1;
+  color:var(--ink-text)}
+.amount .fig .u{font-size:19px;font-weight:600;letter-spacing:-.02em}
+.amount .cash{font-family:var(--mono);font-variant-numeric:tabular-nums;
+  font-size:19px;font-weight:700;color:var(--stamp);margin-top:9px;letter-spacing:-.02em}
+.split{display:flex;gap:0;text-align:right;border-left:1px solid var(--rule)}
+.split div{padding:0 0 0 24px;margin-left:24px;border-left:1px solid var(--rule)}
+.split div:first-child{border-left:0;margin-left:0;padding-left:24px}
+.split .v{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:26px;
+  font-weight:700;letter-spacing:-.03em;line-height:1.1}
+.split .high .v{color:var(--sev-high)} .split .med .v{color:var(--sev-med)}
+.split .low .v{color:var(--sev-low)}
+.split .lab{margin-top:5px}
 
-.disclaimer{color:var(--text-3);font-size:12px;margin:18px 0 8px;line-height:1.6}
-.footer{border-top:1px solid var(--hairline);margin-top:36px;background:var(--surface)}
-.footer-in{max-width:960px;margin:0 auto;padding:22px 24px;font-size:12.5px;color:var(--text-3)}
-.footer-in .gen{margin-bottom:12px;color:var(--text-2)}
-/* The family bar: the same block, in the same order, with the same per-tool
-   accents on all three published demo pages. */
-.fam-row{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:0}
-.fam{font-size:12.5px;font-weight:600;letter-spacing:.14em;text-decoration:none}
-a.fam:hover{text-decoration:underline;text-underline-offset:3px}
-.fam-argus{color:#8B5CF6} .fam-glasspane{color:#5B8DEF} .fam-telelens{color:#2DD4BF}
-[aria-current="page"].fam{border-bottom:1.5px solid currentColor;padding-bottom:1px}
-.fam-sep{color:var(--text-3)}
-.fam-tag{margin:5px 0 0;font-size:12px;color:var(--text-3)}
-/* --- "How this report happened": the four stages that produced this page,
-   each carrying its own recorded number. The strip is one connected object
-   (shared hairlines + arrows on the seams) because the product is a motion,
-   not a dashboard. Numbers: assets/live-findings.json (scan_duration,
-   findings[], simulation) and assets/live-collector-fragment.yaml. --- */
-.pipeline{border-bottom:1px solid var(--hairline);
-  background:linear-gradient(180deg,var(--bg),var(--surface))}
-.pipeline-in{max-width:960px;margin:0 auto;padding:24px}
-.pipeline h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;
-  color:var(--text-2);font-weight:600;margin:0 0 13px}
-.stages{list-style:none;margin:0 0 12px;padding:0;display:grid;
-  grid-template-columns:repeat(4,1fr);gap:1px;background:var(--hairline);
-  border:1px solid var(--hairline);border-radius:12px;overflow:visible}
-.stage{background:var(--surface);padding:14px 16px;position:relative}
-.stage:first-child{border-radius:12px 0 0 12px}
-.stage:last-child{border-radius:0 12px 12px 0}
-.stage:not(:last-child)::after{content:"→";position:absolute;right:-10px;top:50%;
-  transform:translateY(-50%);width:20px;height:20px;border-radius:999px;
-  background:var(--raised);border:1px solid var(--border);color:var(--teal-bright);
-  font-size:11px;line-height:18px;text-align:center;z-index:2}
-.st-k{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--text-2);
-  display:flex;align-items:baseline;gap:7px;margin-bottom:7px}
-.st-n{font-family:var(--mono);font-size:10px;color:var(--teal);letter-spacing:0}
-.st-v{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:19px;
-  font-weight:700;letter-spacing:-.02em;color:var(--text-1);line-height:1.15}
-.st-v.safe{color:var(--green)}
-.st-d{font-size:11.5px;color:var(--text-3);margin-top:4px;line-height:1.45}
-.pipeline .claim{margin:0;font-size:13px;color:var(--text-2)}
-.pipeline .claim b{color:var(--teal-bright);font-weight:600}
-@media (max-width:719px){
-  .stages{grid-template-columns:1fr}
-  .stage:first-child{border-radius:12px 12px 0 0}
-  .stage:last-child{border-radius:0 0 12px 12px}
-  .stage:not(:last-child)::after{right:auto;left:50%;top:auto;bottom:-11px;
-    transform:translateX(-50%) rotate(90deg)}
-}
+/* --- the stamp: the signature -------------------------------------------- */
+/* The −95% is not a card floating on the page. It is stamped onto the bill,
+   in teal ink, and the honest counterweight is inside the same stamped
+   block — you cannot read the number without reading what it does not mean. */
+.stamped{padding:34px 40px 36px;border-bottom:1px solid var(--rule);
+  display:grid;grid-template-columns:auto minmax(0,1fr);gap:36px;align-items:start}
+.stamp{transform:rotate(-1.5deg);border:2px solid var(--stamp);
+  box-shadow:0 0 0 1px var(--paper),0 0 0 3px var(--stamp);
+  padding:14px 22px 16px;text-align:center;color:var(--stamp);flex:none}
+.stamp .lab{color:var(--stamp);font-size:9.5px;letter-spacing:.2em;
+  border-bottom:1px solid rgba(14,124,107,.4);padding-bottom:7px;margin-bottom:9px}
+.stamp .measure{font-family:var(--mono);font-variant-numeric:tabular-nums;
+  font-size:72px;font-weight:700;line-height:.86;letter-spacing:-.055em}
+.stamp .of{font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  margin-top:9px;text-transform:uppercase}
+.stamped .body h2{margin:0 0 8px;font-size:19px;font-weight:600;
+  letter-spacing:-.02em;color:var(--ink-text)}
+.stamped .body p{margin:0;font-size:14px;line-height:1.6;max-width:56ch}
+.counterweight{margin-top:22px;border-left:3px solid var(--amber);
+  padding:2px 0 2px 16px;font-size:13.5px;line-height:1.6;color:var(--ink-text-2)}
+.counterweight b{color:var(--amber)}
+.counterweight em{font-style:italic}
 
-/* --- Policy explorer: every displayed outcome is a recorded replay result,
-   not an interpolation. The control positions are limited to the ones the
-   evidence covers (3 thresholds x 7 sample rates). --- */
-.explorer{background:var(--surface);border:1px solid var(--hairline);
-  border-radius:12px;overflow:hidden;margin-bottom:8px}
-.exp-controls{display:grid;grid-template-columns:minmax(200px,.8fr) minmax(210px,1fr) minmax(230px,1.2fr);
-  gap:1px;background:var(--hairline)}
-.ctl{background:var(--surface);padding:15px 18px;border:0;margin:0;min-width:0}
-.ctl .ctl-l{font-size:11px;text-transform:uppercase;letter-spacing:.05em;
-  color:var(--text-3);font-weight:600;padding:0;margin:0 0 10px;display:flex;
-  align-items:center;gap:6px}
-.exp-out .v{white-space:nowrap}
-.locked{display:inline-flex;align-items:center;gap:8px;background:rgba(61,214,140,.09);
-  border:1px solid rgba(61,214,140,.32);border-radius:999px;padding:5px 12px;
-  font-size:12.5px;color:var(--green);font-weight:600;cursor:not-allowed}
-.locked input{accent-color:var(--green);margin:0;pointer-events:none}
-.lock-note{font-size:11.5px;color:var(--text-3);margin:8px 0 0;line-height:1.45;
+/* --- rubrics: the ruled section headings on the bill --------------------- */
+.rubric{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  padding:30px 40px 12px;scroll-margin-top:16px}
+.rubric h2{margin:0;font-size:10.5px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-text)}
+.rubric .note{font-family:var(--mono);font-size:11px;color:var(--ink-text-3);
+  letter-spacing:.02em}
+
+/* --- ruled readout grid (verdict + explorer outputs) --------------------- */
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.cell{padding:14px 16px 14px 0;border-right:1px solid var(--rule-soft);min-width:0}
+.cell:last-child{border-right:0}
+.cell+.cell{padding-left:16px}
+.cell .v{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:16px;
+  font-weight:700;letter-spacing:-.02em;white-space:nowrap;color:var(--ink-text)}
+.cell .v .keep{color:var(--stamp)}
+.cell .l{margin-top:5px}
+.verdict-line{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;
+  padding:0 0 14px}
+.verdict-stamp{font-family:var(--mono);font-size:11.5px;font-weight:700;
+  letter-spacing:.16em;color:var(--stamp);border:1px solid var(--stamp);
+  padding:4px 11px;text-transform:uppercase}
+.verdict-policy{font-family:var(--mono);font-size:12.5px;color:var(--ink-text-2)}
+.fine{font-size:12.5px;color:var(--ink-text-3);line-height:1.6;margin:14px 0 0;
+  max-width:82ch}
+
+/* --- perforation + remittance stub (the policy explorer) ----------------- */
+/* On a utility bill the tear-off strip is where you act on the amount. That
+   is exactly what the explorer is, so that is what it looks like. */
+.perf{height:26px;margin-top:34px;border-top:2px dashed var(--rule)}
+.stub{background:var(--paper-2);border-top:1px solid var(--rule-soft)}
+.stub .rubric{padding-top:24px}
+.exp-controls{display:grid;
+  grid-template-columns:minmax(190px,.85fr) minmax(200px,1fr) minmax(230px,1.15fr);
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+  margin:0 40px}
+.ctl{padding:18px 22px 20px 0;border-right:1px solid var(--rule-soft);min-width:0}
+.ctl+.ctl{padding-left:22px}
+.ctl:last-child{border-right:0}
+.ctl .ctl-l{margin:0 0 12px;font-size:10.5px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-text-2);display:block}
+.locked{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);
+  font-size:12.5px;font-weight:700;letter-spacing:.06em;color:var(--stamp);
+  border:1px solid var(--stamp);padding:6px 12px;cursor:not-allowed;
+  text-transform:uppercase}
+.locked input{accent-color:var(--stamp);margin:0;pointer-events:none}
+.lock-note{font-size:12px;color:var(--ink-text-3);margin:10px 0 0;line-height:1.5;
   transition:color .18s ease}
-.lock-note.flash{color:var(--green)}
-.seg{display:flex;flex-wrap:wrap;gap:6px}
-.segopt{position:relative;display:inline-flex}
+.lock-note.flash{color:var(--stamp)}
+.seg{display:flex;flex-wrap:wrap;gap:0;border:1px solid var(--rule);width:max-content;
+  max-width:100%}
+.segopt{position:relative;display:inline-flex;border-right:1px solid var(--rule)}
+.segopt:last-child{border-right:0}
 .segopt input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
-.segopt span{display:block;border:1px solid var(--border);border-radius:6px;
-  padding:6px 11px;font-size:12.5px;font-family:var(--mono);color:var(--text-2);
-  transition:border-color .12s ease,color .12s ease,background .12s ease}
-.segopt input:hover+span{border-color:var(--teal);color:var(--text-1)}
-.segopt input:checked+span{border-color:var(--teal);background:var(--teal-dim);
-  color:var(--teal-bright);font-weight:600}
-.segopt input:focus-visible+span{outline:2px solid var(--teal-bright);outline-offset:2px}
-#exp-pct{width:100%;accent-color:var(--teal);margin:2px 0 0;height:22px;cursor:pointer}
-#exp-pct:focus-visible{outline:2px solid var(--teal-bright);outline-offset:4px;border-radius:4px}
-.ticks{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;
-  color:var(--text-3);margin-top:2px}
+.segopt span{display:block;padding:7px 13px;font-size:12.5px;font-family:var(--mono);
+  font-variant-numeric:tabular-nums;color:var(--ink-text-2);white-space:nowrap;
+  transition:background .12s ease,color .12s ease}
+.segopt input:hover+span{background:var(--paper-3);color:var(--ink-text)}
+.segopt input:checked+span{background:var(--stamp);color:var(--paper);font-weight:700}
+.segopt input:focus-visible+span{outline:2px solid var(--stamp);outline-offset:2px}
+#exp-pct{width:100%;accent-color:var(--stamp);margin:4px 0 0;height:22px;cursor:pointer}
+#exp-pct:focus-visible{outline:2px solid var(--stamp);outline-offset:4px}
+.ticks{display:flex;justify-content:space-between;font-family:var(--mono);
+  font-variant-numeric:tabular-nums;font-size:10.5px;color:var(--ink-text-3);margin-top:3px}
 .ticks span{flex:1;text-align:center}
 .ticks span:first-child{text-align:left}.ticks span:last-child{text-align:right}
-.ticks .on{color:var(--teal-bright);font-weight:700}
-.exp-head{display:flex;align-items:center;gap:12px;padding:14px 18px;
-  border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);flex-wrap:wrap}
-.exp-out{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  gap:1px;background:var(--hairline)}
-.exp-foot{padding:13px 18px;font-size:12.5px;color:var(--text-2);
-  background:rgba(245,166,35,.07);border-top:1px solid rgba(245,166,35,.24)}
-.exp-foot b{color:var(--med)}
-.exp-src{font-size:11.5px;color:var(--text-3);padding:11px 18px;border-top:1px solid var(--hairline)}
-@media (max-width:719px){.exp-controls{grid-template-columns:1fr}}
-@media (max-width:720px){.savings{grid-template-columns:1fr 1fr}
-  .masthead .prop{font-size:20px}
-  .banner{padding:18px 18px;gap:16px}
-  .banner .measure{font-size:56px}}
-@media (max-width:520px){.masthead .prop{font-size:18px}.banner .measure{font-size:48px}}
+.ticks .on{color:var(--stamp);font-weight:700}
+.exp-head{padding:16px 40px 0}
+.exp-out{margin:0 40px}
+.exp-foot{margin:0 40px;padding:14px 0 0;font-size:13px;color:var(--ink-text-2);
+  border-left:3px solid var(--amber);padding-left:16px;margin-top:16px;line-height:1.6}
+.exp-foot b{color:var(--amber)}
+.exp-src{font-size:12px;color:var(--ink-text-3);padding:16px 40px 30px;line-height:1.6;
+  max-width:96ch}
+.exp-src .mono{color:var(--ink-text-2)}
+/* the meter: the knob moves the needle. Width comes straight from the span
+   reduction the explorer already computed — it displays that number, it does
+   not invent one. */
+.meter{margin:20px 40px 0;border-top:1px solid var(--rule)}
+.meter-top{display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+  padding:12px 0 8px}
+.meter-track{position:relative;height:11px;border:1px solid var(--rule);
+  background:var(--paper);overflow:hidden}
+.meter-fill{position:absolute;inset:0 auto 0 0;width:var(--meter,0%);
+  background:var(--stamp);transition:width .28s cubic-bezier(.4,0,.2,1)}
+
+/* --- the ledger --------------------------------------------------------- */
+.ledger-wrap{overflow-x:auto;margin:0 40px}
+table{width:100%;border-collapse:collapse;font-size:13px;
+  font-variant-numeric:tabular-nums}
+thead th{text-align:left;font-size:10px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-text-2);padding:9px 12px 9px 0;
+  border-top:1px solid var(--ink-text);border-bottom:1px solid var(--rule);
+  white-space:nowrap}
+thead th.r{text-align:right;padding-right:0;padding-left:12px}
+tbody td{padding:9px 12px 9px 0;border-bottom:1px solid var(--rule-soft);
+  vertical-align:baseline}
+tbody td.r{text-align:right;white-space:nowrap;padding-right:0;padding-left:12px;
+  font-family:var(--mono);color:var(--ink-text)}
+tbody tr:hover{background:var(--paper-2)}
+td.id{font-family:var(--mono);color:var(--ink-text-3);white-space:nowrap;
+  padding-left:10px;border-left:3px solid transparent}
+td.cat{font-family:var(--mono);color:var(--ink-text-2)}
+td.finding{color:var(--ink-text);line-height:1.5;min-width:26ch}
+/* severity is a ruled left edge plus a tracked word — no badge, no pill */
+td.sev{font-size:10px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+  white-space:nowrap}
+tr.sev-high td.id{border-left-color:var(--sev-high)} tr.sev-high td.sev{color:var(--sev-high)}
+tr.sev-medium td.id{border-left-color:var(--sev-med)} tr.sev-medium td.sev{color:var(--sev-med)}
+tr.sev-low td.id{border-left-color:var(--sev-low)} tr.sev-low td.sev{color:var(--sev-low)}
+/* the invoice total */
+tfoot td{padding:15px 12px 16px 0;border-top:1px solid var(--ink-text);
+  box-shadow:inset 0 3px 0 -2px var(--ink-text);font-weight:700}
+tfoot td.lbl{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-text);padding-left:10px}
+tfoot td.r{text-align:right;padding-right:0;padding-left:12px;font-family:var(--mono);
+  font-size:17px;letter-spacing:-.02em;color:var(--ink-text)}
+tfoot td.r.cash{color:var(--stamp)}
+.bill-foot{padding:18px 40px 34px}
+
+/* ------------------------------------------------------------- endmatter -- */
+.endmatter{max-width:var(--page);margin:0 auto;padding:26px 24px 0;
+  font-size:12.5px;color:var(--on-ink-3);line-height:1.65;max-width:min(var(--page),96ch)}
+.endmatter .mono{color:var(--on-ink-2)}
+.footer{border-top:1px solid var(--ink-line);margin-top:34px;background:var(--ink-2)}
+.footer-in{max-width:var(--page);margin:0 auto;padding:26px 24px 30px;
+  font-size:12.5px;color:var(--on-ink-3)}
+.footer-in .gen{margin-bottom:18px;color:var(--on-ink-2);max-width:80ch}
+/* The family bar: the same block, in the same order, with the same per-tool
+   accents on all three published demo pages. */
+.fam-row{display:flex;align-items:center;flex-wrap:wrap;gap:11px;margin:0;
+  padding-top:16px;border-top:1px solid var(--ink-line)}
+.fam{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.2em;
+  text-decoration:none}
+a.fam:hover{text-decoration:underline;text-underline-offset:4px}
+.fam-argus{color:var(--fam-argus)} .fam-glasspane{color:var(--fam-glasspane)}
+.fam-telelens{color:var(--fam-telelens)}
+[aria-current="page"].fam{border-bottom:1.5px solid currentColor;padding-bottom:2px}
+.fam-sep{color:var(--on-ink-3)}
+.fam-tag{margin:9px 0 0;font-size:12.5px;color:var(--on-ink-3)}
+
+/* ------------------------------------------------------------------ tour -- */
+/* "What am I looking at?" — the spotlight walks the reader through the bill.
+   The card is a slip of the same paper: zero radius, one stamp-ink rule at the
+   top, mono step count. Under 760px it becomes a bottom sheet. */
+#tour{position:fixed;inset:0;z-index:80;display:none;pointer-events:none}
+#tour[data-open] #tour-card{pointer-events:auto}
+#tour[data-open]{display:block}
+#tour-hole{position:fixed;border:2px solid var(--stamp);pointer-events:none;
+  box-shadow:0 0 0 9999px var(--veil);transition:top .22s ease,left .22s ease,
+  width .22s ease,height .22s ease}
+#tour-card{position:fixed;width:min(430px,calc(100vw - 32px));background:var(--paper);
+  color:var(--ink-text);border:1px solid var(--rule);border-top:3px solid var(--stamp);
+  padding:20px 24px 18px;box-shadow:0 24px 56px -24px rgba(0,0,0,.62)}
+#tour-card .step-n{font-family:var(--mono);font-size:10.5px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--stamp);
+  border-bottom:1px solid var(--rule);padding-bottom:9px;margin:0 0 12px;
+  display:flex;justify-content:space-between;gap:12px}
+#tour-card .step-n .esc{color:var(--ink-text-3);font-weight:400;letter-spacing:.1em}
+#tour-card h3{margin:0 0 8px;font-size:17px;font-weight:600;letter-spacing:-.02em;
+  color:var(--ink-text)}
+#tour-card p{margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-text-2)}
+#tour-card .tour-nav{display:flex;align-items:center;gap:16px;margin-top:18px;
+  padding-top:14px;border-top:1px solid var(--rule-soft)}
+.tour-next{margin-left:auto;background:var(--stamp);color:var(--paper);border:0;
+  font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;padding:9px 16px;cursor:pointer}
+.tour-next:hover{background:var(--ink-text)}
+.tour-quiet{background:none;border:0;padding:0 0 3px;cursor:pointer;
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-text-3);border-bottom:1px solid transparent}
+.tour-quiet:hover{color:var(--stamp);border-color:var(--stamp)}
+.tour-quiet[hidden]{display:none}
+#tour-card :focus-visible,.tour-open :focus-visible{outline:2px solid var(--stamp);outline-offset:3px}
+@media (max-width:760px){
+  #tour-card{left:0;right:0;bottom:0;top:auto !important;width:100%;
+    max-width:none;border-left:0;border-right:0;border-bottom:0;
+    padding:18px 20px calc(18px + env(safe-area-inset-bottom))}
+}
+@media (prefers-reduced-motion:reduce){#tour-hole{transition:none}}
+
+/* ----------------------------------------------------------- responsive -- */
+@media (max-width:960px){
+  .front-in{grid-template-columns:1fr;gap:32px;padding:36px 24px 32px}
+  .claim{font-size:29px;max-width:26ch}
+  .whatis-in{grid-template-columns:1fr;gap:0}
+  .wi{border-right:0;padding:0 0 16px}
+  .wi+.wi{padding-left:0;padding-top:16px;border-top:1px solid var(--ink-line)}
+  .wi:last-child{padding-bottom:0}
+  .wi p{max-width:70ch}
+  .stages{grid-template-columns:1fr 1fr}
+  .stage:nth-child(2){border-right:0;padding-right:0}
+  .stage:nth-child(2)::after{content:none}
+  .stage:nth-child(3),.stage:nth-child(4){border-top:1px solid var(--ink-line);padding-top:16px}
+}
+@media (max-width:820px){
+  .pad,.bill-head,.amount,.stamped,.rubric,.exp-head,.exp-src,.bill-foot{
+    padding-left:24px;padding-right:24px}
+  .exp-controls,.exp-out,.exp-foot,.meter,.ledger-wrap{margin-left:24px;margin-right:24px}
+  .exp-foot{margin-left:24px}
+  .meta{grid-template-columns:1fr 1fr}
+  .stamped{grid-template-columns:1fr;gap:26px}
+  .exp-controls{grid-template-columns:1fr}
+  .ctl{border-right:0;border-bottom:1px solid var(--rule-soft);padding:16px 0 18px}
+  .ctl+.ctl{padding-left:0}
+  .ctl:last-child{border-bottom:0}
+}
+@media (max-width:560px){
+  body{font-size:14.5px}
+  .sheet{padding:0 12px}
+  .front-in{padding:30px 20px 28px}
+  .claim{font-size:25px;letter-spacing:-.024em}
+  .wordmark{height:26px;margin-bottom:20px}
+  .top-right{width:100%;justify-content:space-between;gap:12px}
+  .actions{gap:16px}
+  .btn{flex:1 1 auto;justify-content:center}
+  .stages{grid-template-columns:1fr}
+  .stage{border-right:0;padding-right:0;border-top:1px solid var(--ink-line);padding-top:14px}
+  .stage:first-child{border-top:0;padding-top:16px}
+  .stage::after{content:none !important}
+  .pad,.bill-head,.amount,.stamped,.rubric,.exp-head,.exp-src,.bill-foot{
+    padding-left:18px;padding-right:18px}
+  .exp-controls,.exp-out,.exp-foot,.meter,.ledger-wrap{margin-left:18px;margin-right:18px}
+  .meta{grid-template-columns:1fr;background:transparent}
+  .meta>div{padding:11px 0;border-bottom:1px solid var(--rule-soft)}
+  .meta>div+div{padding-left:0}
+  .amount{gap:22px}
+  .amount .fig{font-size:38px}
+  /* the severity split becomes ruled rows — label left, count right */
+  .split{display:block;border-left:0;width:100%;text-align:left}
+  .split div{display:flex;align-items:baseline;justify-content:space-between;gap:14px;
+    padding:8px 0;margin-left:0;border-left:0;border-top:1px solid var(--rule-soft)}
+  .split div:first-child{padding-left:0;border-top:0;padding-top:0}
+  .split .v{font-size:19px;order:2}
+  .split .lab{margin-top:0}
+  .stamp .measure{font-size:56px}
+  .readout,.exp-out{grid-template-columns:1fr 1fr}
+  .cell .v{font-size:13.5px}
+  .cell{border-right:0;border-bottom:1px solid var(--rule-soft);padding:12px 0}
+  .cell+.cell{padding-left:0}
+  .cell:nth-child(odd){padding-right:14px;border-right:1px solid var(--rule-soft)}
+  .cell:nth-child(even){padding-left:14px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.001ms !important;animation-duration:.001ms !important}
+  .meter-fill{transition:none}
+}
 </style>
 </head>
 <body>
@@ -255,43 +534,81 @@ a.fam:hover{text-decoration:underline;text-underline-offset:3px}
       <span class="word">TELELENS</span>
       <span class="sub">Waste Report</span>
     </div>
-    <a class="repo-link" href="https://github.com/vinayaksonthalia/telelens">github.com/vinayaksonthalia/telelens ↗</a>
+    <div class="top-right">
+      <a class="repo-link" href="https://github.com/vinayaksonthalia/telelens">github.com/vinayaksonthalia/telelens ↗</a>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false">
+        <span class="dot" aria-hidden="true"></span><span id="theme-label">Light paper</span>
+      </button>
+    </div>
   </div>
 </header>
 
-<section class="masthead">
-  <div class="masthead-in">
-    <svg class="wordmark" viewBox="0 0 196 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TELELENS">
-      <defs>
-        <linearGradient id="tl-blade" x1="14" y1="14" x2="50" y2="50" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stop-color="#2DD4BF"/>
-          <stop offset="1" stop-color="#14B8A6"/>
-        </linearGradient>
-      </defs>
-      <g transform="translate(4,4) scale(0.625)">
-        <circle cx="32" cy="32" r="18" stroke="#14B8A6" stroke-width="4" fill="none"/>
-        <g stroke="url(#tl-blade)" stroke-width="3.5" stroke-linecap="round" fill="none">
-          <path d="M38.5 35.75 L20.71 46.02"/>
-          <path d="M32 39.5 L14.21 29.23"/>
-          <path d="M25.5 35.75 L25.5 15.21"/>
-          <path d="M25.5 28.25 L43.29 17.98"/>
-          <path d="M32 24.5 L49.79 34.77"/>
-          <path d="M38.5 28.25 L38.5 48.79"/>
+<section class="front">
+  <div class="front-in">
+    <div>
+      <svg class="wordmark" viewBox="0 0 196 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TELELENS">
+        <defs>
+          <linearGradient class="blades" id="tl-blade" x1="14" y1="14" x2="50" y2="50" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#2DD4BF"/>
+            <stop offset="1" stop-color="#14B8A6"/>
+          </linearGradient>
+        </defs>
+        <g transform="translate(4,4) scale(0.625)">
+          <circle class="lens" cx="32" cy="32" r="18" stroke="#14B8A6" stroke-width="4" fill="none"/>
+          <g stroke="url(#tl-blade)" stroke-width="3.5" stroke-linecap="round" fill="none">
+            <path d="M38.5 35.75 L20.71 46.02"/>
+            <path d="M32 39.5 L14.21 29.23"/>
+            <path d="M25.5 35.75 L25.5 15.21"/>
+            <path d="M25.5 28.25 L43.29 17.98"/>
+            <path d="M32 24.5 L49.79 34.77"/>
+            <path d="M38.5 28.25 L38.5 48.79"/>
+          </g>
         </g>
-      </g>
-      <text x="50" y="32.3" font-family="Inter, -apple-system, sans-serif" font-size="23" font-weight="600" letter-spacing="2.4" fill="#EDEDEF">TELELENS</text>
-    </svg>
-    <p class="prop">Your SigNoz bill, itemised: 12.5 GB/mo of waste found read-only — and the fix
-      is <em>proven to drop zero error traces</em> before you apply it.</p>
-    <ul class="chips">
-      <li class="accent"><b>−94.9%</b> boring traces dropped</li>
-      <li class="honest"><b>−6.9%</b> total span volume — errors kept in full</li>
-      <li class="safe"><b>110,430 / 110,430</b> error traces kept · SAFE</li>
-      <li><b>12.5 GB/mo</b> waste found across 26 findings</li>
-    </ul>
-    <div class="cta">
-      <a class="btn btn-primary" href="https://github.com/vinayaksonthalia/telelens">GitHub →</a>
-      <a class="btn btn-ghost" href="#findings">The findings ↓</a>
+        <text x="50" y="32.3" font-family="Inter, -apple-system, sans-serif" font-size="23" font-weight="600" letter-spacing="2.4" fill="#E8EDEC">TELELENS</text>
+      </svg>
+      <p class="claim">Your SigNoz bill, itemised: 12.5&nbsp;GB/mo of waste found read-only — and the fix
+        is <em>proven to drop zero error traces</em> before you apply it.</p>
+      <div class="actions">
+        <a class="btn" href="#findings">The findings ↓</a>
+        <button class="tlink" id="tour-start" type="button">What am I looking at? · 60-second tour</button>
+        <a class="tlink" href="https://github.com/vinayaksonthalia/telelens">GitHub ↗</a>
+      </div>
+    </div>
+    <!-- The four headline numbers, set as the statement's summary column:
+         label left, figure right, hairline between. No chips. -->
+    <div class="summary">
+      <p class="lab lab-ink">Statement summary</p>
+      <dl>
+        <div class="srow"><dt>Boring traces dropped</dt><dd class="t">−94.9%</dd></div>
+        <div class="srow"><dt>Total span volume — errors kept in full</dt><dd class="a">−6.9%</dd></div>
+        <div class="srow"><dt>Error traces kept · SAFE</dt><dd>110,430 / 110,430</dd></div>
+        <div class="srow"><dt>Waste found across 26 findings</dt><dd>12.5 GB/mo</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- What a first-time reader needs before the numbers start: what the tool is,
+     what this page is, and what there is to do here. Three sentences. -->
+<section class="whatis">
+  <div class="whatis-in">
+    <div class="wi">
+      <p class="lab">The tool</p>
+      <p><b>TELELENS is a read-only profiler you point at your own SigNoz:</b> it prices your
+        telemetry waste in GB and dollars, proves a sampling fix drops zero error traces by
+        replaying it over your real traces, and writes the collector config for a human to review.</p>
+    </div>
+    <div class="wi">
+      <p class="lab">This page</p>
+      <p><b>This is one real scan's output, rendered as the bill it is</b> — 26 findings from a
+        7-day window of our demo instance, every figure straight from the scan artifact,
+        nothing applied to the cluster.</p>
+    </div>
+    <div class="wi">
+      <p class="lab">What to do here</p>
+      <p><b>Move the policy controls further down and the numbers move with them</b> — every
+        position is a recorded replay, not an estimate — then run it against your own instance
+        with one command from <a class="tlink" href="https://github.com/vinayaksonthalia/telelens">GitHub ↗</a>.</p>
     </div>
   </div>
 </section>
@@ -303,8 +620,8 @@ a.fam:hover{text-decoration:underline;text-underline-offset:3px}
      transform/defuse_label_bombs, filter/drop_unread_metrics) — and
      assets/live-apply-measure-m4-evidence.md, where a human applied two of the
      three and deliberately rejected the third. -->
-<section class="pipeline">
-  <div class="pipeline-in">
+<section class="how">
+  <div class="how-in">
     <h2>How this report happened</h2>
     <ol class="stages">
       <li class="stage">
@@ -328,163 +645,211 @@ a.fam:hover{text-decoration:underline;text-underline-offset:3px}
         <div class="st-d">collector config written as a proposal — 0 applied by TELELENS.</div>
       </li>
     </ol>
-    <p class="claim"><b>TELELENS never applies anything. It proves, you decide.</b>
+    <p class="claim-line"><b>TELELENS never applies anything. It proves, you decide.</b>
       When a human did apply it, one of the three generated processors was rejected on
       review — that step is the product.</p>
   </div>
 </section>
 
-<main class="wrap">
-  <section class="hero">
-    <h1>Telemetry waste report</h1>
-    <p class="lede">A read-only scan of our demo SigNoz instance — every finding priced from
-      the scan artifact, the headline fix proven safe before it is applied.</p>
-    <div class="meta">
-      <div><span class="k">Scanned</span><b>2026-07-18T06:08:02.230961Z</b></div>
-      <div><span class="k">Source</span><b>clickhouse (http://localhost:8123, window=7d)</b></div>
-      <div><span class="k">Scan duration</span><b>8.7s</b></div>
-      <div><span class="k">Pricing basis</span><b>$0.3 / uncompressed-ingest GB</b></div>
-    </div>
+<main class="sheet">
+  <article class="bill">
 
-    <div class="savings">
-      <div class="stat big">
-        <div class="v">12.5 GB<span style="font-size:15px">/mo</span></div>
-        <div class="l">total identified savings ≈ <b style="color:var(--teal-bright)">$3.75/mo</b></div>
+    <header class="bill-head">
+      <div class="doc-kind">
+        <span class="lab">Telemetry statement · demo SigNoz instance</span>
+        <span class="issue">READ-ONLY SCAN · NOTHING APPLIED</span>
       </div>
-      <div class="stat"><div class="v high">8</div><div class="l">high severity</div></div>
-      <div class="stat"><div class="v med">13</div><div class="l">medium severity</div></div>
-      <div class="stat"><div class="v low">5</div><div class="l">low / directional</div></div>
-    </div>
-  </section>
-
-  <div class="section-h">The headline fix — tail sampling <span class="chip">F-001</span></div>
-  <div class="headline">
-  <div class="banner">
-    <div class="measure">−95%</div>
-    <div class="body">
-      <div class="h">94.9% of “boring” traces dropped</div>
-      <p>Keep 100% of errors, keep every trace ≥ 750 ms, sample the
-      remaining successful/fast traces at 5%. Of 58,136
-      boring traces, only 2,947 are kept.</p>
-    </div>
-  </div>
-  <div class="caveat">
-    <b>The honest counterweight:</b> dropping 95% of boring <em>traces</em> is not the same as
-    dropping 95% of the <em>bill</em>. Because errors and slow traces are retained in full,
-    total span volume falls by only <b>6.9%</b>
-    (8,953,804 → 8,332,657 spans). Safety first, savings second —
-    the profiler never conflates the two.
-  </div>
-  </div>
-
-  <div class="section-h">Sampling safety proof <span class="chip">telelens simulate — replayed on the real scan</span></div>
-  <div class="verdict">
-    <div class="verdict-head">
-      <span class="verdict-stamp">✓ VERDICT: SAFE</span>
-      <span class="verdict-policy">keep errors + keep ≥ 750 ms + sample 5% of the rest</span>
-    </div>
-    <div class="verdict-grid">
-      <div class="vcell"><div class="v"><span class="keep">110,430</span> / 110,430</div><div class="l">error traces kept (100%)</div></div>
-      <div class="vcell"><div class="v"><span class="keep">145</span> / 145</div><div class="l">slow traces kept (100%)</div></div>
-      <div class="vcell"><div class="v">2,947 / 58,136</div><div class="l">boring traces kept (5.1%)</div></div>
-      <div class="vcell"><div class="v">113,522 / 168,711</div><div class="l">traces kept overall</div></div>
-    </div>
-  </div>
-  <p class="disclaimer">Replay of 168,711 traces / 8,953,804 spans.
-    The policy is judged SAFE because it retains 100% of error traces and 100% of slow traces —
-    the two classes you actually page on.</p>
-
-  <div class="section-h" id="explorer">Try the policy yourself <span class="chip">every position is a recorded replay, not an interpolation</span></div>
-  <div class="explorer">
-    <div class="exp-controls">
-      <div class="ctl">
-        <div class="ctl-l" id="lbl-err">Keep error traces</div>
-        <span class="locked" title="The profiler refuses to drop errors — non-negotiable."
-              onclick="tlFlashLock()">
-          <input type="checkbox" checked disabled aria-labelledby="lbl-err" aria-describedby="lock-note">
-          <span aria-hidden="true">🔒</span> ON — locked
-        </span>
-        <p class="lock-note" id="lock-note">The profiler refuses to drop errors — non-negotiable.
-          A policy that would lose one error trace exits non-zero.</p>
+      <h1>Telemetry waste report</h1>
+      <p class="lede">A read-only scan of our demo SigNoz instance — every finding priced from
+        the scan artifact, the headline fix proven safe before it is applied.</p>
+      <div class="meta">
+        <div><span class="k lab">Scanned</span><b>2026-07-18T06:08:02.230961Z</b></div>
+        <div><span class="k lab">Source</span><b>clickhouse (http://localhost:8123, window=7d)</b></div>
+        <div><span class="k lab">Scan duration</span><b>8.7s</b></div>
+        <div><span class="k lab">Pricing basis</span><b>$0.3 / uncompressed-ingest GB</b></div>
       </div>
-      <div class="ctl">
-        <div class="ctl-l" id="lbl-lat">Slow-trace threshold</div>
-        <div class="seg" role="radiogroup" aria-labelledby="lbl-lat">
-          <label class="segopt"><input type="radio" name="tl-lat" value="250"><span>250 ms</span></label>
-          <label class="segopt"><input type="radio" name="tl-lat" value="500"><span>500 ms</span></label>
-          <label class="segopt"><input type="radio" name="tl-lat" value="750" checked><span>750 ms</span></label>
+    </header>
+
+    <div class="amount">
+      <div>
+        <p class="lab" style="margin:0 0 9px">Total identified savings</p>
+        <div class="fig">12.5<span class="u"> GB/mo</span></div>
+        <div class="cash">≈ $3.75 / mo</div>
+      </div>
+      <div class="split">
+        <div class="high"><div class="v">8</div><div class="lab">high severity</div></div>
+        <div class="med"><div class="v">13</div><div class="lab">medium severity</div></div>
+        <div class="low"><div class="v">5</div><div class="lab">low / directional</div></div>
+      </div>
+    </div>
+
+    <!-- The headline number and its honest counterweight are ONE unit. The
+         number is stamped onto the bill; the caveat is welded to it inside the
+         same block, so nobody can read the −95% without reading what it does
+         not mean. -->
+    <section class="stamped">
+      <div class="stamp">
+        <div class="lab">Meter read · F-001</div>
+        <div class="measure">−95%</div>
+        <div class="of">tail sampling</div>
+      </div>
+      <div class="body">
+        <h2>94.9% of “boring” traces dropped</h2>
+        <p>Keep 100% of errors, keep every trace ≥ 750 ms, sample the
+          remaining successful/fast traces at 5%. Of 58,136
+          boring traces, only 2,947 are kept.</p>
+        <p class="counterweight">
+          <b>The honest counterweight:</b> dropping 95% of boring <em>traces</em> is not the same as
+          dropping 95% of the <em>bill</em>. Because errors and slow traces are retained in full,
+          total span volume falls by only <b>6.9%</b>
+          (8,953,804 → 8,332,657 spans). Safety first, savings second —
+          the profiler never conflates the two.
+        </p>
+      </div>
+    </section>
+
+    <section id="proof">
+      <div class="rubric">
+        <h2>Sampling safety proof</h2>
+        <span class="note">telelens simulate — replayed on the real scan</span>
+      </div>
+      <div class="pad">
+        <div class="verdict-line">
+          <span class="verdict-stamp">✓ Verdict: SAFE</span>
+          <span class="verdict-policy">keep errors + keep ≥ 750 ms + sample 5% of the rest</span>
         </div>
-        <p class="lock-note">Only the three thresholds this window's replay actually covers.</p>
+        <div class="readout">
+          <div class="cell"><div class="v"><span class="keep">110,430</span> / 110,430</div><div class="l lab">error traces kept (100%)</div></div>
+          <div class="cell"><div class="v"><span class="keep">145</span> / 145</div><div class="l lab">slow traces kept (100%)</div></div>
+          <div class="cell"><div class="v">2,947 / 58,136</div><div class="l lab">boring traces kept (5.1%)</div></div>
+          <div class="cell"><div class="v">113,522 / 168,711</div><div class="l lab">traces kept overall</div></div>
+        </div>
+        <p class="fine">Replay of 168,711 traces / 8,953,804 spans.
+          The policy is judged SAFE because it retains 100% of error traces and 100% of slow traces —
+          the two classes you actually page on.</p>
+        <div class="perf" aria-hidden="true"></div>
       </div>
-      <div class="ctl">
-        <label class="ctl-l" for="exp-pct">Sample this % of boring traces</label>
-        <input type="range" id="exp-pct" min="0" max="6" step="1" value="2"
-               aria-describedby="exp-ticks" aria-valuetext="5 percent">
-        <div class="ticks" id="exp-ticks" aria-hidden="true">
-          <span>0</span><span>1</span><span>5</span><span>10</span><span>25</span><span>50</span><span>100</span>
+    </section>
+
+    <!-- The tear-off stub. On a bill this is the part you detach and act on;
+         here it is where you move the policy and watch the meter answer.
+         Every position is a recorded replay, not an interpolation. -->
+    <section class="stub">
+      <div class="rubric" id="explorer">
+        <h2>Try the policy yourself</h2>
+        <span class="note">every position is a recorded replay, not an interpolation</span>
+      </div>
+      <div class="exp-controls">
+        <div class="ctl">
+          <span class="ctl-l" id="lbl-err">Keep error traces</span>
+          <span class="locked" title="The profiler refuses to drop errors — non-negotiable."
+                onclick="tlFlashLock()">
+            <input type="checkbox" checked disabled aria-labelledby="lbl-err" aria-describedby="lock-note">
+            <span aria-hidden="true">🔒</span> ON — locked
+          </span>
+          <p class="lock-note" id="lock-note">The profiler refuses to drop errors — non-negotiable.
+            A policy that would lose one error trace exits non-zero.</p>
+        </div>
+        <div class="ctl">
+          <span class="ctl-l" id="lbl-lat">Slow-trace threshold</span>
+          <div class="seg" role="radiogroup" aria-labelledby="lbl-lat">
+            <label class="segopt"><input type="radio" name="tl-lat" value="250"><span>250 ms</span></label>
+            <label class="segopt"><input type="radio" name="tl-lat" value="500"><span>500 ms</span></label>
+            <label class="segopt"><input type="radio" name="tl-lat" value="750" checked><span>750 ms</span></label>
+          </div>
+          <p class="lock-note">Only the three thresholds this window's replay actually covers.</p>
+        </div>
+        <div class="ctl">
+          <label class="ctl-l" for="exp-pct">Sample this % of boring traces</label>
+          <input type="range" id="exp-pct" min="0" max="6" step="1" value="2"
+                 aria-describedby="exp-ticks" aria-valuetext="5 percent">
+          <div class="ticks" id="exp-ticks" aria-hidden="true">
+            <span>0</span><span>1</span><span>5</span><span>10</span><span>25</span><span>50</span><span>100</span>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="exp-head">
-      <span class="verdict-stamp" id="exp-verdict">✓ VERDICT: SAFE</span>
-      <span class="verdict-policy" id="exp-policy">keep errors + keep ≥ 750 ms + sample 5% of the rest</span>
-    </div>
-    <div class="exp-out verdict-grid" aria-live="polite">
-      <div class="vcell"><div class="v"><span class="keep" id="o-err">110,430</span> / 110,430</div><div class="l">error traces kept (100%)</div></div>
-      <div class="vcell"><div class="v"><span class="keep" id="o-slow">145 / 145</span></div><div class="l" id="o-slow-l">slow traces kept (100%)</div></div>
-      <div class="vcell"><div class="v" id="o-boring">2,947 / 58,136</div><div class="l" id="o-boring-l">boring traces kept (5.1%)</div></div>
-      <div class="vcell"><div class="v" id="o-total">113,522 / 168,711</div><div class="l" id="o-total-l">traces kept overall (67.3%)</div></div>
-      <div class="vcell"><div class="v" id="o-span">−6.9%</div><div class="l">est. span-volume reduction</div></div>
-    </div>
-    <p class="exp-foot" id="exp-note"><b>The honest counterweight:</b> dropping 94.9% of boring
-      traces cuts span volume by only 6.9% — 65% of this window's traces carry an error, and
-      the policy keeps every one of them.</p>
-    <p class="exp-src">Recomputed from the recorded replay of 168,711 real traces / 8,953,804 spans
-      (<span class="mono">assets/live-findings.json</span>, scan of 2026-07-18). The 21 policy
-      positions offered here were each replayed through the same simulator that produced the
-      verdict above; the shipped default (750 ms / 5%) reproduces that record exactly.</p>
-  </div>
+      <div class="exp-head">
+        <div class="verdict-line">
+          <span class="verdict-stamp" id="exp-verdict">✓ VERDICT: SAFE</span>
+          <span class="verdict-policy" id="exp-policy">keep errors + keep ≥ 750 ms + sample 5% of the rest</span>
+        </div>
+      </div>
+      <div class="exp-out readout" aria-live="polite">
+        <div class="cell"><div class="v"><span class="keep" id="o-err">110,430</span> / 110,430</div><div class="l lab">error traces kept (100%)</div></div>
+        <div class="cell"><div class="v"><span class="keep" id="o-slow">145 / 145</span></div><div class="l lab" id="o-slow-l">slow traces kept (100%)</div></div>
+        <div class="cell"><div class="v" id="o-boring">2,947 / 58,136</div><div class="l lab" id="o-boring-l">boring traces kept (5.1%)</div></div>
+        <div class="cell"><div class="v" id="o-total">113,522 / 168,711</div><div class="l lab" id="o-total-l">traces kept overall (67.3%)</div></div>
+        <div class="cell"><div class="v" id="o-span">−6.9%</div><div class="l lab">est. span-volume reduction</div></div>
+      </div>
+      <!-- the meter needle: shows the span-volume reduction the readout above
+           already computed, on a 0–100% scale, so the ceiling is visible. -->
+      <div class="meter" aria-hidden="true">
+        <div class="meter-top">
+          <span class="lab">Meter · span volume removed</span>
+          <span class="lab">full scale = 100% of all spans</span>
+        </div>
+        <div class="meter-track"><div class="meter-fill" id="meter-fill"></div></div>
+      </div>
+      <p class="exp-foot" id="exp-note"><b>The honest counterweight:</b> dropping 94.9% of boring
+        traces cuts span volume by only 6.9% — 65% of this window's traces carry an error, and
+        the policy keeps every one of them.</p>
+      <p class="exp-src">Recomputed from the recorded replay of 168,711 real traces / 8,953,804 spans
+        (<span class="mono">assets/live-findings.json</span>, scan of 2026-07-18). The 21 policy
+        positions offered here were each replayed through the same simulator that produced the
+        verdict above; the shipped default (750 ms / 5%) reproduces that record exactly.</p>
+    </section>
 
-  <div class="section-h" id="findings">All findings <span class="chip">26 total, priced against the scan window</span></div>
-  <div class="table-scroll">
-  <table>
-    <thead><tr>
-      <th>#</th><th>Sev</th><th>Category</th><th>Finding</th>
-      <th class="num">GB/mo</th><th class="num">$/mo</th>
-    </tr></thead>
-    <tbody>
-<tr class="sev-high"><td class="mono id">F-001</td><td><span class="sev-badge sev-high">HIGH</span></td><td class="mono cat">traces</td><td class="finding">7801417 near-identical success spans are prime tail-sampling candidates</td><td class="num mono">9.7</td><td class="num mono">$2.90</td></tr>
-<tr class="sev-high"><td class="mono id">F-003</td><td><span class="sev-badge sev-high">HIGH</span></td><td class="mono cat">metrics</td><td class="finding">86 more metrics are written but read by no dashboard or alert</td><td class="num mono">0.3</td><td class="num mono">$0.08</td></tr>
-<tr class="sev-high"><td class="mono id">F-004</td><td><span class="sev-badge sev-high">HIGH</span></td><td class="mono cat">metrics</td><td class="finding">Metric &quot;signoz_latency.bucket&quot; is written but read by no dashboard or alert</td><td class="num mono">0.3</td><td class="num mono">$0.08</td></tr>
-<tr class="sev-high"><td class="mono id">F-006</td><td><span class="sev-badge sev-high">HIGH</span></td><td class="mono cat">metrics</td><td class="finding">Metric &quot;http.server.duration.bucket&quot; is written but read by no dashboard or alert</td><td class="num mono">0.0</td><td class="num mono">$0.01</td></tr>
-<tr class="sev-high"><td class="mono id">F-007</td><td><span class="sev-badge sev-high">HIGH</span></td><td class="mono cat">metrics</td><td class="finding">Metric &quot;http.server.response.size.bucket&quot; is written but read by no dashboard or alert</td><td class="num mono">0.0</td><td class="num mono">$0.01</td></tr>
-<tr class="sev-high"><td class="mono id">F-008</td><td><span class="sev-badge sev-high">HIGH</span></td><td class="mono cat">metrics</td><td class="finding">Metric &quot;checkout.cart.value.bucket&quot; is written but read by no dashboard or alert</td><td class="num mono">0.0</td><td class="num mono">$0.01</td></tr>
-<tr class="sev-high"><td class="mono id">F-009</td><td><span class="sev-badge sev-high">HIGH</span></td><td class="mono cat">metrics</td><td class="finding">Metric &quot;otel.sdk.metric_reader.collection.duration.bucket&quot; is written but read by no dashboard or alert</td><td class="num mono">0.0</td><td class="num mono">$0.01</td></tr>
-<tr class="sev-high"><td class="mono id">F-024</td><td><span class="sev-badge sev-high">HIGH</span></td><td class="mono cat">metrics</td><td class="finding">Unbounded ID &quot;session.id&quot; is a metric label on browser.sessions.count</td><td class="num mono">—</td><td class="num mono">—</td></tr>
-<tr class="sev-medium"><td class="mono id">F-002</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">logs</td><td class="finding">INFO firehose: checkout is 35% of your log volume</td><td class="num mono">1.9</td><td class="num mono">$0.58</td></tr>
-<tr class="sev-medium"><td class="mono id">F-010</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;url.full&quot; has 57315 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.01</td></tr>
-<tr class="sev-medium"><td class="mono id">F-011</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;db.statement&quot; has 54630 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
-<tr class="sev-medium"><td class="mono id">F-012</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;shipping.tracking.id&quot; has 53051 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
-<tr class="sev-medium"><td class="mono id">F-013</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;payment.transaction.id&quot; has 53243 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
-<tr class="sev-medium"><td class="mono id">F-014</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;app.shipping.tracking.id&quot; has 53045 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
-<tr class="sev-medium"><td class="mono id">F-015</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;app.payment.transaction.id&quot; has 53062 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
-<tr class="sev-medium"><td class="mono id">F-016</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;app.order.id&quot; has 65591 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
-<tr class="sev-medium"><td class="mono id">F-017</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;http.url&quot; has 10068 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
-<tr class="sev-medium"><td class="mono id">F-018</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;order.id&quot; has 68176 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
-<tr class="sev-medium"><td class="mono id">F-019</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;app.email.message_id&quot; has 54780 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
-<tr class="sev-medium"><td class="mono id">F-020</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;app.email.recipient&quot; has 10011 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
-<tr class="sev-medium"><td class="mono id">F-021</td><td><span class="sev-badge sev-medium">MEDIUM</span></td><td class="mono cat">traces</td><td class="finding">Span attribute &quot;app.user.id&quot; has 43377 distinct values</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
-<tr class="sev-low"><td class="mono id">F-005</td><td><span class="sev-badge sev-low">LOW</span></td><td class="mono cat">traces</td><td class="finding">Browser RUM telemetry bill: &quot;browser-frontend&quot; ships 120358 session spans across 1 sessions</td><td class="num mono">0.2</td><td class="num mono">$0.05</td></tr>
-<tr class="sev-low"><td class="mono id">F-022</td><td><span class="sev-badge sev-low">LOW</span></td><td class="mono cat">traces</td><td class="finding">Browser RUM telemetry bill: &quot;meridian-web&quot; ships 223 session spans across 38 sessions</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
-<tr class="sev-low"><td class="mono id">F-023</td><td><span class="sev-badge sev-low">LOW</span></td><td class="mono cat">traces</td><td class="finding">AI-agent telemetry bill: &quot;argus&quot; ships 35 gen_ai spans (204665 tokens tracked)</td><td class="num mono">0.0</td><td class="num mono">$0.00</td></tr>
-<tr class="sev-low"><td class="mono id">F-025</td><td><span class="sev-badge sev-low">LOW</span></td><td class="mono cat">quality</td><td class="finding">Cardinality discipline held: 2 unbounded ID attribute(s) stay off metric labels</td><td class="num mono">—</td><td class="num mono">—</td></tr>
-<tr class="sev-low"><td class="mono id">F-026</td><td><span class="sev-badge sev-low">LOW</span></td><td class="mono cat">quality</td><td class="finding">demo-app mixes severity casing (&quot;Info&quot;)</td><td class="num mono">—</td><td class="num mono">—</td></tr>
-    </tbody>
-  </table>
-  </div>
-  <p class="disclaimer">Estimates are uncompressed-ingest figures extrapolated from the scan window;
-    findings shown as “—” are directional (cardinality / quality risks that are not reliably priceable).
-    TELELENS profilers are read-only — nothing is applied without a human running <span class="mono">foundryctl cast</span>.</p>
+    <section>
+      <div class="rubric" id="findings">
+        <h2>All findings</h2>
+        <span class="note">26 total, priced against the scan window</span>
+      </div>
+      <div class="ledger-wrap" id="ledger">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Sev</th><th>Category</th><th>Finding</th>
+          <th class="r">GB/mo</th><th class="r">$/mo</th>
+        </tr></thead>
+        <tbody>
+<tr class="sev-high"><td class="id">F-001</td><td class="sev">High</td><td class="cat">traces</td><td class="finding">7801417 near-identical success spans are prime tail-sampling candidates</td><td class="r">9.7</td><td class="r">$2.90</td></tr>
+<tr class="sev-high"><td class="id">F-003</td><td class="sev">High</td><td class="cat">metrics</td><td class="finding">86 more metrics are written but read by no dashboard or alert</td><td class="r">0.3</td><td class="r">$0.08</td></tr>
+<tr class="sev-high"><td class="id">F-004</td><td class="sev">High</td><td class="cat">metrics</td><td class="finding">Metric &quot;signoz_latency.bucket&quot; is written but read by no dashboard or alert</td><td class="r">0.3</td><td class="r">$0.08</td></tr>
+<tr class="sev-high"><td class="id">F-006</td><td class="sev">High</td><td class="cat">metrics</td><td class="finding">Metric &quot;http.server.duration.bucket&quot; is written but read by no dashboard or alert</td><td class="r">0.0</td><td class="r">$0.01</td></tr>
+<tr class="sev-high"><td class="id">F-007</td><td class="sev">High</td><td class="cat">metrics</td><td class="finding">Metric &quot;http.server.response.size.bucket&quot; is written but read by no dashboard or alert</td><td class="r">0.0</td><td class="r">$0.01</td></tr>
+<tr class="sev-high"><td class="id">F-008</td><td class="sev">High</td><td class="cat">metrics</td><td class="finding">Metric &quot;checkout.cart.value.bucket&quot; is written but read by no dashboard or alert</td><td class="r">0.0</td><td class="r">$0.01</td></tr>
+<tr class="sev-high"><td class="id">F-009</td><td class="sev">High</td><td class="cat">metrics</td><td class="finding">Metric &quot;otel.sdk.metric_reader.collection.duration.bucket&quot; is written but read by no dashboard or alert</td><td class="r">0.0</td><td class="r">$0.01</td></tr>
+<tr class="sev-high"><td class="id">F-024</td><td class="sev">High</td><td class="cat">metrics</td><td class="finding">Unbounded ID &quot;session.id&quot; is a metric label on browser.sessions.count</td><td class="r">—</td><td class="r">—</td></tr>
+<tr class="sev-medium"><td class="id">F-002</td><td class="sev">Medium</td><td class="cat">logs</td><td class="finding">INFO firehose: checkout is 35% of your log volume</td><td class="r">1.9</td><td class="r">$0.58</td></tr>
+<tr class="sev-medium"><td class="id">F-010</td><td class="sev">Medium</td><td class="cat">traces</td><td class="finding">Span attribute &quot;url.full&quot; has 57315 distinct values</td><td class="r">0.0</td><td class="r">$0.01</td></tr>
+<tr class="sev-medium"><td class="id">F-011</td><td class="sev">Medium</td><td class="cat">traces</td><td class="finding">Span attribute &quot;db.statement&quot; has 54630 distinct values</td><td class="r">0.0</td><td class="r">$0.00</td></tr>
+<tr class="sev-medium"><td class="id">F-012</td><td class="sev">Medium</td><td class="cat">traces</td><td class="finding">Span attribute &quot;shipping.tracking.id&quot; has 53051 distinct values</td><td class="r">0.0</td><td class="r">$0.00</td></tr>
+<tr class="sev-medium"><td class="id">F-013</td><td class="sev">Medium</td><td class="cat">traces</td><td class="finding">Span attribute &quot;payment.transaction.id&quot; has 53243 distinct values</td><td class="r">0.0</td><td class="r">$0.00</td></tr>
+<tr class="sev-medium"><td class="id">F-014</td><td class="sev">Medium</td><td class="cat">traces</td><td class="finding">Span attribute &quot;app.shipping.tracking.id&quot; has 53045 distinct values</td><td class="r">0.0</td><td class="r">$0.00</td></tr>
+<tr class="sev-medium"><td class="id">F-015</td><td class="sev">Medium</td><td class="cat">traces</td><td class="finding">Span attribute &quot;app.payment.transaction.id&quot; has 53062 distinct values</td><td class="r">0.0</td><td class="r">$0.00</td></tr>
+<tr class="sev-medium"><td class="id">F-016</td><td class="sev">Medium</td><td class="cat">traces</td><td class="finding">Span attribute &quot;app.order.id&quot; has 65591 distinct values</td><td class="r">0.0</td><td class="r">$0.00</td></tr>
+<tr class="sev-medium"><td class="id">F-017</td><td class="sev">Medium</td><td class="cat">traces</td><td class="finding">Span attribute &quot;http.url&quot; has 10068 distinct values</td><td class="r">0.0</td><td class="r">$0.00</td></tr>
+<tr class="sev-medium"><td class="id">F-018</td><td class="sev">Medium</td><td class="cat">traces</td><td class="finding">Span attribute &quot;order.id&quot; has 68176 distinct values</td><td class="r">0.0</td><td class="r">$0.00</td></tr>
+<tr class="sev-medium"><td class="id">F-019</td><td class="sev">Medium</td><td class="cat">traces</td><td class="finding">Span attribute &quot;app.email.message_id&quot; has 54780 distinct values</td><td class="r">0.0</td><td class="r">$0.00</td></tr>
+<tr class="sev-medium"><td class="id">F-020</td><td class="sev">Medium</td><td class="cat">traces</td><td class="finding">Span attribute &quot;app.email.recipient&quot; has 10011 distinct values</td><td class="r">0.0</td><td class="r">$0.00</td></tr>
+<tr class="sev-medium"><td class="id">F-021</td><td class="sev">Medium</td><td class="cat">traces</td><td class="finding">Span attribute &quot;app.user.id&quot; has 43377 distinct values</td><td class="r">0.0</td><td class="r">$0.00</td></tr>
+<tr class="sev-low"><td class="id">F-005</td><td class="sev">Low</td><td class="cat">traces</td><td class="finding">Browser RUM telemetry bill: &quot;browser-frontend&quot; ships 120358 session spans across 1 sessions</td><td class="r">0.2</td><td class="r">$0.05</td></tr>
+<tr class="sev-low"><td class="id">F-022</td><td class="sev">Low</td><td class="cat">traces</td><td class="finding">Browser RUM telemetry bill: &quot;meridian-web&quot; ships 223 session spans across 38 sessions</td><td class="r">0.0</td><td class="r">$0.00</td></tr>
+<tr class="sev-low"><td class="id">F-023</td><td class="sev">Low</td><td class="cat">traces</td><td class="finding">AI-agent telemetry bill: &quot;argus&quot; ships 35 gen_ai spans (204665 tokens tracked)</td><td class="r">0.0</td><td class="r">$0.00</td></tr>
+<tr class="sev-low"><td class="id">F-025</td><td class="sev">Low</td><td class="cat">quality</td><td class="finding">Cardinality discipline held: 2 unbounded ID attribute(s) stay off metric labels</td><td class="r">—</td><td class="r">—</td></tr>
+<tr class="sev-low"><td class="id">F-026</td><td class="sev">Low</td><td class="cat">quality</td><td class="finding">demo-app mixes severity casing (&quot;Info&quot;)</td><td class="r">—</td><td class="r">—</td></tr>
+        </tbody>
+        <tfoot><tr>
+          <td class="lbl" colspan="4">Total identified savings · 26 findings</td>
+          <td class="r">12.5</td><td class="r cash">$3.75</td>
+        </tr></tfoot>
+      </table>
+      </div>
+      <p class="fine bill-foot">Estimates are uncompressed-ingest figures extrapolated from the scan window;
+        findings shown as “—” are directional (cardinality / quality risks that are not reliably priceable).
+        TELELENS profilers are read-only — nothing is applied without a human running <span class="mono">foundryctl cast</span>.</p>
+    </section>
+
+  </article>
 </main>
 
 <footer class="footer">
@@ -502,6 +867,20 @@ a.fam:hover{text-decoration:underline;text-underline-offset:3px}
     </div>
   </div>
 </footer>
+
+<div id="tour" role="dialog" aria-modal="true" aria-labelledby="tour-title" tabindex="-1">
+  <div id="tour-hole" aria-hidden="true"></div>
+  <div id="tour-card">
+    <p class="step-n"><span id="tour-count">Step 1 of 5</span><span class="esc">Esc to close</span></p>
+    <h3 id="tour-title"></h3>
+    <p id="tour-body"></p>
+    <div class="tour-nav">
+      <button class="tour-quiet" id="tour-back" type="button">← Back</button>
+      <button class="tour-quiet" id="tour-skip" type="button">Skip</button>
+      <button class="tour-next" id="tour-next" type="button">Next →</button>
+    </div>
+  </div>
+</div>
 
 <script>
 /* TELELENS policy explorer — no dependencies, no network.
@@ -564,6 +943,8 @@ function tlRender(){
   tlEl('o-total').textContent = tlNum(keptTraces) + ' / ' + tlNum(TL.totalTraces);
   tlEl('o-total-l').textContent = 'traces kept overall (' + tlPct(keptTraces, TL.totalTraces) + '%)';
   tlEl('o-span').textContent = (reduction === 0 ? '' : '−') + reduction.toFixed(1) + '%';
+  /* Skin only: the meter needle mirrors the reduction already shown above. */
+  tlEl('meter-fill').style.width = reduction.toFixed(1) + '%';
 
   var dropped = tlPct(row.boring - boringKept, row.boring);
   var errShare = tlPct(TL.errorTraces, TL.totalTraces);
@@ -584,7 +965,150 @@ function tlRender(){
   tlEl('exp-note').innerHTML = note;
 }
 
+/* Theme. Dark is the default; the OS preference decides when the reader has
+   not chosen. The button is labelled with the mode it switches TO. */
+function tlCurrentTheme(){
+  var set = document.documentElement.getAttribute('data-theme');
+  if (set === 'light' || set === 'dark') return set;
+  return (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches)
+    ? 'light' : 'dark';
+}
+function tlSyncThemeButton(){
+  var now = tlCurrentTheme();
+  tlEl('theme-label').textContent = now === 'dark' ? 'Light paper' : 'Dark desk';
+  var b = tlEl('theme-toggle');
+  b.setAttribute('aria-pressed', now === 'light' ? 'true' : 'false');
+  b.setAttribute('aria-label', now === 'dark' ? 'Switch to the light theme'
+                                              : 'Switch to the dark theme');
+}
+function tlToggleTheme(){
+  var next = tlCurrentTheme() === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('tl-theme', next); } catch (e) {}
+  tlSyncThemeButton();
+}
+
+/* ---------------------------------------------------------------- tour ----
+ * "What am I looking at?" — five stops, in the order the bill reads. Every
+ * figure quoted here is a figure already printed on the page.
+ */
+var TOUR = [
+  { sel: '.whatis', title: 'A bill for your telemetry',
+    body: 'TELELENS is a read-only profiler you point at your own SigNoz: it prices the waste, ' +
+      'proves a fix is safe, and writes the collector config for a human to review. This page is ' +
+      'one real scan of our demo instance — 26 findings from a 7-day window — rendered as the bill it is.' },
+  { sel: '.stamped', title: 'The stamp, and its counterweight',
+    body: 'Tail sampling drops 94.9% of “boring” traces. That is not 95% off the bill: because every ' +
+      'error and every trace ≥ 750 ms is kept in full, total span volume falls only 6.9%. Both numbers ' +
+      'are the point — the second is what makes the first trustworthy.' },
+  { sel: '#proof', title: 'It refuses to drop errors',
+    body: 'Before anything is applied, the policy is replayed over all 168,711 real traces in the window. ' +
+      '110,430 of 110,430 error traces and 145 of 145 slow traces survive — that is what makes the verdict ' +
+      'SAFE. A policy that lost one error trace exits non-zero.' },
+  { sel: '.exp-controls', title: 'Now move it yourself',
+    body: 'These controls are not an interpolation: each of the 21 positions was replayed through the same ' +
+      'simulator that produced the verdict above. Drag the sample-rate slider and watch the meter and the ' +
+      'counterweight answer — go ahead, try it now.' },
+  { sel: '#ledger', title: 'The itemised bill',
+    body: 'All 26 findings, priced in GB/mo and $/mo against the scan window, totalling 12.5 GB/mo ≈ $3.75/mo. ' +
+      'Rows shown as “—” are directional risks that are not reliably priceable. Running this against your own ' +
+      'instance is one command from the repo.' }
+];
+var tourAt = -1, tourReturn = null;
+
+function tlReduced(){
+  return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+function tlPlaceTour(){
+  if (tourAt < 0) return;
+  var el = document.querySelector(TOUR[tourAt].sel);
+  if (!el) return;
+  var r = el.getBoundingClientRect();
+  var pad = 8, card = tlEl('tour-card'), sheet = window.innerWidth <= 760;
+  /* as a bottom sheet the card owns the lower part of the screen, so the
+     spotlight is only allowed the space above it */
+  var floor = sheet ? Math.max(120, window.innerHeight - card.offsetHeight - 12)
+                    : window.innerHeight - 4;
+  var top = Math.max(4, r.top - pad), left = Math.max(4, r.left - pad);
+  var w = Math.min(r.width + pad * 2, window.innerWidth - 8);
+  var h = Math.min(r.height + pad * 2, floor - top);
+  if (h < 56) { top = Math.max(4, Math.min(top, floor - 56)); h = 56; }
+  var hole = tlEl('tour-hole');
+  hole.style.top = top + 'px'; hole.style.left = left + 'px';
+  hole.style.width = w + 'px'; hole.style.height = h + 'px';
+
+  if (sheet) { card.style.left = ''; card.style.top = ''; return; }
+  var cw = card.offsetWidth, ch = card.offsetHeight, gap = 14;
+  var ct = top + h + gap;
+  if (ct + ch > window.innerHeight - 8) ct = Math.max(8, top - ch - gap);
+  if (ct + ch > window.innerHeight - 8) ct = Math.max(8, window.innerHeight - ch - 8);
+  var cl = Math.min(Math.max(8, left), window.innerWidth - cw - 8);
+  card.style.top = ct + 'px'; card.style.left = cl + 'px';
+}
+function tlTourGo(i){
+  if (i < 0 || i >= TOUR.length) return tlTourEnd();
+  tourAt = i;
+  var step = TOUR[i];
+  var el = document.querySelector(step.sel);
+  if (el) {
+    if (window.innerWidth <= 760) {
+      /* bottom sheet: park the step's subject just under the top edge, without
+         animation, so the spotlight always has the room above the card */
+      window.scrollTo(0, window.pageYOffset + el.getBoundingClientRect().top - 14);
+    } else {
+      el.scrollIntoView({ block: 'center', behavior: tlReduced() ? 'auto' : 'smooth' });
+    }
+  }
+  tlEl('tour-count').textContent = 'Step ' + (i + 1) + ' of ' + TOUR.length;
+  tlEl('tour-title').textContent = step.title;
+  tlEl('tour-body').textContent = step.body;
+  tlEl('tour-back').hidden = (i === 0);
+  tlEl('tour-next').textContent = (i === TOUR.length - 1) ? 'Done' : 'Next →';
+  if (window.innerWidth > 760) setTimeout(tlPlaceTour, tlReduced() ? 0 : 300);
+  tlPlaceTour();
+}
+function tlTourStart(){
+  tourReturn = (document.activeElement && document.activeElement !== document.body)
+    ? document.activeElement : tlEl('tour-start');
+  tlEl('tour').setAttribute('data-open', '');
+  document.body.classList.add('tour-open');
+  tlTourGo(0);
+  tlEl('tour-next').focus();
+}
+function tlTourEnd(){
+  tourAt = -1;
+  tlEl('tour').removeAttribute('data-open');
+  document.body.classList.remove('tour-open');
+  if (tourReturn && tourReturn.focus) tourReturn.focus();
+}
+function tlTourKeys(e){
+  if (tourAt < 0) return;
+  if (e.key === 'Escape') { e.preventDefault(); tlTourEnd(); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); tlTourGo(tourAt + 1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); tlTourGo(tourAt - 1); }
+  else if (e.key === 'Tab') {
+    /* keep focus inside the card while the dialog is open */
+    var f = tlEl('tour-card').querySelectorAll('button:not([hidden])');
+    if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    else if (!tlEl('tour-card').contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function(){
+  tlEl('tour-start').addEventListener('click', tlTourStart);
+  tlEl('tour-next').addEventListener('click', function(){ tlTourGo(tourAt + 1); });
+  tlEl('tour-back').addEventListener('click', function(){ tlTourGo(tourAt - 1); });
+  tlEl('tour-skip').addEventListener('click', tlTourEnd);
+  document.addEventListener('keydown', tlTourKeys);
+  window.addEventListener('resize', tlPlaceTour);
+  window.addEventListener('scroll', tlPlaceTour, { passive: true });
+  if (/[?&]tour=1(&|$)/.test(window.location.search)) tlTourStart();
+
+  tlEl('theme-toggle').addEventListener('click', tlToggleTheme);
+  tlSyncThemeButton();
   tlEl('exp-pct').addEventListener('input', tlRender);
   Array.prototype.forEach.call(document.querySelectorAll('input[name="tl-lat"]'), function(r){
     r.addEventListener('change', tlRender);
