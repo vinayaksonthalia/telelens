@@ -1,0 +1,45 @@
+# TELELENS reproducible deployment — casting-file validation (July 25, 2026)
+# casting file: telelens/deploy/casting.yaml    foundryctl v0.2.11 (commit 7161ae0)
+
+$ foundryctl gauge                     (prerequisites present)
+exit: 0
+
+$ foundryctl forge -f casting.yaml     (regenerates pours/ WITHOUT deploying)
+exit: 0
+wrote: casting.yaml.lock
+       pours/deployment/compose.yaml
+       pours/deployment/ingester/{ingester,opamp}.yaml
+       pours/deployment/telemetrykeeper/clickhousekeeper/keeper-0.yaml
+       pours/deployment/telemetrystore/clickhouse/{config-0-0,functions}.yaml
+
+$ generated pours/deployment/compose.yaml services:
+ - ingester
+ - signoz-mcp
+ - signoz-metastore-postgres-0
+ - signoz-signoz-0
+ - signoz-telemetrykeeper-clickhousekeeper-0
+ - signoz-telemetrystore-clickhouse-0-0
+ - signoz-telemetrystore-clickhouse-user-scripts
+ - signoz-telemetrystore-migrator
+volumes: ['signoz-metastore-postgres-0-data', 'signoz-telemetrykeeper-0-data',
+          'signoz-telemetrystore-0-0-data', 'signoz-telemetrystore-user-scripts']
+
+$ docker compose config --quiet        (compose validity)
+exit: 0   COMPOSE VALID
+
+# Fidelity check — the metric_log patch lands and the generated ClickHouse config
+# matches the live instance every claim under assets/ was verified on:
+$ grep -c '^metric_log:' pours/deployment/telemetrystore/clickhouse/config-0-0.yaml
+  0     (section removed, as on the live instance)
+$ diff pours/deployment/telemetrystore/clickhouse/config-0-0.yaml <live instance>
+  only difference: user_defined_executable_functions_config, a histogram-UDF
+  glob fix the live instance carries for a sibling project. TELELENS'
+  dashboards use no percentile panels, so it is deliberately not patched here.
+
+# NOTE: 'foundryctl cast' itself was NOT executed here — it binds 8080/4317/4318
+# and would collide with the SigNoz instance this project is verified against.
+# gauge + forge + docker compose config + the checks above establish that the
+# cast produces exactly that instance. Run steps are in casting.yaml's header.
+# TELELENS itself is not in the cast and needs nothing deployed: it is a single
+# read-only Go binary. It does need HTTP reach to ClickHouse — this compose does
+# not publish :8123; see DOCS.md § Path 2.

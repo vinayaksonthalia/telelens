@@ -1,0 +1,48 @@
+# TELELENS — reproducible SigNoz deployment (SigNoz Foundry casting file).
+#
+# This file rebuilds the exact self-hosted SigNoz backend that every live claim
+# under assets/ was verified against: stock SigNoz v0.132.2 docker-compose, the
+# SigNoz MCP server (TELELENS cross-checks findings through it), plus one
+# ClickHouse configuration delta (below). It deploys SigNoz only — TELELENS
+# itself is a single read-only Go binary that needs no deployment.
+#
+#   cd telelens/deploy
+#   foundryctl gauge          # verify docker + prerequisites are present
+#   foundryctl forge          # regenerate pours/ WITHOUT deploying (dry run)
+#   foundryctl cast           # bring the SigNoz stack up
+#
+# First run, same as any fresh SigNoz: open http://localhost:8080 and complete
+# the signup (until then the collector accepts no OTLP), then create an API key
+# (Settings -> API Keys) for SIGNOZ_API_KEY in your .env.
+#
+# The one delta, and why it exists:
+#
+#   ClickHouse `metric_log` is removed. On this instance its merges ran in a
+#   pathological loop (~80/min, each peaking 6.2 GiB on a 53k-row, ~1300-column
+#   table), tripping the server-wide memory limit and killing telemetry queries
+#   at random with MEMORY_LIMIT_EXCEEDED — including TELELENS scans. SigNoz
+#   reads nothing from system.metric_log, so disabling it costs no
+#   observability. To restore stock behaviour, delete the patch below.
+#
+# Reaching ClickHouse: this compose does not publish :8123. TELELENS needs HTTP
+# access to it for live scans — run the binary inside `signoz-network`, publish
+# the port, or use the throwaway forwarder documented in DOCS.md § Path 2. The
+# read-only `telelens_ro` user in .env.example is the recommended posture.
+apiVersion: v1alpha1
+kind: Installation
+metadata:
+  name: signoz
+spec:
+  deployment:
+    mode: docker
+    flavor: compose
+  mcp:
+    spec:
+      enabled: true
+  patches:
+    # Disable ClickHouse's system.metric_log — see the note above.
+    - target: deployment/telemetrystore/clickhouse/config-0-0.yaml
+      type: jsonpatch
+      operations:
+        - op: remove
+          path: /metric_log

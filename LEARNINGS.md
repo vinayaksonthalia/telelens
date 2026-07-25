@@ -122,5 +122,5 @@ config file's own comment block.
 ## If you're joining this codebase
 
 Start with `assets/README.md` (evidence index), then run Path 1 in DOCS.md.
-`go build ./... && go test ./...` must be green (38 tests across 7 packages)
+`go build ./... && go test ./...` must be green (41 tests, 86 subtests, 7 packages)
 before you believe anything else.

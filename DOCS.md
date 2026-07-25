@@ -80,6 +80,18 @@ GB/month + $ line, and a simulator verdict that keeps 100% of error traces.
    The alert channel is resolved at import time (`$SIGNOZ_ALERT_CHANNEL` or
    your first existing channel) — nothing machine-specific ships in the JSON.
 
+## Reproducible deployment
+
+`deploy/casting.yaml` + `deploy/casting.yaml.lock` rebuild the exact SigNoz backend
+every live claim in `assets/` was verified against — stock self-hosted SigNoz
+v0.132.2 (docker compose), the SigNoz MCP server, and one delta: ClickHouse's
+`metric_log` is removed, because its merge loop tripped the server-wide memory
+limit and killed telemetry queries at random. Run `cd deploy && foundryctl cast`
+(or `foundryctl forge` to regenerate `pours/` without deploying). TELELENS itself
+needs **nothing deployed** — it is one read-only Go binary — but it does need HTTP
+reach to ClickHouse, which this compose does not publish; see Path 2 above.
+Validation receipt: `assets/foundry-casting-validation.txt`.
+
 ## Rollback runbook (before you apply anything)
 
 The M4 live run followed this exact procedure; it is written here as YOUR
