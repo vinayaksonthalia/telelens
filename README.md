@@ -152,23 +152,29 @@ Pricing is deliberately transparent — uncompressed-ingest bytes × 30 days × 
 
 ## Architecture
 
+The product is a loop: find the waste, price it, prove the fix is safe on your own
+traces, hand a human the config, then watch the guardrails. Numbers below are the
+live-verified ones from [`assets/`](assets/).
+
+```mermaid
+%%{init: {'flowchart': {'rankSpacing': 40, 'nodeSpacing': 30, 'wrappingWidth': 340}}}%%
+flowchart TD
+  CH[("ClickHouse :8123<br/>SELECT only")] --> SCAN
+  API[("SigNoz API :8080<br/>GET only")] --> SCAN
+  SCAN["1 · scan — six profilers, read-only<br/>26 findings in 3.74 s"]
+  SCAN --> PRICE["2 · price — uncompressed GB × 30 days × your cost per GB<br/>risks that cannot be priced ship as directional, not padded"]
+  PRICE --> SIM{"3 · prove — replay the policy over<br/>162,760 of your own traces"}
+  SIM -->|"UNSAFE — one error trace would be lost"| STOP["exit 1, nothing is generated"]
+  SIM -->|"SAFE — 31 / 31 error traces kept, every slow trace kept"| GEN["4 · generate → out/ — collector-fragment.yaml + casting-patch.yaml<br/>the drop-metrics block ships commented out, under a review banner"]
+  GEN --> REVIEW{{"a human reads the diff — TELELENS applies nothing"}}
+  REVIEW --> CAST["the operator runs foundryctl cast<br/>−95.0% span storage measured (~6% on an error-storm day)"]
+  CAST --> GUARD["5 · guardrails — 3 dashboards + 3 alert rules<br/>ingest falls off a cliff, the error-span panel stays flat"]
+  GUARD -.->|"next scan window"| SCAN
 ```
-      ClickHouse :8123 ──SELECT only──┐            ┌── SigNoz API :8080 (GET only)
-                                      ▼            ▼
-                       ┌──────────── telelens (Go, one binary) ───────────┐
-                       │ store: TelemetryStore ── clickhouse | fixtures   │
-                       │ profilers: traces · logs · metrics · usage-xref  │
-                       │            · data-quality · ecosystem            │
-                       │ analyzers: Drain template miner · pricing ·      │
-                       │            tail-sampling simulator (safety proof) │
-                       │ generators (only writes = files in out/):        │
-                       │   waste-report.md · findings.json                │
-                       │   collector-fragment.yaml · casting-patch.yaml   │
-                       └──────────────────────────────────────────────────┘
-                                      │
-                       human reviews out/, merges the casting patch,
-                       runs `foundryctl cast` — TELELENS never applies anything
-```
+
+<p align="center">
+  <img src="assets/illustrations/04-system-architecture.png" alt="How TELELENS hangs together: ClickHouse (SELECT only) and the SigNoz API (GET only) feed the profilers (traces, logs, metrics, ecosystem), which feed the analyzers (cardinality, Drain log templates, tail-sampling simulator), which emit the priced waste report, the collector fragment and casting patch a human applies, the Telemetry Bill dashboards, and the guardrail rules plus the --json agent surface. Read-only by design: the client refuses anything but SELECT/GET." width="900">
+</p>
 
 **Read-only by design (the product invariant).** Profilers issue only ClickHouse `SELECT`s and SigNoz `GET`s; the live client refuses non-SELECT statements in code, and `.env.example` documents the least-privilege `telelens_ro` ClickHouse user that enforces it at the database. The only writes are files in `out/`. (Foundry is SigNoz's official deployment tool — [github.com/SigNoz/foundry](https://github.com/SigNoz/foundry); `foundryctl cast` applies a *casting*, its config.)
 
