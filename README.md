@@ -10,6 +10,8 @@
 
 The first waste it ever found was ClickHouse's own `system.metric_log` — ~80 merges a minute, 6.2 GiB peaks, OOM-killing the very scan that discovered it.
 
+▶ **Watch it work (3:42):** https://youtu.be/lZKU3A7t5GM
+
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Go 1.24+](https://img.shields.io/badge/go-1.24%2B-00ADD8.svg)](go.mod)
 [![Last commit](https://img.shields.io/github/last-commit/vinayaksonthalia/telelens.svg)](https://github.com/vinayaksonthalia/telelens/commits)
