@@ -1,0 +1,322 @@
+{
+  "generated_at": "2026-07-25T00:31:40.447622Z",
+  "source": "clickhouse (http://localhost:8123, window=7d)",
+  "window_days": 7,
+  "cost_per_gb": 0.3,
+  "scan_duration": "5.944s",
+  "total_savings_gb_per_month": 2.4969865331634447,
+  "total_savings_usd_per_month": 0.7490959599490331,
+  "findings": [
+    {
+      "id": "F-001",
+      "category": "traces",
+      "severity": "high",
+      "title": "1856787 near-identical success spans are prime tail-sampling candidates",
+      "evidence": [
+        "catalog \"catalog.db_query\": 169007 near-identical spans, error rate 0.000%, distinct-duration ratio 0.25",
+        "catalog \"catalog.cache_check\": 169007 near-identical spans, error rate 0.000%, distinct-duration ratio 0.06",
+        "catalog \"catalog.enrich_pricing\": 169006 near-identical spans, error rate 0.000%, distinct-duration ratio 0.13",
+        "catalog \"catalog.lookup_products\": 169006 near-identical spans, error rate 0.000%, distinct-duration ratio 0.30",
+        "checkout \"checkout.validate_cart\": 118079 near-identical spans, error rate 0.000%, distinct-duration ratio 0.26",
+        "checkout \"checkout.apply_discount\": 118078 near-identical spans, error rate 0.000%, distinct-duration ratio 0.16",
+        "gateway \"gateway.auth_middleware\": 118077 near-identical spans, error rate 0.000%, distinct-duration ratio 0.11",
+        "payment \"payment.fraud_check\": 118077 near-identical spans, error rate 0.000%, distinct-duration ratio 0.41",
+        "checkout \"checkout.process_order\": 118077 near-identical spans, error rate 0.000%, distinct-duration ratio 0.77",
+        "payment \"payment.validate_card\": 118076 near-identical spans, error rate 0.000%, distinct-duration ratio 0.22",
+        "payment \"payment.gateway_call\": 118075 near-identical spans, error rate 0.000%, distinct-duration ratio 0.73",
+        "payment \"payment.charge_card\": 118075 near-identical spans, error rate 0.000%, distinct-duration ratio 0.75",
+        "gateway \"gateway.build_response\": 118074 near-identical spans, error rate 0.000%, distinct-duration ratio 0.05",
+        "gateway \"gateway.handle_checkout_request\": 118073 near-identical spans, error rate 0.000%, distinct-duration ratio 0.77"
+      ],
+      "est_gb_per_month": 2.2739209160205873,
+      "est_usd_per_month": 0.6821762748061762,
+      "remediation": "Add a tail_sampling processor: keep 100% of errors, keep traces \u003e= 750 ms, sample the remaining successes at 5%. Run `telelens simulate` for the safety proof.",
+      "fix": {
+        "kind": "tail_sampling",
+        "sampling_pct": 5,
+        "latency_threshold_ms": 750
+      }
+    },
+    {
+      "id": "F-002",
+      "category": "metrics",
+      "severity": "high",
+      "title": "Metric \"checkout.cart.value.bucket\" is written but read by no dashboard or alert",
+      "evidence": [
+        "metric=checkout.cart.value.bucket series=16 samples_in_window=325120; checked 31 dashboards and 21 alert rules — zero references"
+      ],
+      "est_gb_per_month": 0.044587885714285715,
+      "est_usd_per_month": 0.013376365714285713,
+      "remediation": "Stop shipping \"checkout.cart.value.bucket\": drop it at the collector (filter processor) or remove the instrument. Caveat: telelens can only see SigNoz dashboards and alert rules — if an external consumer (federated Prometheus, another pipeline) reads this metric, keep it and delete its line from the generated filter block during review.",
+      "fix": {
+        "kind": "drop_metric",
+        "metric": "checkout.cart.value.bucket"
+      }
+    },
+    {
+      "id": "F-003",
+      "category": "metrics",
+      "severity": "high",
+      "title": "36 more metrics are written but read by no dashboard or alert",
+      "evidence": [
+        "36 further unread metrics totaling 284783 samples in window; checked 31 dashboards and 21 alert rules — zero references",
+        "full list: checkout.cart.value.sum, checkout.cart.value.min, checkout.cart.value.count, checkout.cart.value.max, checkout.orders.count, http.server.duration.count, http.server.duration.sum, http.server.duration.min, http.server.response.size.count, http.server.response.size.min, http.server.response.size.sum, http.server.duration.max, http.server.response.size.max, http.server.active_requests, http.server.request.size.count, http.server.request.size.sum, http.server.request.size.max, http.server.request.size.min, http.client.duration.count, http.client.duration.min, http.client.duration.sum, http.client.duration.max, browser.web_vitals.ttfb.count, browser.web_vitals.ttfb.min, browser.web_vitals.ttfb.sum, browser.web_vitals.ttfb.max, browser.web_vitals.lcp.sum, browser.web_vitals.lcp.max, browser.web_vitals.fcp.sum, browser.web_vitals.lcp.min, browser.web_vitals.fcp.max, browser.web_vitals.fcp.min, browser.web_vitals.fcp.count, browser.web_vitals.inp.min, browser.web_vitals.inp.max, browser.web_vitals.inp.sum"
+      ],
+      "est_gb_per_month": 0.03905595428571428,
+      "est_usd_per_month": 0.011716786285714284,
+      "remediation": "Same story at lower volume: drop them at the collector, or delete the instruments. The generated filter/drop_unread_metrics block lists every name (it ships commented-out — verify external consumers, then uncomment).",
+      "fix": {
+        "kind": "drop_metric",
+        "metric": "checkout.cart.value.sum",
+        "metrics": [
+          "checkout.cart.value.min",
+          "checkout.cart.value.count",
+          "checkout.cart.value.max",
+          "checkout.orders.count",
+          "http.server.duration.count",
+          "http.server.duration.sum",
+          "http.server.duration.min",
+          "http.server.response.size.count",
+          "http.server.response.size.min",
+          "http.server.response.size.sum",
+          "http.server.duration.max",
+          "http.server.response.size.max",
+          "http.server.active_requests",
+          "http.server.request.size.count",
+          "http.server.request.size.sum",
+          "http.server.request.size.max",
+          "http.server.request.size.min",
+          "http.client.duration.count",
+          "http.client.duration.min",
+          "http.client.duration.sum",
+          "http.client.duration.max",
+          "browser.web_vitals.ttfb.count",
+          "browser.web_vitals.ttfb.min",
+          "browser.web_vitals.ttfb.sum",
+          "browser.web_vitals.ttfb.max",
+          "browser.web_vitals.lcp.sum",
+          "browser.web_vitals.lcp.max",
+          "browser.web_vitals.fcp.sum",
+          "browser.web_vitals.lcp.min",
+          "browser.web_vitals.fcp.max",
+          "browser.web_vitals.fcp.min",
+          "browser.web_vitals.fcp.count",
+          "browser.web_vitals.inp.min",
+          "browser.web_vitals.inp.max",
+          "browser.web_vitals.inp.sum"
+        ]
+      }
+    },
+    {
+      "id": "F-004",
+      "category": "metrics",
+      "severity": "high",
+      "title": "Metric \"http.server.duration.bucket\" is written but read by no dashboard or alert",
+      "evidence": [
+        "metric=http.server.duration.bucket series=528 samples_in_window=244960; checked 31 dashboards and 21 alert rules — zero references"
+      ],
+      "est_gb_per_month": 0.033594514285714284,
+      "est_usd_per_month": 0.010078354285714285,
+      "remediation": "Stop shipping \"http.server.duration.bucket\": drop it at the collector (filter processor) or remove the instrument. Caveat: telelens can only see SigNoz dashboards and alert rules — if an external consumer (federated Prometheus, another pipeline) reads this metric, keep it and delete its line from the generated filter block during review.",
+      "fix": {
+        "kind": "drop_metric",
+        "metric": "http.server.duration.bucket"
+      }
+    },
+    {
+      "id": "F-005",
+      "category": "metrics",
+      "severity": "high",
+      "title": "Metric \"http.server.response.size.bucket\" is written but read by no dashboard or alert",
+      "evidence": [
+        "metric=http.server.response.size.bucket series=528 samples_in_window=244960; checked 31 dashboards and 21 alert rules — zero references"
+      ],
+      "est_gb_per_month": 0.033594514285714284,
+      "est_usd_per_month": 0.010078354285714285,
+      "remediation": "Stop shipping \"http.server.response.size.bucket\": drop it at the collector (filter processor) or remove the instrument. Caveat: telelens can only see SigNoz dashboards and alert rules — if an external consumer (federated Prometheus, another pipeline) reads this metric, keep it and delete its line from the generated filter block during review.",
+      "fix": {
+        "kind": "drop_metric",
+        "metric": "http.server.response.size.bucket"
+      }
+    },
+    {
+      "id": "F-006",
+      "category": "metrics",
+      "severity": "high",
+      "title": "Metric \"http.server.request.size.bucket\" is written but read by no dashboard or alert",
+      "evidence": [
+        "metric=http.server.request.size.bucket series=256 samples_in_window=126208; checked 31 dashboards and 21 alert rules — zero references"
+      ],
+      "est_gb_per_month": 0.017308525714285712,
+      "est_usd_per_month": 0.0051925577142857135,
+      "remediation": "Stop shipping \"http.server.request.size.bucket\": drop it at the collector (filter processor) or remove the instrument. Caveat: telelens can only see SigNoz dashboards and alert rules — if an external consumer (federated Prometheus, another pipeline) reads this metric, keep it and delete its line from the generated filter block during review.",
+      "fix": {
+        "kind": "drop_metric",
+        "metric": "http.server.request.size.bucket"
+      }
+    },
+    {
+      "id": "F-007",
+      "category": "traces",
+      "severity": "medium",
+      "title": "Span attribute \"url.full\" has 57315 distinct values",
+      "evidence": [
+        "key=\"url.full\" cardinality=57315 occurrences=65037 avg value 60B — bloats attribute indexes and filter latency"
+      ],
+      "est_gb_per_month": 0.016677711428571426,
+      "est_usd_per_month": 0.005003313428571428,
+      "remediation": "No action needed for cost — span cardinality is cheap here. Watch two edges: \"url.full\" must never become a metric label, and if its values grow large the jumbo-attribute finding will propose a truncation.",
+      "fix": {
+        "kind": "none",
+        "attribute": "url.full"
+      }
+    },
+    {
+      "id": "F-008",
+      "category": "metrics",
+      "severity": "high",
+      "title": "Metric \"http.client.duration.bucket\" is written but read by no dashboard or alert",
+      "evidence": [
+        "metric=http.client.duration.bucket series=160 samples_in_window=73392; checked 31 dashboards and 21 alert rules — zero references"
+      ],
+      "est_gb_per_month": 0.01006518857142857,
+      "est_usd_per_month": 0.003019556571428571,
+      "remediation": "Stop shipping \"http.client.duration.bucket\": drop it at the collector (filter processor) or remove the instrument. Caveat: telelens can only see SigNoz dashboards and alert rules — if an external consumer (federated Prometheus, another pipeline) reads this metric, keep it and delete its line from the generated filter block during review.",
+      "fix": {
+        "kind": "drop_metric",
+        "metric": "http.client.duration.bucket"
+      }
+    },
+    {
+      "id": "F-009",
+      "category": "traces",
+      "severity": "high",
+      "title": "Span attribute \"order.id\" has 158675 distinct values",
+      "evidence": [
+        "key=\"order.id\" cardinality=158675 occurrences=192612 avg value 12B — bloats attribute indexes and filter latency"
+      ],
+      "est_gb_per_month": 0.00990563142857143,
+      "est_usd_per_month": 0.002971689428571429,
+      "remediation": "No action needed for cost — span cardinality is cheap here. Watch two edges: \"order.id\" must never become a metric label, and if its values grow large the jumbo-attribute finding will propose a truncation.",
+      "fix": {
+        "kind": "none",
+        "attribute": "order.id"
+      }
+    },
+    {
+      "id": "F-010",
+      "category": "logs",
+      "severity": "medium",
+      "title": "INFO firehose: gateway is 76% of your log volume",
+      "evidence": [
+        "service=gateway severity=INFO: 9266 records, 0.00 GB in window — 76% of ALL log bytes",
+        "dominant template (973 occurrences): \"HTTP Request: \u003c*\u003e \u003c*\u003e \\\"HTTP/1.1 200 OK\\\"\""
+      ],
+      "est_gb_per_month": 0.008493822857142857,
+      "est_usd_per_month": 0.002548146857142857,
+      "remediation": "Review \"gateway\"'s chattiest INFO templates: demote per-request noise to DEBUG (then filter), or aggregate to metrics. Not auto-dropped: INFO may carry real signal.",
+      "fix": {
+        "kind": "none",
+        "service": "gateway"
+      }
+    },
+    {
+      "id": "F-011",
+      "category": "traces",
+      "severity": "medium",
+      "title": "Span attribute \"app.order.id\" has 65591 distinct values",
+      "evidence": [
+        "key=\"app.order.id\" cardinality=65591 occurrences=65581 avg value 25B — bloats attribute indexes and filter latency"
+      ],
+      "est_gb_per_month": 0.00702696,
+      "est_usd_per_month": 0.0021080879999999997,
+      "remediation": "No action needed for cost — span cardinality is cheap here. Watch two edges: \"app.order.id\" must never become a metric label, and if its values grow large the jumbo-attribute finding will propose a truncation.",
+      "fix": {
+        "kind": "none",
+        "attribute": "app.order.id"
+      }
+    },
+    {
+      "id": "F-012",
+      "category": "logs",
+      "severity": "medium",
+      "title": "INFO firehose: orders is 23% of your log volume",
+      "evidence": [
+        "service=orders severity=INFO: 2759 records, 0.00 GB in window — 23% of ALL log bytes",
+        "dominant template (946 occurrences): \"HTTP Request: POST http://payments:8092/charge \\\"HTTP/1.1 200 OK\\\"\""
+      ],
+      "est_gb_per_month": 0.0025326342857142853,
+      "est_usd_per_month": 0.0007597902857142856,
+      "remediation": "Review \"orders\"'s chattiest INFO templates: demote per-request noise to DEBUG (then filter), or aggregate to metrics. Not auto-dropped: INFO may carry real signal.",
+      "fix": {
+        "kind": "none",
+        "service": "orders"
+      }
+    },
+    {
+      "id": "F-013",
+      "category": "traces",
+      "severity": "low",
+      "title": "Browser RUM telemetry bill: \"meridian-web\" ships 170 session spans across 21 sessions",
+      "evidence": [
+        "service=meridian-web spans_with_session.id=170 sessions=21 attr_bytes=864 (2.5 KB/session uncompressed)"
+      ],
+      "est_gb_per_month": 0.0002222742857142857,
+      "est_usd_per_month": 0.00006668228571428571,
+      "remediation": "Attribution, not waste: this is the frontend-observability bill. Scale it by expected sessions/month before rollout; RUM SDK sampleRate is the knob.",
+      "fix": {
+        "kind": "none",
+        "service": "meridian-web"
+      }
+    },
+    {
+      "id": "F-014",
+      "category": "traces",
+      "severity": "medium",
+      "title": "9 more span attributes exceed 10000 distinct values",
+      "evidence": [
+        "attributes (cardinality): app.email.message_id (54780), db.statement (54630), payment.transaction.id (53243), app.payment.transaction.id (53062), shipping.tracking.id (53051), app.shipping.tracking.id (53045), app.user.id (43377), http.url (10068), app.email.recipient (10011) — same advisory as above: cheap on spans, dangerous as metric labels"
+      ],
+      "est_gb_per_month": 0,
+      "est_usd_per_month": 0,
+      "remediation": "Same advisory at lower rank: none of these needs action for cost; keep every one of them off metric labels.",
+      "fix": {
+        "kind": "none"
+      }
+    },
+    {
+      "id": "F-015",
+      "category": "quality",
+      "severity": "low",
+      "title": "Cardinality discipline held: 2 unbounded ID attribute(s) stay off metric labels",
+      "evidence": [
+        "order.id (158675 distinct values on spans)",
+        "user.id (500 distinct values on spans)",
+        "these IDs live on spans (where cardinality is free) and appear on NO metric series — exactly right"
+      ],
+      "est_gb_per_month": 0,
+      "est_usd_per_month": 0,
+      "remediation": "Nothing to fix — keep it this way. This is the discipline the label-bomb findings ask for.",
+      "fix": {
+        "kind": "none"
+      }
+    }
+  ],
+  "simulation": {
+    "policy": {
+      "sampling_pct": 5,
+      "latency_threshold_ms": 750
+    },
+    "total_traces": 75586,
+    "kept_traces": 3974,
+    "error_traces": 27,
+    "errors_kept": 27,
+    "slow_traces": 22,
+    "slow_kept": 22,
+    "boring_traces": 75537,
+    "boring_kept": 3925,
+    "total_spans": 845103,
+    "kept_spans": 44655,
+    "safe": true
+  }
+}

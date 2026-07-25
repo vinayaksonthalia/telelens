@@ -204,7 +204,7 @@ WHERE tag_data_type = 'string'
 GROUP BY key
 HAVING cardinality > 100
 ORDER BY cardinality DESC
-LIMIT 50` + chSettings)
+LIMIT 50`+chSettings)
 }
 
 // JumboAttributes finds attributes whose values are disproportionately large.

@@ -7,10 +7,47 @@ package ui
 
 import (
 	"fmt"
+	"os"
 	"strings"
+	"time"
 
 	"github.com/charmbracelet/lipgloss"
 )
+
+// bgDetectBudget caps how long we wait for the terminal to answer the OSC 11
+// "what is your background colour?" query that AdaptiveColor needs.
+const bgDetectBudget = 250 * time.Millisecond
+
+// rnd is the renderer every style below is built from. It is deliberately a
+// dedicated renderer rather than lipgloss's package-level default: the default
+// serialises all of its methods behind one mutex, so an in-flight background
+// probe would block every Render call for the full OSC timeout. With a private
+// renderer we can resolve the probe on the default renderer, apply the answer
+// here, and never contend with it.
+var rnd = lipgloss.NewRenderer(os.Stdout)
+
+// init resolves the terminal background once, with a deadline.
+//
+// AdaptiveColor needs to know whether the terminal is light or dark, which
+// lipgloss answers by sending an OSC 11 query and waiting up to five seconds
+// for a reply. Terminals that never reply — `script`, `docker run -t`, some
+// multiplexer and CI configurations — spend that full five seconds, so a scan
+// that finishes in 18 ms shows nothing at all and looks hung. Resolving it
+// once, up front, with a short budget keeps answering terminals exact (they
+// reply in single-digit milliseconds) and caps silent ones at 250 ms.
+// Measured on a non-answering pty: 5.02 s to first output before, 0.27 s after.
+func init() {
+	rnd.SetColorProfile(rnd.ColorProfile()) // env-only detection; no terminal query
+	dark := make(chan bool, 1)
+	go func() { dark <- lipgloss.HasDarkBackground() }()
+	select {
+	case d := <-dark:
+		rnd.SetHasDarkBackground(d)
+	case <-time.After(bgDetectBudget):
+		// No answer in time: assume dark, the overwhelmingly common default.
+		rnd.SetHasDarkBackground(true)
+	}
+}
 
 // TELELENS accent (teal — "efficiency, cool and clinical") + shared severity
 // palette. Severity colors are semantic and never repurposed.
@@ -24,19 +61,19 @@ var (
 		"low":      {Light: "#6B7280", Dark: "#9CA3AF"},
 	}
 
-	header    = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.AdaptiveColor{Light: "#6B7280", Dark: "#9CA3AF"})
-	hairline  = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#D1D5DB", Dark: "#374151"})
-	bold      = lipgloss.NewStyle().Bold(true)
-	dim       = lipgloss.NewStyle().Faint(true)
-	accentSty = lipgloss.NewStyle().Foreground(Accent).Bold(true)
-	safeSty   = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#16A34A", Dark: "#22C55E"}).Bold(true)
-	unsafeSty = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#DC2626", Dark: "#EF4444"}).Bold(true)
+	header    = rnd.NewStyle().Bold(true).Foreground(lipgloss.AdaptiveColor{Light: "#6B7280", Dark: "#9CA3AF"})
+	hairline  = rnd.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#D1D5DB", Dark: "#374151"})
+	bold      = rnd.NewStyle().Bold(true)
+	dim       = rnd.NewStyle().Faint(true)
+	accentSty = rnd.NewStyle().Foreground(Accent).Bold(true)
+	safeSty   = rnd.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#16A34A", Dark: "#22C55E"}).Bold(true)
+	unsafeSty = rnd.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#DC2626", Dark: "#EF4444"}).Bold(true)
 )
 
 // Severity renders a severity token in its semantic color.
 func Severity(s string) string {
 	if c, ok := sevColors[strings.ToLower(s)]; ok {
-		return lipgloss.NewStyle().Foreground(c).Render(s)
+		return rnd.NewStyle().Foreground(c).Render(s)
 	}
 	return s
 }

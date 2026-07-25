@@ -508,4 +508,3 @@ func cmdSimulate(args []string) error {
 	}
 	return nil
 }
-
